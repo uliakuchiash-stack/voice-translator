@@ -1,15 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html lang="uk">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Voice Translator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f7f7f8;
+    }
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    button {
+      padding: 14px 22px;
+      border: none;
+      border-radius: 12px;
+      background: black;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      margin-top: 16px;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    .status {
+      margin-top: 14px;
+      color: #444;
+    }
+  </style>
 </head>
 <body>
-  <h1>Voice Translator</h1>
-  <button onclick="start()">Start</button>
+  <div class="card">
+    <h1>Voice Translator</h1>
+    <button id="speakBtn">🎤 Speak</button>
+    <div class="status" id="status">Натисни Speak</div>
+    <textarea id="output" placeholder="Тут з’явиться твій текст..."></textarea>
+  </div>
 
   <script>
-    function start() {
-      alert("Voice will be here later");
+    const speakBtn = document.getElementById("speakBtn");
+    const statusEl = document.getElementById("status");
+    const outputEl = document.getElementById("output");
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      statusEl.textContent = "У цьому браузері голосове розпізнавання не підтримується.";
+      speakBtn.disabled = true;
+    } else {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "uk-UA";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      speakBtn.addEventListener("click", () => {
+        outputEl.value = "";
+        statusEl.textContent = "Слухаю...";
+        recognition.start();
+      });
+
+      recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript;
+        outputEl.value = text;
+        statusEl.textContent = "Готово";
+      };
+
+      recognition.onerror = (event) => {
+        statusEl.textContent = "Помилка: " + event.error;
+      };
+
+      recognition.onend = () => {
+        if (!outputEl.value) {
+          statusEl.textContent = "Спробуй ще раз";
+        }
+      };
     }
   </script>
 </body>
