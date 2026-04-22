@@ -1,30 +1,145 @@
-if (!SpeechRecognition) {
-      statusEl.textContent = "У цьому браузері голосове розпізнавання не підтримується.";
-      speakBtn.disabled = true;
-    } else {
-      const recognition = new SpeechRecognition();
-      recognition.lang = "uk-UA";
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Voice Translator</title>
 
-      speakBtn.addEventListener("click", () => {
-        statusEl.textContent = "Слухаю...";
-        recognition.start();
-      });
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f0f12;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-      recognition.onresult = (event) => {
-        const text = event.results[0][0].transcript;
-        outputEl.value = text;
-        statusEl.textContent = "Текст розпізнано. Натисни Translate";
-      };
+.container {
+  width: 90%;
+  max-width: 600px;
+  background: #1a1a20;
+  padding: 20px;
+  border-radius: 16px;
+}
 
-      recognition.onerror = (event) => {
-        statusEl.textContent = "Помилка мікрофона: " + event.error;
-      };
+textarea {
+  width: 100%;
+  height: 120px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  resize: none;
+}
 
-      recognition.onend = () => {
-      };
-    }
-  </script>
+button {
+  margin-top: 10px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+}
+
+#mic {
+  background: #ff9800;
+}
+
+#translate {
+  background: #333;
+  color: white;
+}
+
+.status {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #aaa;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>🎤 Voice Translator</h2>
+
+  <textarea id="input" placeholder="Говори або пиши..."></textarea>
+  <textarea id="output" placeholder="Переклад..." readonly></textarea>
+
+  <button id="mic">🎤 Speak</button>
+  <button id="translate">Translate</button>
+
+  <div class="status" id="status">Ready</div>
+</div>
+
+<script>
+const micBtn = document.getElementById("mic");
+const translateBtn = document.getElementById("translate");
+const input = document.getElementById("input");
+const output = document.getElementById("output");
+const status = document.getElementById("status");
+
+let recognition;
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+  recognition = new SpeechRecognition();
+  recognition.lang = "uk-UA";
+
+  recognition.onstart = () => {
+    status.textContent = "Listening...";
+  };
+
+  recognition.onresult = (e) => {
+    input.value = e.results[0][0].transcript;
+    status.textContent = "Got text. Press Translate";
+  };
+
+  recognition.onerror = (e) => {
+    status.textContent = "Mic error: " + e.error;
+  };
+
+} else {
+  status.textContent = "Speech not supported";
+  micBtn.disabled = true;
+}
+
+micBtn.onclick = () => {
+  if (recognition) recognition.start();
+};
+
+translateBtn.onclick = async () => {
+  if (!input.value.trim()) {
+    status.textContent = "No text";
+    return;
+  }
+
+  status.textContent = "Translating...";
+
+  try {
+    const res = await fetch("/api/translate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ text: input.value })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error);
+
+    output.value = data.translation;
+    status.textContent = "Done";
+
+  } catch (err) {
+    status.textContent = "Error: " + err.message;
+  }
+};
+</script>
+
 </body>
 </html>
