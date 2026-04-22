@@ -18,6 +18,14 @@
       border-radius: 16px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     }
+    h1 {
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+    p.sub {
+      margin-top: 0;
+      color: #666;
+    }
     button {
       padding: 14px 22px;
       border: none;
@@ -44,21 +52,54 @@
     .status {
       margin-top: 14px;
       color: #444;
+      min-height: 24px;
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 12px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    select {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+    .label {
+      font-size: 14px;
+      color: #444;
     }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>Voice Translator</h1>
-    <button id="speakBtn">🎤 Speak</button>
+    <p class="sub">Говори українською — AI перекладе природною англійською</p>
+
+    <div class="row">
+      <span class="label">Translate to:</span>
+      <select id="targetLang">
+        <option value="English" selected>English</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <button id="speakBtn">🎤 Speak</button>
+    </div>
+
     <div class="status" id="status">Натисни Speak</div>
-    <textarea id="output" placeholder="Тут з’явиться твій текст..."></textarea>
+
+    <textarea id="output" placeholder="Тут з’явиться переклад..."></textarea>
   </div>
 
   <script>
     const speakBtn = document.getElementById("speakBtn");
     const statusEl = document.getElementById("status");
     const outputEl = document.getElementById("output");
+    const targetLangEl = document.getElementById("targetLang");
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -77,22 +118,9 @@
         recognition.start();
       });
 
-      recognition.onresult = (event) => {
+      recognition.onresult = async (event) => {
         const text = event.results[0][0].transcript;
-        outputEl.value = text;
-        statusEl.textContent = "Готово";
-      };
+        statusEl.textContent = "Перекладаю...";
 
-      recognition.onerror = (event) => {
-        statusEl.textContent = "Помилка: " + event.error;
-      };
-
-      recognition.onend = () => {
-        if (!outputEl.value) {
-          statusEl.textContent = "Спробуй ще раз";
-        }
-      };
-    }
-  </script>
-</body>
-</html>
+        try {
+          const response =
