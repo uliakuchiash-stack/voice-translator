@@ -1,109 +1,4 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Voice Translator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 20px;
-      background: #f7f7f8;
-    }
-    .card {
-      background: white;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
-    h1 {
-      margin-top: 0;
-      margin-bottom: 8px;
-    }
-    p.sub {
-      margin-top: 0;
-      color: #666;
-    }
-    button {
-      padding: 14px 22px;
-      border: none;
-      border-radius: 12px;
-      background: black;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    textarea {
-      width: 100%;
-      min-height: 140px;
-      margin-top: 16px;
-      padding: 14px;
-      font-size: 16px;
-      border-radius: 12px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-    .status {
-      margin-top: 14px;
-      color: #444;
-      min-height: 24px;
-    }
-    .row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      margin-top: 12px;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-    select {
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 15px;
-    }
-    .label {
-      font-size: 14px;
-      color: #444;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h1>Voice Translator</h1>
-    <p class="sub">Говори українською — AI перекладе природною англійською</p>
-
-    <div class="row">
-      <span class="label">Translate to:</span>
-      <select id="targetLang">
-        <option value="English" selected>English</option>
-      </select>
-    </div>
-
-    <div class="row">
-      <button id="speakBtn">🎤 Speak</button>
-    </div>
-
-    <div class="status" id="status">Натисни Speak</div>
-
-    <textarea id="output" placeholder="Тут з’явиться переклад..."></textarea>
-  </div>
-
-  <script>
-    const speakBtn = document.getElementById("speakBtn");
-    const statusEl = document.getElementById("status");
-    const outputEl = document.getElementById("output");
-    const targetLangEl = document.getElementById("targetLang");
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
+if (!SpeechRecognition) {
       statusEl.textContent = "У цьому браузері голосове розпізнавання не підтримується.";
       speakBtn.disabled = true;
     } else {
@@ -113,14 +8,23 @@
       recognition.maxAlternatives = 1;
 
       speakBtn.addEventListener("click", () => {
-        outputEl.value = "";
         statusEl.textContent = "Слухаю...";
         recognition.start();
       });
 
-      recognition.onresult = async (event) => {
+      recognition.onresult = (event) => {
         const text = event.results[0][0].transcript;
-        statusEl.textContent = "Перекладаю...";
+        outputEl.value = text;
+        statusEl.textContent = "Текст розпізнано. Натисни Translate";
+      };
 
-        try {
-          const response =
+      recognition.onerror = (event) => {
+        statusEl.textContent = "Помилка мікрофона: " + event.error;
+      };
+
+      recognition.onend = () => {
+      };
+    }
+  </script>
+</body>
+</html>
