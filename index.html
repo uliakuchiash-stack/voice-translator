@@ -59,6 +59,13 @@ textarea {
   resize: none;
 }
 
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
 .controls {
   display: flex;
   gap: 12px;
@@ -85,6 +92,11 @@ button {
   color: white;
 }
 
+#clearBtn {
+  background: #3a3a45;
+  color: white;
+}
+
 #output {
   background: #111114;
 }
@@ -94,6 +106,16 @@ button {
   color: #999;
   font-size: 14px;
 }
+
+@media (max-width: 700px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+}
 </style>
 </head>
 <body>
@@ -101,29 +123,60 @@ button {
 <div class="container">
   <h1>AI Voice Translator</h1>
   <div class="subtitle">
-    Speak Ukrainian → polished Ukrainian + natural English translation
+    Speak naturally → cleaned original text + natural English translation
   </div>
 
-  <label for="mode">Translation mode</label>
-  <select id="mode">
-    <option value="natural">Natural conversation</option>
-    <option value="street">Street / slang</option>
-    <option value="written">Written / polished</option>
-    <option value="formal">Formal</option>
-  </select>
+  <div class="grid">
+    <div>
+      <label for="sourceLang">Input language</label>
+      <select id="sourceLang">
+        <option value="uk-UA" selected>Ukrainian</option>
+        <option value="ru-RU">Russian</option>
+        <option value="be-BY">Belarusian</option>
+        <option value="pl-PL">Polish</option>
+        <option value="es-ES">Spanish</option>
+        <option value="de-DE">German</option>
+        <option value="fr-FR">French</option>
+        <option value="it-IT">Italian</option>
+        <option value="pt-PT">Portuguese</option>
+        <option value="tr-TR">Turkish</option>
+        <option value="hi-IN">Hindi</option>
+        <option value="ar-SA">Arabic</option>
+      </select>
+    </div>
 
-  <label for="input">Ukrainian</label>
+    <div>
+      <label for="targetVariant">English variant</label>
+      <select id="targetVariant">
+        <option value="en-US" selected>English (US)</option>
+        <option value="en-GB">English (UK)</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="mode">Translation mode</label>
+      <select id="mode">
+        <option value="natural" selected>Natural conversation</option>
+        <option value="street">Street / slang</option>
+        <option value="written">Writing / polished</option>
+        <option value="formal">Formal</option>
+      </select>
+    </div>
+  </div>
+
+  <label for="input">Original text</label>
   <textarea
     id="input"
-    placeholder="Говори або пиши українською..."
+    placeholder="Speak or type here..."
   ></textarea>
 
   <div class="controls">
     <button id="micBtn">🎤 Speak</button>
     <button id="translateBtn">Translate</button>
+    <button id="clearBtn">Clear</button>
   </div>
 
-  <label for="output">English</label>
+  <label for="output">English translation</label>
   <textarea
     id="output"
     placeholder="Translation will appear here..."
@@ -138,40 +191,92 @@ const input = document.getElementById("input");
 const output = document.getElementById("output");
 const micBtn = document.getElementById("micBtn");
 const translateBtn = document.getElementById("translateBtn");
+const clearBtn = document.getElementById("clearBtn");
 const status = document.getElementById("status");
 const mode = document.getElementById("mode");
+const sourceLang = document.getElementById("sourceLang");
+const targetVariant = document.getElementById("targetVariant");
 
 const SpeechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition;
 
 let recognition;
+let isListening = false;
 
-if (SpeechRecognition) {
-  recognition = new SpeechRecognition();
-  recognition.lang = "uk-UA";
-  recognition.interimResults = false;
-  recognition.continuous = false;
+function buildRecognition() {
+  if (!SpeechRecognition) return null;
 
-  recognition.onstart = () => {
+  const r = new SpeechRecognition();
+  r.lang = sourceLang.value;
+  r.interimResults = false;
+  r.continuous = true;
+
+  r.onstart = () => {
+    isListening = true;
     status.textContent = "Listening...";
   };
 
-  recognition.onresult = (event) => {
-    const text = event.results[0][0].transcript;
-    input.value = text;
-    status.textContent = "Speech captured";
+  r.onresult = (event) => {
+    let finalText = "";
+
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        finalText += event.results[i][0].transcript + " ";
+      }
+    }
+
+    if (finalText.trim()) {
+      input.value = (input.value + " " + finalText).replace(/\s+/g, " ").trim();
+      status.textContent = "Speech captured";
+    }
   };
 
-  recognition.onerror = (event) => {
+  r.onerror = (event) => {
     status.textContent = "Microphone error: " + event.error;
+    isListening = false;
   };
+
+  r.onend = () => {
+    isListening = false;
+    status.textContent = "Stopped listening";
+  };
+
+  return r;
+}
+
+if (SpeechRecognition) {
+  recognition = buildRecognition();
 } else {
   micBtn.disabled = true;
   status.textContent = "Speech recognition not supported";
 }
 
+sourceLang.addEventListener("change", () => {
+  if (isListening && recognition) {
+    recognition.stop();
+  }
+  recognition = buildRecognition();
+  status.textContent = "Input language updated";
+});
+
 micBtn.addEventListener("click", () => {
-  if (recognition) recognition.start();
+  if (!recognition) return;
+
+  if (isListening) {
+    recognition.stop();
+    status.textContent = "Stopping...";
+  } else {
+    recognition.start();
+  }
+});
+
+clearBtn.addEventListener("click", () => {
+  if (isListening && recognition) {
+    recognition.stop();
+  }
+  input.value = "";
+  output.value = "";
+  status.textContent = "Cleared";
 });
 
 translateBtn.addEventListener("click", async () => {
@@ -193,7 +298,9 @@ translateBtn.addEventListener("click", async () => {
       },
       body: JSON.stringify({
         text,
-        mode: mode.value
+        mode: mode.value,
+        sourceLanguage: sourceLang.options[sourceLang.selectedIndex].text,
+        targetVariant: targetVariant.value
       })
     });
 
@@ -204,8 +311,8 @@ translateBtn.addEventListener("click", async () => {
       return;
     }
 
-    if (data.polished_ukrainian) {
-      input.value = data.polished_ukrainian;
+    if (data.polished_source) {
+      input.value = data.polished_source;
     }
 
     if (data.translation) {
