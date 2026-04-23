@@ -4,141 +4,268 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>AI Voice Translator</title>
-
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #121316;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+:root{
+  --bg:#121316;
+  --card:#18181d;
+  --card-2:#23232b;
+  --text:#ffffff;
+  --muted:#aaaaaa;
+  --accent:#ffb347;
+  --btn:#3a3a45;
+  --border:rgba(255,255,255,0.08);
 }
 
-.container {
-  width: 90%;
-  max-width: 820px;
-  background: #18181d;
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  padding:24px;
+  transition:background .25s ease,color .25s ease;
 }
 
-h1 {
-  margin-bottom: 10px;
+.container{
+  width:100%;
+  max-width:920px;
+  background:var(--card);
+  border-radius:24px;
+  padding:28px;
+  box-shadow:0 12px 40px rgba(0,0,0,.35);
+  transition:background .25s ease;
 }
 
-.subtitle {
-  color: #aaa;
-  margin-bottom: 20px;
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+  margin-bottom:18px;
 }
 
-textarea, select {
-  width: 100%;
-  border: none;
-  outline: none;
-  border-radius: 14px;
-  padding: 16px;
-  font-size: 16px;
-  background: #23232b;
-  color: white;
-  margin-bottom: 16px;
-  box-sizing: border-box;
+h1{
+  margin:0 0 8px;
+  font-size:28px;
 }
 
-textarea {
-  min-height: 140px;
-  resize: none;
+.subtitle{
+  color:var(--muted);
+  font-size:15px;
 }
 
-label {
-  display: block;
-  margin-bottom: 8px;
-  color: #bbb;
-  font-size: 14px;
+.themeDots{
+  display:flex;
+  gap:10px;
+  padding-top:6px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+.themeDot{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.25);
+  cursor:pointer;
+  transition:transform .15s ease,border-color .15s ease;
+}
+.themeDot:hover{transform:scale(1.08)}
+.themeDot.active{border-color:#fff}
+
+label.sectionLabel{
+  display:block;
+  margin:16px 0 8px;
+  color:#d5d5d5;
+  font-size:14px;
+  font-weight:700;
 }
 
-.controls,
-.outputActions {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
+select, textarea{
+  width:100%;
+  border:none;
+  outline:none;
+  border-radius:16px;
+  padding:16px;
+  font-size:16px;
+  background:var(--card-2);
+  color:var(--text);
+  margin-bottom:12px;
+  transition:background .25s ease,color .25s ease;
 }
 
-button {
-  border: none;
-  border-radius: 14px;
-  padding: 14px 18px;
-  font-size: 15px;
-  cursor: pointer;
+textarea{
+  min-height:130px;
+  resize:vertical;
+  line-height:1.45;
 }
 
-#micBtn {
-  background: #ffb347;
-  color: black;
-  font-weight: bold;
+.grid3{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:12px;
 }
 
-#translateBtn {
-  flex: 1;
-  background: #2b2b35;
-  color: white;
+.pillGroup{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:10px;
 }
 
-.secondaryBtn {
-  background: #3a3a45;
-  color: white;
+.pill{
+  border:none;
+  border-radius:999px;
+  padding:11px 16px;
+  background:var(--btn);
+  color:var(--text);
+  cursor:pointer;
+  font-size:14px;
+  line-height:1.2;
+  transition:transform .15s ease,opacity .15s ease,background .25s ease;
+}
+.pill:hover{transform:translateY(-1px)}
+.pill.active{
+  background:var(--accent);
+  color:#111;
+  font-weight:700;
 }
 
-.status {
-  margin-top: 10px;
-  color: #999;
-  font-size: 14px;
+.pill small{
+  display:block;
+  font-size:11px;
+  opacity:.8;
+  margin-top:2px;
+}
+
+.controls, .outputActions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+
+button{
+  border:none;
+  border-radius:16px;
+  padding:14px 18px;
+  font-size:15px;
+  cursor:pointer;
+}
+
+#micBtn{
+  background:var(--accent);
+  color:#111;
+  font-weight:700;
+  min-width:120px;
+}
+
+#translateBtn{
+  flex:1;
+  background:var(--btn);
+  color:var(--text);
+}
+
+.secondaryBtn{
+  background:var(--btn);
+  color:var(--text);
+}
+
+.status{
+  margin-top:6px;
+  color:var(--muted);
+  font-size:14px;
+  min-height:18px;
+}
+
+@media (max-width:800px){
+  .grid3{grid-template-columns:1fr}
+  .topbar{flex-direction:column}
 }
 </style>
 </head>
 <body>
-
 <div class="container">
+  <div class="topbar">
+    <div>
+      <h1>AI Voice Translator</h1>
+      <div class="subtitle">Speak naturally → clean text + real English</div>
+    </div>
 
-  <h1>AI Voice Translator</h1>
-  <div class="subtitle">
-    Speak naturally → clean text + real English
+    <div class="themeDots" id="themeDots">
+      <div class="themeDot active" data-theme="dark" style="background:#121316"></div>
+      <div class="themeDot" data-theme="light" style="background:#F5F1EA"></div>
+      <div class="themeDot" data-theme="rose" style="background:#E8D7D4"></div>
+      <div class="themeDot" data-theme="ocean" style="background:#AEBBC6"></div>
+      <div class="themeDot" data-theme="khaki" style="background:#4F5B45"></div>
+    </div>
   </div>
 
-  <div class="grid">
+  <div class="grid3">
     <div>
-      <label>Style</label>
-      <select id="mode">
-        <option value="friendly">Friendly Talk</option>
-        <option value="street">Real Talk: Slang & Swearing 🔥</option>
-        <option value="formal">Formal & Professional</option>
+      <label class="sectionLabel" for="sourceLang">Input language</label>
+      <select id="sourceLang">
+        <option value="English">English</option>
+        <option value="Ukrainian" selected>Ukrainian</option>
+        <option value="Russian">Russian</option>
+        <option value="Polish">Polish</option>
+        <option value="Romanian (Romania / Moldova)">Romanian (Romania / Moldova)</option>
+        <option value="Lithuanian">Lithuanian</option>
+        <option value="Latvian">Latvian</option>
+        <option value="Portuguese">Portuguese</option>
+        <option value="Spanish">Spanish</option>
+        <option value="Italian">Italian</option>
+        <option value="German">German</option>
+        <option value="French">French</option>
+        <option value="Dutch">Dutch</option>
+        <option value="Turkish">Turkish</option>
+        <option value="Arabic">Arabic</option>
+        <option value="Hindi">Hindi</option>
+        <option value="Chinese">Chinese</option>
+        <option value="Japanese">Japanese</option>
+        <option value="Korean">Korean</option>
+        <option value="Czech">Czech</option>
+        <option value="Bulgarian">Bulgarian</option>
       </select>
     </div>
 
     <div>
-      <label>Output Format</label>
+      <label class="sectionLabel" for="targetVariant">English variant</label>
+      <select id="targetVariant">
+        <option value="en-US">English (US)</option>
+        <option value="en-GB" selected>English (UK)</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="sectionLabel" for="format">Output format</label>
       <select id="format">
-        <option value="chat">Chat Version</option>
+        <option value="chat" selected>Chat Version</option>
         <option value="email">Email Version</option>
       </select>
     </div>
   </div>
 
-  <label>Original Text</label>
-  <textarea
-    id="input"
-    placeholder="Speak or type here..."
-  ></textarea>
+  <label class="sectionLabel">English level</label>
+  <div class="pillGroup" id="levelGroup">
+    <button class="pill active" data-level="elementary">Elementary<small>A1–A2</small></button>
+    <button class="pill" data-level="everyday">Everyday<small>B1–B2</small></button>
+    <button class="pill" data-level="advanced">Advanced<small>C1–C2</small></button>
+    <button class="pill" data-level="native">Native</button>
+  </div>
+
+  <label class="sectionLabel">Style</label>
+  <div class="pillGroup" id="styleGroup">
+    <button class="pill active" data-style="friendly">Friendly Talk</button>
+    <button class="pill" data-style="street">Real Talk: Slang & Swearing 🔥</button>
+    <button class="pill" data-style="formal">Formal & Professional</button>
+  </div>
+
+  <label class="sectionLabel" for="input">Original text</label>
+  <textarea id="input" placeholder="Speak or type here..."></textarea>
 
   <div class="controls">
     <button id="micBtn">🎤 Speak</button>
@@ -147,12 +274,8 @@ button {
     <button id="copyInputBtn" class="secondaryBtn">Copy Original</button>
   </div>
 
-  <label>English Translation</label>
-  <textarea
-    id="output"
-    placeholder="Translation will appear here..."
-    readonly
-  ></textarea>
+  <label class="sectionLabel" for="output">English translation</label>
+  <textarea id="output" placeholder="Translation will appear here..." readonly></textarea>
 
   <div class="outputActions">
     <button id="speakBtn" class="secondaryBtn">🔊 Speak Translation</button>
@@ -160,7 +283,6 @@ button {
   </div>
 
   <div class="status" id="status">Ready</div>
-
 </div>
 
 <script>
@@ -172,61 +294,179 @@ const clearBtn = document.getElementById("clearBtn");
 const copyInputBtn = document.getElementById("copyInputBtn");
 const copyOutputBtn = document.getElementById("copyOutputBtn");
 const speakBtn = document.getElementById("speakBtn");
-const status = document.getElementById("status");
-const mode = document.getElementById("mode");
+const statusEl = document.getElementById("status");
+const sourceLang = document.getElementById("sourceLang");
+const targetVariant = document.getElementById("targetVariant");
 const format = document.getElementById("format");
+const themeDots = document.querySelectorAll(".themeDot");
 
-const SpeechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
+let selectedLevel = "elementary";
+let selectedStyle = "friendly";
 
-let recognition;
+document.querySelectorAll("#levelGroup .pill").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#levelGroup .pill").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedLevel = btn.dataset.level;
+  });
+});
+
+document.querySelectorAll("#styleGroup .pill").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#styleGroup .pill").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedStyle = btn.dataset.style;
+  });
+});
+
+const themes = {
+  dark: {
+    "--bg":"#121316",
+    "--card":"#18181d",
+    "--card-2":"#23232b",
+    "--text":"#ffffff",
+    "--muted":"#aaaaaa",
+    "--accent":"#ffb347",
+    "--btn":"#3a3a45"
+  },
+  light: {
+    "--bg":"#F5F1EA",
+    "--card":"#FFFFFF",
+    "--card-2":"#EEE8DF",
+    "--text":"#1E1E1E",
+    "--muted":"#666666",
+    "--accent":"#d09b3d",
+    "--btn":"#D9D2C7"
+  },
+  rose: {
+    "--bg":"#E8D7D4",
+    "--card":"#F3E8E6",
+    "--card-2":"#DFC9C6",
+    "--text":"#2A2020",
+    "--muted":"#6E5B5B",
+    "--accent":"#C9867A",
+    "--btn":"#D8B5AF"
+  },
+  ocean: {
+    "--bg":"#AEBBC6",
+    "--card":"#D5DEE5",
+    "--card-2":"#BCC9D3",
+    "--text":"#1F2A33",
+    "--muted":"#52606D",
+    "--accent":"#6E8FA8",
+    "--btn":"#A2B3C0"
+  },
+  khaki: {
+    "--bg":"#4F5B45",
+    "--card":"#5D6A52",
+    "--card-2":"#718063",
+    "--text":"#F4F2EC",
+    "--muted":"#D3D0C4",
+    "--accent":"#C9A76B",
+    "--btn":"#6B785F"
+  }
+};
+
+function applyTheme(name) {
+  const theme = themes[name];
+  for (const key in theme) {
+    document.documentElement.style.setProperty(key, theme[key]);
+  }
+  localStorage.setItem("ai_voice_theme", name);
+  themeDots.forEach(dot => dot.classList.remove("active"));
+  document.querySelector(`.themeDot[data-theme="${name}"]`)?.classList.add("active");
+}
+
+themeDots.forEach(dot => {
+  dot.addEventListener("click", () => applyTheme(dot.dataset.theme));
+});
+
+applyTheme(localStorage.getItem("ai_voice_theme") || "dark");
+
+const langMap = {
+  "English":"en-US",
+  "Ukrainian":"uk-UA",
+  "Russian":"ru-RU",
+  "Polish":"pl-PL",
+  "Romanian (Romania / Moldova)":"ro-RO",
+  "Lithuanian":"lt-LT",
+  "Latvian":"lv-LV",
+  "Portuguese":"pt-PT",
+  "Spanish":"es-ES",
+  "Italian":"it-IT",
+  "German":"de-DE",
+  "French":"fr-FR",
+  "Dutch":"nl-NL",
+  "Turkish":"tr-TR",
+  "Arabic":"ar-SA",
+  "Hindi":"hi-IN",
+  "Chinese":"zh-CN",
+  "Japanese":"ja-JP",
+  "Korean":"ko-KR",
+  "Czech":"cs-CZ",
+  "Bulgarian":"bg-BG"
+};
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
 let isListening = false;
 
-if (SpeechRecognition) {
-  recognition = new SpeechRecognition();
-  recognition.lang = "uk-UA";
-  recognition.continuous = true;
-  recognition.interimResults = false;
+function buildRecognition() {
+  if (!SpeechRecognition) return null;
+  const r = new SpeechRecognition();
+  r.lang = langMap[sourceLang.value] || "uk-UA";
+  r.continuous = true;
+  r.interimResults = false;
 
-  recognition.onstart = () => {
+  r.onstart = () => {
     isListening = true;
-    status.textContent = "Listening...";
+    statusEl.textContent = "Listening...";
   };
 
-  recognition.onresult = (event) => {
+  r.onresult = (event) => {
     let finalText = "";
-
     for (let i = event.resultIndex; i < event.results.length; i++) {
       if (event.results[i].isFinal) {
         finalText += event.results[i][0].transcript + " ";
       }
     }
-
     if (finalText.trim()) {
-      input.value = (input.value + " " + finalText)
-        .replace(/\s+/g, " ")
-        .trim();
-
-      status.textContent = "Speech captured";
+      input.value = (input.value + " " + finalText).replace(/\s+/g, " ").trim();
+      statusEl.textContent = "Speech captured";
     }
   };
 
-  recognition.onerror = (event) => {
-    status.textContent = "Microphone error: " + event.error;
+  r.onerror = (event) => {
+    statusEl.textContent = "Microphone error: " + event.error;
     isListening = false;
   };
 
-  recognition.onend = () => {
+  r.onend = () => {
     isListening = false;
-    status.textContent = "Stopped listening";
+    statusEl.textContent = "Stopped listening";
   };
+
+  return r;
 }
+
+if (SpeechRecognition) {
+  recognition = buildRecognition();
+} else {
+  micBtn.disabled = true;
+  statusEl.textContent = "Speech recognition not supported";
+}
+
+sourceLang.addEventListener("change", () => {
+  if (isListening && recognition) recognition.stop();
+  recognition = buildRecognition();
+  statusEl.textContent = "Input language updated";
+});
 
 micBtn.addEventListener("click", () => {
   if (!recognition) return;
-
   if (isListening) {
     recognition.stop();
+    statusEl.textContent = "Stopping...";
   } else {
     recognition.start();
   }
@@ -234,24 +474,24 @@ micBtn.addEventListener("click", () => {
 
 translateBtn.addEventListener("click", async () => {
   const text = input.value.trim();
-
   if (!text) {
-    status.textContent = "Enter text first";
+    statusEl.textContent = "Enter text first";
     return;
   }
 
-  status.textContent = "Translating...";
+  statusEl.textContent = "Translating...";
   output.value = "";
 
   try {
     const response = await fetch("/api/translate", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         text,
-        mode: mode.value,
+        sourceLanguage: sourceLang.value,
+        targetVariant: targetVariant.value,
+        level: selectedLevel,
+        mode: selectedStyle,
         format: format.value
       })
     });
@@ -259,55 +499,55 @@ translateBtn.addEventListener("click", async () => {
     const data = await response.json();
 
     if (!response.ok) {
-      status.textContent = data.error || "Translation failed";
+      statusEl.textContent = data.error || "Translation failed";
       return;
+    }
+
+    if (data.polished_source) {
+      input.value = data.polished_source;
     }
 
     if (data.translation) {
       output.value = data.translation;
-      status.textContent = "Done";
+      statusEl.textContent = "Done";
     } else {
-      status.textContent = "Translation failed";
+      statusEl.textContent = "Translation failed";
     }
-
-  } catch (error) {
-    status.textContent = "Server error";
+  } catch (e) {
+    statusEl.textContent = "Server error";
   }
 });
 
 clearBtn.addEventListener("click", () => {
+  if (isListening && recognition) recognition.stop();
   input.value = "";
   output.value = "";
-  status.textContent = "Cleared";
+  statusEl.textContent = "Cleared";
 });
 
 copyInputBtn.addEventListener("click", async () => {
   await navigator.clipboard.writeText(input.value);
-  status.textContent = "Original copied";
+  statusEl.textContent = "Original copied";
 });
 
 copyOutputBtn.addEventListener("click", async () => {
   await navigator.clipboard.writeText(output.value);
-  status.textContent = "Translation copied";
+  statusEl.textContent = "Translation copied";
 });
 
 speakBtn.addEventListener("click", () => {
   if (!output.value.trim()) {
-    status.textContent = "Nothing to speak";
+    statusEl.textContent = "Nothing to speak";
     return;
   }
-
   const utterance = new SpeechSynthesisUtterance(output.value);
-  utterance.lang = "en-GB";
+  utterance.lang = targetVariant.value;
   utterance.rate = 1;
   utterance.pitch = 1;
-
   speechSynthesis.cancel();
   speechSynthesis.speak(utterance);
-
-  status.textContent = "Playing voice...";
+  statusEl.textContent = "Playing voice...";
 });
 </script>
-
 </body>
 </html>
