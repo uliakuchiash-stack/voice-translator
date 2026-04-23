@@ -4,7 +4,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { text, mode } = req.body || {};
+    const {
+      text,
+      mode = "natural",
+      sourceLanguage = "Ukrainian",
+      targetVariant = "en-US"
+    } = req.body || {};
 
     if (!text) {
       return res.status(400).json({ error: "No text provided" });
@@ -14,38 +19,46 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Missing API key" });
     }
 
+    const targetInstruction =
+      targetVariant === "en-GB"
+        ? "Translate into natural British English. Prefer British vocabulary, spelling, and phrasing."
+        : "Translate into natural American English. Prefer American vocabulary, spelling, and phrasing.";
+
     const modeInstruction = {
-      natural: `Translate into natural, fluent everyday English. Sound like a smart native speaker in normal conversation.`,
-      street: `Translate into natural spoken English with slang where appropriate. Preserve street tone, emotional force, and profanity naturally. Do not censor.`,
-      written: `Translate into polished, natural written English. Clear, elegant, and grammatically clean, but not robotic.`,
-      formal: `Translate into formal, respectful, professional English.`
-    }[mode || "natural"];
+      natural: "Use natural, fluent everyday speech.",
+      street: "Use natural spoken English with slang where appropriate. Preserve profanity and emotional force. Do not censor.",
+      written: "Use polished, natural written English. Clean, elegant, and grammatically strong, but not robotic.",
+      formal: "Use formal, respectful, professional English."
+    }[mode] || "Use natural, fluent everyday speech.";
 
     const systemPrompt = `
-You are an expert Ukrainian-to-English translator and Ukrainian text normalizer.
+You are an expert multilingual-to-English translator and source-text normalizer.
+
+The source language is: ${sourceLanguage}.
+The target language is: ${targetVariant}.
 
 You must do TWO things:
-1. Rewrite the Ukrainian input into clean, natural Ukrainian with proper punctuation, capitalization, and sentence structure.
+1. Rewrite the source text into clean, natural ${sourceLanguage} with proper punctuation, sentence boundaries, and capitalization.
 2. Translate it into high-quality English.
 
-Rules for polished Ukrainian:
-- Fix punctuation and sentence boundaries naturally.
-- Capitalize only where normal Ukrainian grammar requires it.
-- Do NOT capitalize words like "ти", "ви", "тобі", "вас", "твій", "ваш" in the middle of a sentence unless they truly begin a sentence.
-- Make the Ukrainian version look natural and human.
-- Preserve meaning, tone, emotion, slang, and profanity.
+Rules for the cleaned source text:
+- Fix punctuation naturally.
+- Fix capitalization naturally.
+- Preserve meaning, tone, slang, profanity, and emotional force.
+- Make it read like a real human wrote it.
+- If the source language uses pronouns that should normally stay lowercase in the middle of a sentence, keep them lowercase unless they start a sentence.
 
-Rules for English translation:
+Rules for English:
+- ${targetInstruction}
 - ${modeInstruction}
 - Avoid literal translation.
-- Preserve tone, meaning, emotion, slang, and profanity.
-- If the original is rude, sharp, emotional, sarcastic, tender, or vulgar, preserve that naturally in English.
+- Preserve tone, emotion, humor, sarcasm, slang, and profanity naturally.
 - Do not censor profanity unless absolutely necessary.
-- Output natural, idiomatic English.
+- Return natural, idiomatic English, not textbook English unless the selected mode requires it.
 
-Return ONLY valid JSON in this exact format:
+Return ONLY valid JSON in exactly this format:
 {
-  "polished_ukrainian": "...",
+  "polished_source": "...",
   "translation": "..."
 }
 `;
@@ -99,7 +112,7 @@ Return ONLY valid JSON in this exact format:
     }
 
     return res.status(200).json({
-      polished_ukrainian: parsed.polished_ukrainian || "",
+      polished_source: parsed.polished_source || "",
       translation: parsed.translation || ""
     });
 
