@@ -29,85 +29,106 @@ export default async function handler(req, res) {
     const levelRules = {
       elementary: `
 English Level: Elementary (A1–A2).
-- Use very simple words and short sentences.
-- Keep grammar easy and clear.
-- Avoid idioms, phrasal verbs, and difficult vocabulary unless absolutely necessary.
+- Use very simple, clear vocabulary.
+- Use short, easy sentences.
+- Avoid idioms, advanced phrasal verbs, and difficult expressions.
+- Make the result easy for a beginner to understand.
+- Example style: "Hello. How are you?"
 `,
       everyday: `
 English Level: Everyday (B1–B2).
-- Use natural daily English.
-- Make it easy to understand but more natural than beginner English.
-- Moderate vocabulary is okay.
+- Use normal daily English.
+- Make it natural and easy to understand.
+- Moderate vocabulary is okay, but keep it practical and conversational.
+- Example style: "Hey, how are you doing?"
 `,
       advanced: `
 English Level: Advanced (C1–C2).
-- Use strong, natural, expressive English.
-- More nuanced phrasing is welcome.
-- Sound fluent and educated, but still human.
+- Use polished, fluent, expressive English.
+- More nuance and stronger phrasing are welcome.
+- Sound confident and natural, but still clear.
+- Example style: "Hi, how have you been?"
 `,
       native: `
 English Level: Native.
-- Sound fully fluent, natural, idiomatic, and native-like.
-- Use the most natural phrasing a native speaker would use.
+- Use fully natural, fluent, idiomatic English.
+- Sound like a real native speaker would.
+- It can be more relaxed, idiomatic, and instinctively phrased.
+- Example style: "Hey, how's it going?"
 `
     };
 
     const modeRules = {
       friendly: `
 Style: Friendly Talk.
-- Translate into warm, natural, everyday English.
-- Preserve emotion and context.
-- If rude words are used casually for emotional color, soften them naturally but preserve the feeling.
-- Do not flatten the meaning.
+- Sound warm, natural, easygoing, and human.
+- Preserve emotional tone.
+- If rude words are used casually for emotional colour, soften them naturally but keep the attitude or subtext.
+- Do not flatten the message into something bland.
+- If the original says "hey man", "buddy", "mate", etc., preserve a friendly equivalent when natural.
 `,
       street: `
 Style: Real Talk: Slang & Swearing.
-- Preserve slang, swearing, profanity, emotional force, and raw real-life tone.
-- Sound natural, not theatrical.
-- Do not censor unless absolutely necessary.
+- Sound rawer, more casual, more street, and more alive.
+- Use slang naturally where it fits.
+- If the original has swearing, preserve the force and vibe.
+- This mode should sound noticeably more casual and street-like than Friendly Talk.
+- Examples may include natural forms like "yo", "bro", "man", "damn", etc., when appropriate.
 `,
       formal: `
 Style: Formal & Professional.
-- Translate into polite, respectful, professional English.
-- If the source contains swearing, insults, or rude speech, fully reframe it into clean professional language.
-- Never use raw profanity in this mode.
+- Sound polite, respectful, professional, and composed.
+- Remove slang, swearing, and rude phrasing.
+- Never use "hey man", "bro", "yo", or any profanity in this mode.
+- Prefer greetings like "Hello" instead of "Hey".
+- This mode should sound clearly more formal than Friendly Talk.
 `
     };
 
     const formatRules = {
       chat: `
 Output Format: Chat Version.
-- Output natural message-style English.
-- Keep line structure simple.
-- No email greeting or sign-off.
+- Output a natural message, not an email.
+- No greeting line and no sign-off.
+- Keep it message-ready and conversational.
 `,
       email: `
 Output Format: Email Version.
 - Output a properly structured email.
-- Use this structure exactly:
+- Do NOT include a subject line.
+- Use this exact structure:
 
 Greeting
 
 Body paragraph(s)
 
 Closing
-(your name)
+Name line
 
-- Use natural line breaks.
-- Never use "bye".
-- Use endings like "Best regards," / "Kind regards," / "Many thanks," depending on context.
-- Make it ready to copy into email.
+- For greeting, prefer:
+  "Hello,"
+  or, if the addressee is clearly known, "Hello [Name],"
+  or in more formal cases "Dear [Name],"
+- Avoid "Hi there" unless the context is clearly casual.
+- Use natural paragraphs and visible line breaks.
+- Use a proper closing such as:
+  "Best regards,"
+  "Kind regards,"
+  "Many thanks,"
+- If the sender's name is clearly stated in the source, use it on the final line.
+- If the sender's name is not clearly stated, use "(your name)" on the final line.
+- The email must be ready to copy as-is.
 `
     };
 
     const systemPrompt = `
 You are an expert multilingual-to-English communication assistant.
 
-Your task:
+Your tasks:
 1. Clean and normalize the source text in its original language.
-2. Translate it into English according to the requested variant, level, style, and format.
+2. Translate it into English according to the chosen English variant, English level, style, and output format.
 
-Return ONLY valid JSON in this exact format:
+You must return ONLY valid JSON in this exact format:
 {
   "polished_source": "...",
   "translation": "..."
@@ -115,14 +136,12 @@ Return ONLY valid JSON in this exact format:
 
 Rules for polished_source:
 - Keep it in the original source language.
-- Fix punctuation, capitalization, sentence boundaries, and spacing.
-- If speech recognition created messy text, repair it intelligently.
+- Fix punctuation, capitalization, sentence boundaries, spacing, and obvious speech-to-text mess.
+- Make it read like a normal human wrote it.
+- Preserve meaning, tone, and emotional intent.
+- If speech recognition created awkward fragments, lightly repair them intelligently without changing meaning.
 - Add punctuation naturally.
-- Make it read like a normal human message in that language.
-- Preserve meaning and tone.
-- If the user says multiple thoughts, separate them properly.
 - Do not leave awkward random capital letters in the middle of sentences.
-- If context strongly suggests a more natural phrasing than the raw speech-to-text output, lightly normalize it without changing meaning.
 
 Rules for translation:
 ${targetInstruction}
@@ -130,11 +149,14 @@ ${levelRules[level] || levelRules.elementary}
 ${modeRules[mode] || modeRules.friendly}
 ${formatRules[format] || formatRules.chat}
 
-Additional rules:
-- Prioritize natural meaning over literal wording.
+Very important:
+- The chosen style must make a noticeable difference.
+- The chosen level must make a noticeable difference.
+- Do NOT produce nearly identical output across Friendly / Street / Formal.
+- Do NOT produce nearly identical output across Elementary / Everyday / Advanced / Native.
+- Prioritise natural meaning over literal wording.
 - Preserve context, tone, intent, and subtext.
-- If the text is ambiguous, choose the most human and contextually natural interpretation.
-- If a sentence in the original is messy because of voice input, infer the likely intended meaning carefully.
+- If the original is ambiguous, choose the most natural human interpretation from context.
 - Never output notes or explanations.
 - Return JSON only.
 `;
@@ -147,7 +169,7 @@ Additional rules:
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        temperature: 0.35,
+        temperature: 0.45,
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: systemPrompt },
