@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { text } = req.body || {};
+    const { text, mode } = req.body || {};
 
     if (!text) {
       return res.status(400).json({ error: "No text provided" });
@@ -14,6 +14,42 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Missing API key" });
     }
 
+    const modeInstruction = {
+      natural: `Translate into natural, fluent everyday English. Sound like a smart native speaker in normal conversation.`,
+      street: `Translate into natural spoken English with slang where appropriate. Preserve street tone, emotional force, and profanity naturally. Do not censor.`,
+      written: `Translate into polished, natural written English. Clear, elegant, and grammatically clean, but not robotic.`,
+      formal: `Translate into formal, respectful, professional English.`
+    }[mode || "natural"];
+
+    const systemPrompt = `
+You are an expert Ukrainian-to-English translator and Ukrainian text normalizer.
+
+You must do TWO things:
+1. Rewrite the Ukrainian input into clean, natural Ukrainian with proper punctuation, capitalization, and sentence structure.
+2. Translate it into high-quality English.
+
+Rules for polished Ukrainian:
+- Fix punctuation and sentence boundaries naturally.
+- Capitalize only where normal Ukrainian grammar requires it.
+- Do NOT capitalize words like "ти", "ви", "тобі", "вас", "твій", "ваш" in the middle of a sentence unless they truly begin a sentence.
+- Make the Ukrainian version look natural and human.
+- Preserve meaning, tone, emotion, slang, and profanity.
+
+Rules for English translation:
+- ${modeInstruction}
+- Avoid literal translation.
+- Preserve tone, meaning, emotion, slang, and profanity.
+- If the original is rude, sharp, emotional, sarcastic, tender, or vulgar, preserve that naturally in English.
+- Do not censor profanity unless absolutely necessary.
+- Output natural, idiomatic English.
+
+Return ONLY valid JSON in this exact format:
+{
+  "polished_ukrainian": "...",
+  "translation": "..."
+}
+`;
+
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -21,37 +57,50 @@ export default async function handler(req, res) {
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
+        temperature: 0.3,
+        response_format: { type: "json_object" },
         messages: [
           {
             role: "system",
-            content: `Translate Ukrainian to natural English.
-Keep slang, tone, emotions, profanity and meaning natural.
-Do not explain anything.
-Return only translation text.`
+            content: systemPrompt
           },
           {
             role: "user",
             content: text
           }
-        ],
-        temperature: 0.3
+        ]
       })
     });
 
     const data = await response.json();
 
-    const translation =
-      data?.choices?.[0]?.message?.content?.trim();
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: data?.error?.message || "OpenAI error"
+      });
+    }
 
-    if (!translation) {
+    const content = data?.choices?.[0]?.message?.content?.trim();
+
+    if (!content) {
       return res.status(500).json({
-        error: data?.error?.message || "Translation failed"
+        error: "Empty model response"
+      });
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      return res.status(500).json({
+        error: "Invalid JSON returned by model"
       });
     }
 
     return res.status(200).json({
-      translation
+      polished_ukrainian: parsed.polished_ukrainian || "",
+      translation: parsed.translation || ""
     });
 
   } catch (error) {
