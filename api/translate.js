@@ -17,45 +17,46 @@ export default async function handler(req, res) {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": Bearer ${process.env.OPENAI_API_KEY},
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
-        temperature: 0.3,
+        model: "gpt-4o",
         messages: [
           {
             role: "system",
-            content:
-              "You are a professional translator. Translate Ukrainian into natural, fluent English. Preserve tone, slang, and profanity. Do not censor. Do not translate literally."
+            content: `Translate Ukrainian to natural English.
+Keep slang, tone, emotions, profanity and meaning natural.
+Do not explain anything.
+Return only translation text.`
           },
           {
             role: "user",
             content: text
           }
-        ]
+        ],
+        temperature: 0.3
       })
     });
 
     const data = await response.json();
 
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: data?.error?.message || "OpenAI error"
+    const translation =
+      data?.choices?.[0]?.message?.content?.trim();
+
+    if (!translation) {
+      return res.status(500).json({
+        error: data?.error?.message || "Translation failed"
       });
     }
 
-    const translation = data?.choices?.[0]?.message?.content;
+    return res.status(200).json({
+      translation
+    });
 
-    if (!translation) {
-      return res.status(500).json({ error: "No translation returned" });
-    }
-
-    return res.status(200).json({ translation });
-
-  } catch (err) {
+  } catch (error) {
     return res.status(500).json({
-      error: err.message || "Server error"
+      error: "Server error"
     });
   }
 }
