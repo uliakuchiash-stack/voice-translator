@@ -1,196 +1,111 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Voice Translator</title>
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0f0f12;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
-.container {
-  width: 90%;
-  max-width: 700px;
-  background: #18181d;
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-}
-
-h1 {
-  margin-bottom: 10px;
-}
-
-.subtitle {
-  color: #aaa;
-  margin-bottom: 25px;
-}
-
-textarea {
-  width: 100%;
-  min-height: 140px;
-  border: none;
-  outline: none;
-  resize: none;
-  border-radius: 14px;
-  padding: 18px;
-  font-size: 16px;
-  background: #23232b;
-  color: white;
-  margin-bottom: 20px;
-}
-
-.controls {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-button {
-  border: none;
-  border-radius: 14px;
-  padding: 14px 20px;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-#micBtn {
-  background: #ffb347;
-  color: black;
-  font-weight: bold;
-}
-
-#translateBtn {
-  flex: 1;
-  background: #2b2b35;
-  color: white;
-}
-
-#output {
-  background: #111114;
-}
-
-.status {
-  margin-top: 10px;
-  color: #999;
-  font-size: 14px;
-}
-</style>
-</head>
-<body>
-
-<div class="container">
-  <h1>AI Voice Translator</h1>
-  <div class="subtitle">
-    Speak Ukrainian → Natural English Translation
-  </div>
-
-  <textarea
-    id="input"
-    placeholder="Speak or type Ukrainian text here..."
-  ></textarea>
-
-  <div class="controls">
-    <button id="micBtn">🎤 Speak</button>
-    <button id="translateBtn">Translate</button>
-  </div>
-
-  <textarea
-    id="output"
-    placeholder="Translation will appear here..."
-    readonly
-  ></textarea>
-
-  <div class="status" id="status">
-    Ready
-  </div>
-</div>
-
-<script>
-const input = document.getElementById("input");
-const output = document.getElementById("output");
-const micBtn = document.getElementById("micBtn");
-const translateBtn = document.getElementById("translateBtn");
-const status = document.getElementById("status");
-
-const SpeechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
-
-let recognition;
-
-if (SpeechRecognition) {
-  recognition = new SpeechRecognition();
-  recognition.lang = "uk-UA";
-  recognition.interimResults = false;
-  recognition.continuous = false;
-
-  recognition.onstart = () => {
-    status.textContent = "Listening...";
-  };
-
-  recognition.onresult = (event) => {
-    const text = event.results[0][0].transcript;
-    input.value = text;
-    status.textContent = "Speech captured";
-  };
-
-  recognition.onerror = () => {
-    status.textContent = "Microphone error";
-  };
-
-  recognition.onend = () => {};
-} else {
-  micBtn.disabled = true;
-  status.textContent = "Speech recognition not supported";
-}
-
-micBtn.addEventListener("click", () => {
-  if (recognition) {
-    recognition.start();
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
-});
-
-translateBtn.addEventListener("click", async () => {
-  const text = input.value.trim();
-
-  if (!text) {
-    status.textContent = "Enter text first";
-    return;
-  }
-
-  status.textContent = "Translating...";
-  output.value = "";
 
   try {
-    const response = await fetch("/api/translate", {
+    const { text, mode } = req.body || {};
+
+    if (!text) {
+      return res.status(400).json({ error: "No text provided" });
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ error: "Missing API key" });
+    }
+
+    const modeInstruction = {
+      natural: `Translate into natural, fluent everyday English. Sound like a smart native speaker in normal conversation.`,
+      street: `Translate into natural spoken English with slang where appropriate. Preserve street tone, emotional force, and profanity naturally. Do not censor.`,
+      written: `Translate into polished, natural written English. Clear, elegant, and grammatically clean, but not robotic.`,
+      formal: `Translate into formal, respectful, professional English.`
+    }[mode || "natural"];
+
+    const systemPrompt = `
+You are an expert Ukrainian-to-English translator and Ukrainian text normalizer.
+
+You must do TWO things:
+1. Rewrite the Ukrainian input into clean, natural Ukrainian with proper punctuation, capitalization, and sentence structure.
+2. Translate it into high-quality English.
+
+Rules for polished Ukrainian:
+- Fix punctuation and sentence boundaries naturally.
+- Capitalize only where normal Ukrainian grammar requires it.
+- Do NOT capitalize words like "ти", "ви", "тобі", "вас", "твій", "ваш" in the middle of a sentence unless they truly begin a sentence.
+- Make the Ukrainian version look natural and human.
+- Preserve meaning, tone, emotion, slang, and profanity.
+
+Rules for English translation:
+- ${modeInstruction}
+- Avoid literal translation.
+- Preserve tone, meaning, emotion, slang, and profanity.
+- If the original is rude, sharp, emotional, sarcastic, tender, or vulgar, preserve that naturally in English.
+- Do not censor profanity unless absolutely necessary.
+- Output natural, idiomatic English.
+
+Return ONLY valid JSON in this exact format:
+{
+  "polished_ukrainian": "...",
+  "translation": "..."
+}
+`;
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
       },
-      body: JSON.stringify({ text })
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        temperature: 0.3,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          {
+            role: "user",
+            content: text
+          }
+        ]
+      })
     });
 
     const data = await response.json();
 
-    if (data.translation) {
-      output.value = data.translation;
-      status.textContent = "Done";
-    } else {
-      status.textContent = data.error || "Translation failed";
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: data?.error?.message || "OpenAI error"
+      });
     }
-  } catch (error) {
-    status.textContent = "Server error";
-  }
-});
-</script>
 
-</body>
-</html>
+    const content = data?.choices?.[0]?.message?.content?.trim();
+
+    if (!content) {
+      return res.status(500).json({
+        error: "Empty model response"
+      });
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      return res.status(500).json({
+        error: "Invalid JSON returned by model"
+      });
+    }
+
+    return res.status(200).json({
+      polished_ukrainian: parsed.polished_ukrainian || "",
+      translation: parsed.translation || ""
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      error: "Server error"
+    });
+  }
+}
