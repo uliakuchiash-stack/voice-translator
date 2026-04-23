@@ -6,6 +6,9 @@ export default async function handler(req, res) {
   try {
     const {
       text,
+      sourceLanguage = "Ukrainian",
+      targetVariant = "en-GB",
+      level = "elementary",
       mode = "friendly",
       format = "chat"
     } = req.body || {};
@@ -18,106 +21,121 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Missing API key" });
     }
 
+    const targetInstruction =
+      targetVariant === "en-US"
+        ? "Translate into natural American English. Prefer American vocabulary, spelling, and phrasing."
+        : "Translate into natural British English. Prefer British vocabulary, spelling, and phrasing.";
+
+    const levelRules = {
+      elementary: `
+English Level: Elementary (A1–A2).
+- Use very simple words and short sentences.
+- Keep grammar easy and clear.
+- Avoid idioms, phrasal verbs, and difficult vocabulary unless absolutely necessary.
+`,
+      everyday: `
+English Level: Everyday (B1–B2).
+- Use natural daily English.
+- Make it easy to understand but more natural than beginner English.
+- Moderate vocabulary is okay.
+`,
+      advanced: `
+English Level: Advanced (C1–C2).
+- Use strong, natural, expressive English.
+- More nuanced phrasing is welcome.
+- Sound fluent and educated, but still human.
+`,
+      native: `
+English Level: Native.
+- Sound fully fluent, natural, idiomatic, and native-like.
+- Use the most natural phrasing a native speaker would use.
+`
+    };
+
     const modeRules = {
       friendly: `
 Style: Friendly Talk.
-- Translate into natural, warm, everyday English.
-- Preserve emotional intent, including irritation, frustration, teasing, affection, or sarcasm.
-- If the source contains swearing or rude words, DO NOT translate them literally unless the tone clearly requires it.
-- Instead, soften them into natural, conversational English while preserving the emotional force.
-- Important: do not erase the attitude. Keep the subtext.
-- Example: if someone says something rude in a casual way, the English should still sound annoyed / sarcastic / sharp, just not vulgar unless necessary.
-- Sound like real human conversation between friends or acquaintances.
+- Translate into warm, natural, everyday English.
+- Preserve emotion and context.
+- If rude words are used casually for emotional color, soften them naturally but preserve the feeling.
+- Do not flatten the meaning.
 `,
       street: `
 Style: Real Talk: Slang & Swearing.
-- Translate into natural spoken English with slang where appropriate.
-- Preserve profanity, swearing, emotional force, and attitude.
+- Preserve slang, swearing, profanity, emotional force, and raw real-life tone.
+- Sound natural, not theatrical.
 - Do not censor unless absolutely necessary.
-- Sound like real speech, not textbook English.
 `,
       formal: `
 Style: Formal & Professional.
-- Translate into polite, professional, respectful English.
-- If the source includes swearing, insults, or rude language, soften and reframe it professionally.
-- Never output raw profanity in this mode.
-- Sound suitable for work, services, landlords, doctors, officials, or formal requests.
+- Translate into polite, respectful, professional English.
+- If the source contains swearing, insults, or rude speech, fully reframe it into clean professional language.
+- Never use raw profanity in this mode.
 `
     };
 
     const formatRules = {
       chat: `
 Output Format: Chat Version.
-- Output natural chat-style English.
-- Keep it concise, natural, and copy-paste ready for messages.
-- No email greeting or sign-off unless clearly needed.
+- Output natural message-style English.
+- Keep line structure simple.
+- No email greeting or sign-off.
 `,
       email: `
 Output Format: Email Version.
-- Output a properly structured email in English.
+- Output a properly structured email.
 - Use this structure exactly:
 
-Greeting line
+Greeting
 
-Main message paragraph(s)
+Body paragraph(s)
 
-Closing line
+Closing
 (your name)
 
-- Use a natural greeting such as:
-  Hello [Name],
-  Dear [Name],
-  Hello,
-  Dear Sir/Madam,
-  depending on the context.
-- If the source suggests a name or addressee, use it naturally.
-- Never end with "bye".
-- Use a proper closing such as:
-  Best regards,
-  Kind regards,
-  Many thanks,
-  depending on context.
-- Always put "(your name)" on the final line.
-- Keep the email realistic and ready to copy.
+- Use natural line breaks.
+- Never use "bye".
+- Use endings like "Best regards," / "Kind regards," / "Many thanks," depending on context.
+- Make it ready to copy into email.
 `
     };
 
     const systemPrompt = `
-You are an expert multilingual communication assistant.
+You are an expert multilingual-to-English communication assistant.
 
 Your task:
-1. Clean and normalize the user's source text.
-2. Translate it into high-quality English.
+1. Clean and normalize the source text in its original language.
+2. Translate it into English according to the requested variant, level, style, and format.
 
-You must return ONLY valid JSON in exactly this format:
+Return ONLY valid JSON in this exact format:
 {
   "polished_source": "...",
   "translation": "..."
 }
 
 Rules for polished_source:
-- Preserve the original language.
-- Fix punctuation, sentence boundaries, spacing, and capitalization naturally.
-- Make it look like a human wrote it correctly.
-- If speech recognition made the source look clumsy, repair it intelligently based on context.
-- Do not invent new meaning.
-- If the text is clearly spoken and lacks punctuation, add proper punctuation.
-- Do not capitalize random words in the middle of a sentence.
+- Keep it in the original source language.
+- Fix punctuation, capitalization, sentence boundaries, and spacing.
+- If speech recognition created messy text, repair it intelligently.
+- Add punctuation naturally.
+- Make it read like a normal human message in that language.
+- Preserve meaning and tone.
+- If the user says multiple thoughts, separate them properly.
+- Do not leave awkward random capital letters in the middle of sentences.
+- If context strongly suggests a more natural phrasing than the raw speech-to-text output, lightly normalize it without changing meaning.
 
 Rules for translation:
+${targetInstruction}
+${levelRules[level] || levelRules.elementary}
 ${modeRules[mode] || modeRules.friendly}
 ${formatRules[format] || formatRules.chat}
 
-Additional translation rules:
-- Avoid literal translation when it sounds unnatural.
-- Preserve meaning, intent, tone, and subtext.
-- Important: emotional meaning matters more than word-for-word translation.
-- If a rude word is used as emotional color rather than a literal insult, translate the feeling naturally, not mechanically.
-- If the source is ambiguous, choose the most natural human interpretation from context.
-- In formal mode, convert rude or messy speech into clean professional English.
-- In email mode, format the translation with line breaks exactly like a real email.
-- If a spoken addressee is awkwardly recognized, infer the most natural English greeting from context.
-- Never output explanations or notes.
+Additional rules:
+- Prioritize natural meaning over literal wording.
+- Preserve context, tone, intent, and subtext.
+- If the text is ambiguous, choose the most human and contextually natural interpretation.
+- If a sentence in the original is messy because of voice input, infer the likely intended meaning carefully.
+- Never output notes or explanations.
 - Return JSON only.
 `;
 
@@ -129,17 +147,11 @@ Additional translation rules:
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        temperature: 0.4,
+        temperature: 0.35,
         response_format: { type: "json_object" },
         messages: [
-          {
-            role: "system",
-            content: systemPrompt
-          },
-          {
-            role: "user",
-            content: text.trim()
-          }
+          { role: "system", content: systemPrompt },
+          { role: "user", content: text.trim() }
         ]
       })
     });
@@ -155,18 +167,14 @@ Additional translation rules:
     const content = data?.choices?.[0]?.message?.content?.trim();
 
     if (!content) {
-      return res.status(500).json({
-        error: "Empty model response"
-      });
+      return res.status(500).json({ error: "Empty model response" });
     }
 
     let parsed;
     try {
       parsed = JSON.parse(content);
     } catch {
-      return res.status(500).json({
-        error: "Invalid JSON returned by model"
-      });
+      return res.status(500).json({ error: "Invalid JSON returned by model" });
     }
 
     return res.status(200).json({
@@ -175,8 +183,6 @@ Additional translation rules:
     });
 
   } catch (error) {
-    return res.status(500).json({
-      error: "Server error"
-    });
+    return res.status(500).json({ error: "Server error" });
   }
 }
