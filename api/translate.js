@@ -23,78 +23,85 @@ export default async function handler(req, res) {
 
     const targetInstruction =
       targetVariant === "en-US"
-        ? "Translate into natural American English. Prefer American vocabulary, spelling, and phrasing."
-        : "Translate into natural British English. Prefer British vocabulary, spelling, and phrasing.";
+        ? `
+Translate into natural American English.
+Prefer American vocabulary, spelling, punctuation, and phrasing.
+`
+        : `
+Translate into natural British English.
+Prefer British vocabulary, spelling, punctuation, and phrasing.
+`;
 
     const levelRules = {
       elementary: `
 English Level: Elementary (A1–A2).
-- Use very simple, clear vocabulary.
-- Use short, easy sentences.
-- Avoid idioms, advanced phrasal verbs, and difficult expressions.
-- Make the result easy for a beginner to understand.
-- Example style: "Hello. How are you?"
+- Use very simple words and short sentences.
+- Keep grammar easy and clear.
+- Avoid idioms, slang, phrasal verbs, and difficult vocabulary unless absolutely necessary.
+- Prioritise clarity over style.
+- Output should feel beginner-friendly.
 `,
       everyday: `
 English Level: Everyday (B1–B2).
-- Use normal daily English.
-- Make it natural and easy to understand.
-- Moderate vocabulary is okay, but keep it practical and conversational.
-- Example style: "Hey, how are you doing?"
+- Use natural daily English.
+- Easy to understand, but more natural than beginner English.
+- Moderate vocabulary is okay.
+- Sound like a normal person in everyday life.
 `,
       advanced: `
 English Level: Advanced (C1–C2).
-- Use polished, fluent, expressive English.
-- More nuance and stronger phrasing are welcome.
-- Sound confident and natural, but still clear.
-- Example style: "Hi, how have you been?"
+- Use fluent, expressive, polished English.
+- More nuanced phrasing is welcome.
+- Sound educated and natural, but not stiff.
 `,
       native: `
 English Level: Native.
-- Use fully natural, fluent, idiomatic English.
-- Sound like a real native speaker would.
-- It can be more relaxed, idiomatic, and instinctively phrased.
-- Example style: "Hey, how's it going?"
+- Sound fully fluent, idiomatic, and natural.
+- Use the most human, natural phrasing a native speaker would actually use.
+- Contractions, rhythm, and phrasing should feel genuinely native.
 `
     };
 
     const modeRules = {
       friendly: `
 Style: Friendly Talk.
-- Sound warm, natural, easygoing, and human.
-- Preserve emotional tone.
-- If rude words are used casually for emotional colour, soften them naturally but keep the attitude or subtext.
-- Do not flatten the message into something bland.
-- If the original says "hey man", "buddy", "mate", etc., preserve a friendly equivalent when natural.
+- Translate into warm, natural, everyday English.
+- Preserve emotion and context.
+- If the source contains rude words used casually, soften them naturally but keep the attitude and subtext.
+- Do not flatten the meaning.
+- This style should sound clearly different from Formal & Professional and from Real Talk.
+- Friendly does NOT mean formal.
 `,
       street: `
 Style: Real Talk: Slang & Swearing.
-- Sound rawer, more casual, more street, and more alive.
-- Use slang naturally where it fits.
-- If the original has swearing, preserve the force and vibe.
-- This mode should sound noticeably more casual and street-like than Friendly Talk.
-- Examples may include natural forms like "yo", "bro", "man", "damn", etc., when appropriate.
+- Translate into natural spoken English with slang where appropriate.
+- Preserve profanity, swearing, emotional force, and attitude.
+- Do not censor unless absolutely necessary.
+- This style must sound clearly more casual, raw, and street-like than Friendly Talk.
+- If the source uses profanity, translate it into the closest natural English profanity for the context.
+- Do not use weird or outdated insults if they sound unnatural.
 `,
       formal: `
 Style: Formal & Professional.
-- Sound polite, respectful, professional, and composed.
-- Remove slang, swearing, and rude phrasing.
-- Never use "hey man", "bro", "yo", or any profanity in this mode.
-- Prefer greetings like "Hello" instead of "Hey".
-- This mode should sound clearly more formal than Friendly Talk.
+- Translate into polite, respectful, professional English.
+- Never use raw profanity, slang, bro, man, yo, or rude wording.
+- If the source contains swearing, insults, or rude speech, fully reframe it into clean professional English.
+- This style must sound clearly more formal than the other modes.
+- If format is email, make it sound like a proper email.
 `
     };
 
     const formatRules = {
       chat: `
 Output Format: Chat Version.
-- Output a natural message, not an email.
-- No greeting line and no sign-off.
-- Keep it message-ready and conversational.
+- Output natural chat-style English.
+- No subject line.
+- No email greeting or sign-off.
+- Keep it concise and ready to paste into chat.
 `,
       email: `
 Output Format: Email Version.
-- Output a properly structured email.
+- Output a properly structured email in English.
 - Do NOT include a subject line.
 - Use this exact structure:
 
@@ -103,62 +110,71 @@ Greeting
 Body paragraph(s)
 
 Closing
-Name line
+(your name)
 
-- For greeting, prefer:
-  "Hello,"
-  or, if the addressee is clearly known, "Hello [Name],"
-  or in more formal cases "Dear [Name],"
-- Avoid "Hi there" unless the context is clearly casual.
-- Use natural paragraphs and visible line breaks.
-- Use a proper closing such as:
-  "Best regards,"
-  "Kind regards,"
-  "Many thanks,"
-- If the sender's name is clearly stated in the source, use it on the final line.
-- If the sender's name is not clearly stated, use "(your name)" on the final line.
-- The email must be ready to copy as-is.
+- Use natural line breaks.
+- Avoid "Hi there" unless the source is clearly very casual.
+- For formal tone, prefer greetings such as "Hello," or "Dear [Name],".
+- Never end with "bye".
+- Use closings like "Best regards," or "Kind regards," depending on context.
+- Always put "(your name)" on the final line.
+- Make it ready to copy into email.
 `
     };
+
+    const sourceCleanupRules = `
+Rules for polished_source:
+- Keep the text in the original source language.
+- Preserve the same language and script as the user originally spoke or typed.
+- Fix punctuation, sentence boundaries, capitalization, and spacing.
+- Make it clearly cleaner than raw speech-to-text.
+- If the user speaks several thoughts, separate them properly.
+- Do not leave awkward random capital letters in the middle of sentences.
+- If the raw text is clumsy because of speech recognition, lightly repair it based on likely meaning.
+- Preserve meaning and tone.
+- Do not over-rewrite.
+`;
+
+    const translationCoreRules = `
+Additional translation rules:
+- Prioritise natural meaning over literal wording.
+- Preserve context, tone, intent, and subtext.
+- If the wording is ambiguous, choose the most natural human interpretation from context.
+- The selected style must be clearly visible in the final output.
+- The selected level must also be clearly visible in the final output.
+- If outputs across styles or levels are too similar, push the differences more.
+- Example contrast:
+  Friendly: "Hey, how are you doing?"
+  Street: "Yo, how you doin'?" / "Hey bro, what's up?"
+  Formal: "Hello, how are you?" / "I hope you're doing well."
+- Never output explanations or notes.
+- Return JSON only.
+`;
 
     const systemPrompt = `
 You are an expert multilingual-to-English communication assistant.
 
-Your tasks:
-1. Clean and normalize the source text in its original language.
-2. Translate it into English according to the chosen English variant, English level, style, and output format.
+Your task:
+1. Clean and normalise the source text in its original language.
+2. Translate it into English according to the selected English variant, level, style, and format.
 
-You must return ONLY valid JSON in this exact format:
+Return ONLY valid JSON in this exact format:
 {
   "polished_source": "...",
   "translation": "..."
 }
 
-Rules for polished_source:
-- Keep it in the original source language.
-- Fix punctuation, capitalization, sentence boundaries, spacing, and obvious speech-to-text mess.
-- Make it read like a normal human wrote it.
-- Preserve meaning, tone, and emotional intent.
-- If speech recognition created awkward fragments, lightly repair them intelligently without changing meaning.
-- Add punctuation naturally.
-- Do not leave awkward random capital letters in the middle of sentences.
+Source language: ${sourceLanguage}
+Target English variant: ${targetVariant}
+
+${sourceCleanupRules}
 
 Rules for translation:
 ${targetInstruction}
 ${levelRules[level] || levelRules.elementary}
 ${modeRules[mode] || modeRules.friendly}
 ${formatRules[format] || formatRules.chat}
-
-Very important:
-- The chosen style must make a noticeable difference.
-- The chosen level must make a noticeable difference.
-- Do NOT produce nearly identical output across Friendly / Street / Formal.
-- Do NOT produce nearly identical output across Elementary / Everyday / Advanced / Native.
-- Prioritise natural meaning over literal wording.
-- Preserve context, tone, intent, and subtext.
-- If the original is ambiguous, choose the most natural human interpretation from context.
-- Never output notes or explanations.
-- Return JSON only.
+${translationCoreRules}
 `;
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -169,7 +185,7 @@ Very important:
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        temperature: 0.45,
+        temperature: 0.6,
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: systemPrompt },
@@ -195,7 +211,7 @@ Very important:
     let parsed;
     try {
       parsed = JSON.parse(content);
-    } catch {
+    } catch (error) {
       return res.status(500).json({ error: "Invalid JSON returned by model" });
     }
 
@@ -203,7 +219,6 @@ Very important:
       polished_source: parsed.polished_source || "",
       translation: parsed.translation || ""
     });
-
   } catch (error) {
     return res.status(500).json({ error: "Server error" });
   }
