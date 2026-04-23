@@ -22,9 +22,12 @@ export default async function handler(req, res) {
       friendly: `
 Style: Friendly Talk.
 - Translate into natural, warm, everyday English.
-- Keep it human, simple, and friendly.
-- Mild emotional wording is okay.
-- Avoid harsh profanity unless it is absolutely central to meaning.
+- Preserve emotional intent, including irritation, frustration, teasing, affection, or sarcasm.
+- If the source contains swearing or rude words, DO NOT translate them literally unless the tone clearly requires it.
+- Instead, soften them into natural, conversational English while preserving the emotional force.
+- Important: do not erase the attitude. Keep the subtext.
+- Example: if someone says something rude in a casual way, the English should still sound annoyed / sarcastic / sharp, just not vulgar unless necessary.
+- Sound like real human conversation between friends or acquaintances.
 `,
       street: `
 Style: Real Talk: Slang & Swearing.
@@ -46,13 +49,13 @@ Style: Formal & Professional.
       chat: `
 Output Format: Chat Version.
 - Output natural chat-style English.
-- No email greeting unless the user clearly asks for a letter.
-- Keep it copy-paste ready for chat/messages.
+- Keep it concise, natural, and copy-paste ready for messages.
+- No email greeting or sign-off unless clearly needed.
 `,
       email: `
 Output Format: Email Version.
 - Output a properly structured email in English.
-- Use this structure:
+- Use this structure exactly:
 
 Greeting line
 
@@ -105,9 +108,12 @@ Rules for translation:
 ${modeRules[mode] || modeRules.friendly}
 ${formatRules[format] || formatRules.chat}
 
-Additional rules:
+Additional translation rules:
 - Avoid literal translation when it sounds unnatural.
-- Preserve meaning, tone, and intent.
+- Preserve meaning, intent, tone, and subtext.
+- Important: emotional meaning matters more than word-for-word translation.
+- If a rude word is used as emotional color rather than a literal insult, translate the feeling naturally, not mechanically.
+- If the source is ambiguous, choose the most natural human interpretation from context.
 - In formal mode, convert rude or messy speech into clean professional English.
 - In email mode, format the translation with line breaks exactly like a real email.
 - If a spoken addressee is awkwardly recognized, infer the most natural English greeting from context.
@@ -123,7 +129,7 @@ Additional rules:
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        temperature: 0.3,
+        temperature: 0.4,
         response_format: { type: "json_object" },
         messages: [
           {
