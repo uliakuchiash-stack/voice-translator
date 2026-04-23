@@ -4,11 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>AI Voice Translator</title>
+
 <style>
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #0f0f12;
+  background: #121316;
   color: white;
   display: flex;
   justify-content: center;
@@ -18,7 +19,7 @@ body {
 
 .container {
   width: 90%;
-  max-width: 760px;
+  max-width: 820px;
   background: #18181d;
   border-radius: 20px;
   padding: 30px;
@@ -34,14 +35,7 @@ h1 {
   margin-bottom: 20px;
 }
 
-label {
-  display: block;
-  margin-bottom: 8px;
-  color: #bbb;
-  font-size: 14px;
-}
-
-select, textarea {
+textarea, select {
   width: 100%;
   border: none;
   outline: none;
@@ -50,7 +44,7 @@ select, textarea {
   font-size: 16px;
   background: #23232b;
   color: white;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   box-sizing: border-box;
 }
 
@@ -59,23 +53,31 @@ textarea {
   resize: none;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 18px;
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #bbb;
+  font-size: 14px;
 }
 
-.controls {
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.controls,
+.outputActions {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
 button {
   border: none;
   border-radius: 14px;
-  padding: 14px 20px;
+  padding: 14px 18px;
   font-size: 15px;
   cursor: pointer;
 }
@@ -92,13 +94,9 @@ button {
   color: white;
 }
 
-#clearBtn {
+.secondaryBtn {
   background: #3a3a45;
   color: white;
-}
-
-#output {
-  background: #111114;
 }
 
 .status {
@@ -106,65 +104,37 @@ button {
   color: #999;
   font-size: 14px;
 }
-
-@media (max-width: 700px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .controls {
-    flex-direction: column;
-  }
-}
 </style>
 </head>
 <body>
 
 <div class="container">
+
   <h1>AI Voice Translator</h1>
   <div class="subtitle">
-    Speak naturally → cleaned original text + natural English translation
+    Speak naturally → clean text + real English
   </div>
 
   <div class="grid">
     <div>
-      <label for="sourceLang">Input language</label>
-      <select id="sourceLang">
-        <option value="uk-UA" selected>Ukrainian</option>
-        <option value="ru-RU">Russian</option>
-        <option value="be-BY">Belarusian</option>
-        <option value="pl-PL">Polish</option>
-        <option value="es-ES">Spanish</option>
-        <option value="de-DE">German</option>
-        <option value="fr-FR">French</option>
-        <option value="it-IT">Italian</option>
-        <option value="pt-PT">Portuguese</option>
-        <option value="tr-TR">Turkish</option>
-        <option value="hi-IN">Hindi</option>
-        <option value="ar-SA">Arabic</option>
-      </select>
-    </div>
-
-    <div>
-      <label for="targetVariant">English variant</label>
-      <select id="targetVariant">
-        <option value="en-US" selected>English (US)</option>
-        <option value="en-GB">English (UK)</option>
-      </select>
-    </div>
-
-    <div>
-      <label for="mode">Translation mode</label>
+      <label>Style</label>
       <select id="mode">
-        <option value="natural" selected>Natural conversation</option>
-        <option value="street">Street / slang</option>
-        <option value="written">Writing / polished</option>
-        <option value="formal">Formal</option>
+        <option value="friendly">Friendly Talk</option>
+        <option value="street">Real Talk: Slang & Swearing 🔥</option>
+        <option value="formal">Formal & Professional</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Output Format</label>
+      <select id="format">
+        <option value="chat">Chat Version</option>
+        <option value="email">Email Version</option>
       </select>
     </div>
   </div>
 
-  <label for="input">Original text</label>
+  <label>Original Text</label>
   <textarea
     id="input"
     placeholder="Speak or type here..."
@@ -173,17 +143,24 @@ button {
   <div class="controls">
     <button id="micBtn">🎤 Speak</button>
     <button id="translateBtn">Translate</button>
-    <button id="clearBtn">Clear</button>
+    <button id="clearBtn" class="secondaryBtn">Clear</button>
+    <button id="copyInputBtn" class="secondaryBtn">Copy Original</button>
   </div>
 
-  <label for="output">English translation</label>
+  <label>English Translation</label>
   <textarea
     id="output"
     placeholder="Translation will appear here..."
     readonly
   ></textarea>
 
+  <div class="outputActions">
+    <button id="speakBtn" class="secondaryBtn">🔊 Speak Translation</button>
+    <button id="copyOutputBtn" class="secondaryBtn">Copy Translation</button>
+  </div>
+
   <div class="status" id="status">Ready</div>
+
 </div>
 
 <script>
@@ -192,10 +169,12 @@ const output = document.getElementById("output");
 const micBtn = document.getElementById("micBtn");
 const translateBtn = document.getElementById("translateBtn");
 const clearBtn = document.getElementById("clearBtn");
+const copyInputBtn = document.getElementById("copyInputBtn");
+const copyOutputBtn = document.getElementById("copyOutputBtn");
+const speakBtn = document.getElementById("speakBtn");
 const status = document.getElementById("status");
 const mode = document.getElementById("mode");
-const sourceLang = document.getElementById("sourceLang");
-const targetVariant = document.getElementById("targetVariant");
+const format = document.getElementById("format");
 
 const SpeechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -203,20 +182,18 @@ const SpeechRecognition =
 let recognition;
 let isListening = false;
 
-function buildRecognition() {
-  if (!SpeechRecognition) return null;
+if (SpeechRecognition) {
+  recognition = new SpeechRecognition();
+  recognition.lang = "uk-UA";
+  recognition.continuous = true;
+  recognition.interimResults = false;
 
-  const r = new SpeechRecognition();
-  r.lang = sourceLang.value;
-  r.interimResults = false;
-  r.continuous = true;
-
-  r.onstart = () => {
+  recognition.onstart = () => {
     isListening = true;
     status.textContent = "Listening...";
   };
 
-  r.onresult = (event) => {
+  recognition.onresult = (event) => {
     let finalText = "";
 
     for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -226,57 +203,33 @@ function buildRecognition() {
     }
 
     if (finalText.trim()) {
-      input.value = (input.value + " " + finalText).replace(/\s+/g, " ").trim();
+      input.value = (input.value + " " + finalText)
+        .replace(/\s+/g, " ")
+        .trim();
+
       status.textContent = "Speech captured";
     }
   };
 
-  r.onerror = (event) => {
+  recognition.onerror = (event) => {
     status.textContent = "Microphone error: " + event.error;
     isListening = false;
   };
 
-  r.onend = () => {
+  recognition.onend = () => {
     isListening = false;
     status.textContent = "Stopped listening";
   };
-
-  return r;
 }
-
-if (SpeechRecognition) {
-  recognition = buildRecognition();
-} else {
-  micBtn.disabled = true;
-  status.textContent = "Speech recognition not supported";
-}
-
-sourceLang.addEventListener("change", () => {
-  if (isListening && recognition) {
-    recognition.stop();
-  }
-  recognition = buildRecognition();
-  status.textContent = "Input language updated";
-});
 
 micBtn.addEventListener("click", () => {
   if (!recognition) return;
 
   if (isListening) {
     recognition.stop();
-    status.textContent = "Stopping...";
   } else {
     recognition.start();
   }
-});
-
-clearBtn.addEventListener("click", () => {
-  if (isListening && recognition) {
-    recognition.stop();
-  }
-  input.value = "";
-  output.value = "";
-  status.textContent = "Cleared";
 });
 
 translateBtn.addEventListener("click", async () => {
@@ -287,7 +240,7 @@ translateBtn.addEventListener("click", async () => {
     return;
   }
 
-  status.textContent = "Polishing and translating...";
+  status.textContent = "Translating...";
   output.value = "";
 
   try {
@@ -299,8 +252,7 @@ translateBtn.addEventListener("click", async () => {
       body: JSON.stringify({
         text,
         mode: mode.value,
-        sourceLanguage: sourceLang.options[sourceLang.selectedIndex].text,
-        targetVariant: targetVariant.value
+        format: format.value
       })
     });
 
@@ -309,10 +261,6 @@ translateBtn.addEventListener("click", async () => {
     if (!response.ok) {
       status.textContent = data.error || "Translation failed";
       return;
-    }
-
-    if (data.polished_source) {
-      input.value = data.polished_source;
     }
 
     if (data.translation) {
@@ -325,6 +273,39 @@ translateBtn.addEventListener("click", async () => {
   } catch (error) {
     status.textContent = "Server error";
   }
+});
+
+clearBtn.addEventListener("click", () => {
+  input.value = "";
+  output.value = "";
+  status.textContent = "Cleared";
+});
+
+copyInputBtn.addEventListener("click", async () => {
+  await navigator.clipboard.writeText(input.value);
+  status.textContent = "Original copied";
+});
+
+copyOutputBtn.addEventListener("click", async () => {
+  await navigator.clipboard.writeText(output.value);
+  status.textContent = "Translation copied";
+});
+
+speakBtn.addEventListener("click", () => {
+  if (!output.value.trim()) {
+    status.textContent = "Nothing to speak";
+    return;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(output.value);
+  utterance.lang = "en-GB";
+  utterance.rate = 1;
+  utterance.pitch = 1;
+
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utterance);
+
+  status.textContent = "Playing voice...";
 });
 </script>
 
