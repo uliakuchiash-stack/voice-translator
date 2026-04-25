@@ -7,11 +7,7 @@ export default async function handler(req, res) {
     const {
       image,
       sourceLanguage = "Ukrainian",
-      targetVariant = "en-GB",
-      resultType = "plain",
-      englishStyle = "",
-      audience = "",
-      slang = ""
+      targetVariant = "en-GB"
     } = req.body || {};
 
     if (!image) {
@@ -22,39 +18,28 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Missing API key" });
     }
 
-    const targetEnglish =
-      targetVariant === "en-US" ? "English US" : "English UK";
+    const targetEnglish = targetVariant === "en-US" ? "American English" : "British English";
 
     const prompt = `
-You are an OCR and translation assistant.
+You are a photo text translator.
 
-Read all visible text from the image.
+Read the text in the image and TRANSLATE it.
 
-Translation direction rules:
-- If a text fragment is English, translate that fragment into ${sourceLanguage}.
-- If a text fragment is NOT English, translate that fragment into ${targetEnglish}.
-- If the image contains mixed languages, translate EACH line or block separately using the rules above.
-- Do not decide direction based on the whole image only.
-- Preserve the original order of the text blocks.
-- Keep names, brands, addresses, emails, phone numbers and codes unchanged unless they are part of a normal sentence.
-- If the image has no readable text, return detectedText as empty and translation as "No readable text found."
+Do NOT just copy the original text.
 
-User selected:
-Main language: ${sourceLanguage}
-English variant: ${targetEnglish}
+Rules:
+- If a line is in English, translate it into ${sourceLanguage}.
+- If a line is in ${sourceLanguage} or any non-English language, translate it into ${targetEnglish}.
+- If the image has mixed English and non-English text, translate every line separately.
+- Never return the same text unchanged unless it is a name, brand, email, phone number, address, or code.
+- Keep the original order.
+- If there is no readable text, return "No readable text found."
 
-Style context:
-Result type: ${resultType}
-English level: ${englishStyle || "default"}
-Audience: ${audience || "infer from context"}
-Slang setting: ${slang || "default"}
+Return ONLY JSON:
 
-Return ONLY valid JSON.
-
-JSON format:
 {
-  "detectedText": "...",
-  "translation": "..."
+  "detectedText": "original text from image",
+  "translation": "translated text only"
 }
 `;
 
@@ -66,7 +51,7 @@ JSON format:
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        temperature: 0.15,
+        temperature: 0,
         response_format: { type: "json_object" },
         messages: [
           {
