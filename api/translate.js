@@ -9,9 +9,9 @@ export default async function handler(req, res) {
       sourceLanguage = "Ukrainian",
       targetVariant = "en-GB",
       resultType = "message",
-      englishStyle = "simple",
-      tone = "casual",
-      slang = "soften",
+      englishStyle = "",
+      tone = "",
+      slang = "",
       refine = ""
     } = req.body || {};
 
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Missing API key" });
     }
 
-    const englishVariant =
+    const variantRule =
       targetVariant === "en-US"
         ? "Use natural American English."
         : "Use natural British English.";
@@ -31,56 +31,49 @@ export default async function handler(req, res) {
     const resultRules = {
       message: `
 Result type: Message.
-- Output a natural ready-to-send message.
-- No subject line.
+- Create a ready-to-send chat/message translation.
+- No email subject.
 - No email signature.
-- Keep it suitable for chat, WhatsApp, SMS, or social messages.
+- Suitable for SMS, WhatsApp, Telegram, social messages, or chat.
 `,
       email: `
 Result type: Email.
-- Convert the user's message into a properly structured English email.
-- Do not invent a totally new request, but you may expand slightly to make it sound natural and professional.
-- Include a short subject line only if it is useful.
-- Use this structure:
-
-Subject: ...
-
-Greeting
-
-Body
-
-Closing
-(your name)
-
-- Use professional formatting and line breaks.
+- Convert the user's text into a properly structured English email.
+- Do NOT include a subject line.
+- Start directly with a greeting, such as "Dear [Name]," or "Hello,".
+- Include clear body paragraphs.
+- End with a polite closing such as "Kind regards," or "Best regards," and "(your name)".
+- Do not add "Subject:".
 `,
-      clean: `
-Result type: Clean.
-- Clean and improve the text without making it too emotional or too formal.
-- Make it clear, correct, natural, and easy to understand.
+      plain: `
+Result type: Plain Translate.
+- Translate clearly and naturally.
+- Do not format as a message or email.
+- Do not add greetings, closings, emojis, or extra structure.
 `
     };
 
     const styleRules = {
-      simple: `
-English style: Simple.
-- Use easy words and short sentences.
-- Suitable for beginner or intermediate English.
+      elementary: `
+English level: Elementary.
+- Use very simple English.
+- Short clear sentences.
+- Avoid idioms and difficult words.
 `,
-      natural: `
-English style: Natural.
-- Use normal everyday English.
-- Sound human, clear, and not robotic.
+      everyday: `
+English level: Everyday.
+- Use natural everyday English.
+- Clear, relaxed and easy to understand.
 `,
-      polished: `
-English style: Polished.
-- Make the output smooth, confident, and well-written.
-- Suitable for work, emails, and serious communication.
+      professional: `
+English level: Professional.
+- Use polished, professional English.
+- Suitable for work, clients, landlords, HR, and official communication.
 `,
       native: `
-English style: Native-like.
-- Sound fluent, idiomatic, and natural, like a native speaker.
-- Use contractions and natural rhythm where appropriate.
+English level: Native-like.
+- Sound fluent, natural and idiomatic.
+- Use native rhythm and phrasing where appropriate.
 `
     };
 
@@ -88,38 +81,43 @@ English style: Native-like.
       casual: `
 Tone: Casual.
 - Relaxed, simple, conversational.
+- Use casual phrasing only when appropriate.
 `,
       warm: `
 Tone: Warm.
-- Friendly, kind, emotionally soft, polite.
+- Friendly, kind, soft and polite.
+- Good for friends, family and gentle messages.
 `,
       professional: `
 Tone: Professional.
-- Respectful, businesslike, clear, and appropriate for work.
+- Respectful, clear, businesslike.
+- Avoid slang and overly casual greetings.
+- Prefer "Hello" or "Dear" in email.
 `,
       direct: `
 Tone: Direct.
-- Clear, concise, confident, and straight to the point.
+- Clear, concise and straight to the point.
+- No unnecessary softness.
 `
     };
 
     const slangRules = {
       soften: `
 Slang and swearing: Soften.
-- If the original contains slang, rude words, or swearing, soften it.
-- Keep the emotional meaning, but avoid harsh profanity.
+- If the source contains slang or swearing, soften it naturally.
+- Keep the meaning and emotion, but avoid harsh profanity.
 `,
       keep: `
 Slang and swearing: Keep.
-- Preserve slang and swearing when it is important to the meaning.
+- Preserve slang and swearing when it matters.
 - Translate profanity naturally, not literally.
-- Avoid weird wrong insults.
+- Do not invent weird insults.
 `,
       strong: `
 Slang and swearing: Strong.
-- Keep the raw emotional force.
+- Keep strong emotional force.
 - Use natural English slang or profanity if the source uses it.
-- Do not translate "kurwa" as "bastard" unless the context truly means bastard.
+- Do not translate Polish "kurwa" as "bastard" unless the context truly means bastard.
 - Polish "kurwa" may mean "fuck", "shit", "damn", "for fuck's sake", or "bitch" depending on context.
 `
     };
@@ -127,49 +125,50 @@ Slang and swearing: Strong.
     const refineRules = {
       shorter: "Make the result shorter and more concise.",
       warmer: "Make the result warmer and friendlier.",
-      professional: "Make the result more professional and polished.",
-      soften: "Soften rude, aggressive, or too emotional wording.",
-      regenerate: "Regenerate the result with a better, more natural version."
+      professional: "Make the result more professional, polished and work-appropriate.",
+      soften: "Soften rude, aggressive or too emotional wording.",
+      regenerate: "Regenerate a better, more natural version."
     };
+
+    const defaultRules = `
+Default behaviour:
+- If no English level is selected, use natural clear English.
+- If no tone is selected, choose the tone that best fits the context.
+- If no slang option is selected, do not force slang into the result.
+- For professional or email contexts, avoid "Hi" unless the source clearly asks for a casual tone.
+- Prefer "Hello" or "Dear" in professional emails.
+`;
 
     const systemPrompt = `
 You are an expert multilingual AI communication assistant.
 
-Your job:
+Your task:
 Transform the user's text from ${sourceLanguage} into high-quality English.
 
+${variantRule}
+
+${resultRules[resultType] || resultRules.message}
+
+${englishStyle ? styleRules[englishStyle] || "" : ""}
+${tone ? toneRules[tone] || "" : ""}
+${slang ? slangRules[slang] || "" : ""}
+
+${defaultRules}
+
+Refine instruction:
+${refine ? refineRules[refine] || refine : "No extra refine instruction."}
+
 Important:
-- This is not only literal translation.
-- Preserve meaning, context, emotion, and intent.
-- Make the result useful for real communication.
+- Preserve the user's meaning, context, emotion and intent.
+- Do not translate word-for-word if it sounds unnatural.
+- Do not add explanations.
+- Do not say you are an AI.
 - Return ONLY valid JSON.
 
 JSON format:
 {
   "translation": "..."
 }
-
-Target:
-${englishVariant}
-
-Rules:
-${resultRules[resultType] || resultRules.message}
-${styleRules[englishStyle] || styleRules.simple}
-${toneRules[tone] || toneRules.casual}
-${slangRules[slang] || slangRules.soften}
-
-Refine instruction:
-${refine ? refineRules[refine] || refine : "No extra refine instruction."}
-
-Extra rules:
-- Do not explain.
-- Do not add notes.
-- Do not say you are an AI.
-- If the user asks to write an email, you may format it as an email.
-- If the user provides a simple rough request, improve it into natural English.
-- If result type is Email, make it ready to send.
-- If result type is Message, make it ready to paste into chat.
-- If result type is Clean, make it clean and clear.
 `;
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -204,6 +203,7 @@ Extra rules:
     }
 
     let parsed;
+
     try {
       parsed = JSON.parse(content);
     } catch {
