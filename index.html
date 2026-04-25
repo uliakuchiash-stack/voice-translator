@@ -1,865 +1,814 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Voice Translator</title>
-  <style>
-    :root{
-      --bg:#0f131a;
-      --card:#141a22;
-      --card-2:#1f2733;
-      --text:#f4f7fb;
-      --muted:#a4afbc;
-      --accent:#6f95d8;
-      --btn:#2a3442;
-      --btn-text:#f4f7fb;
-      --border:rgba(255,255,255,.08);
-      --shadow:0 14px 40px rgba(0,0,0,.26);
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Slang and Business Translator</title>
 
-    *{box-sizing:border-box}
+<style>
+:root{
+  --bg:#0f131a;
+  --card:#141a22;
+  --card2:#1f2733;
+  --text:#f4f7fb;
+  --muted:#a4afbc;
+  --accent:#6f95d8;
+  --btn:#2a3442;
+  --btnText:#f4f7fb;
+  --border:rgba(255,255,255,.08);
+}
 
-    body{
-      margin:0;
-      font-family:Arial,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      min-height:100vh;
-      padding:22px;
-      transition:background .25s ease,color .25s ease;
-    }
+*{box-sizing:border-box}
 
-    .app{
-      width:100%;
-      max-width:1220px;
-      margin:0 auto;
-      background:var(--card);
-      border-radius:26px;
-      padding:28px;
-      box-shadow:var(--shadow);
-      transition:background .25s ease;
-      border:1px solid var(--border);
-    }
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  padding:18px;
+}
 
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:18px;
-      margin-bottom:22px;
-    }
+.app{
+  max-width:1220px;
+  margin:auto;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:28px;
+  padding:22px;
+  box-shadow:0 18px 50px rgba(0,0,0,.3);
+}
 
-    h1{
-      margin:0 0 8px;
-      font-size:28px;
-      line-height:1.1;
-      font-weight:800;
-    }
+.top{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+  margin-bottom:18px;
+}
 
-    .subtitle{
-      color:var(--muted);
-      font-size:15px;
-      line-height:1.4;
-    }
+h1{
+  margin:0;
+  font-size:25px;
+  line-height:1.1;
+}
 
-    .themeDots{
-      display:flex;
-      gap:10px;
-      padding-top:4px;
-      flex-shrink:0;
-    }
+.subtitle{
+  color:var(--muted);
+  font-size:14px;
+  margin-top:6px;
+}
 
-    .themeDot{
-      width:18px;
-      height:18px;
-      border-radius:50%;
-      border:2px solid rgba(255,255,255,.35);
-      cursor:pointer;
-      transition:transform .15s ease,border-color .15s ease;
-    }
+.iconBtns{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
 
-    .themeDot:hover{transform:scale(1.08)}
-    .themeDot.active{border-color:#fff}
+.iconBtn,.themeDot{
+  border:none;
+  cursor:pointer;
+}
 
-    .selectors{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:14px;
-      margin-bottom:18px;
-    }
+.iconBtn{
+  background:var(--btn);
+  color:var(--btnText);
+  border-radius:14px;
+  padding:11px 12px;
+  font-size:16px;
+}
 
-    label{
-      display:block;
-      font-size:14px;
-      font-weight:700;
-      margin:0 0 8px;
-      color:var(--text);
-    }
+.themeDots{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
 
-    select,
-    textarea{
-      width:100%;
-      border:1px solid var(--border);
-      outline:none;
-      border-radius:18px;
-      background:var(--card-2);
-      color:var(--text);
-      transition:background .25s ease,color .25s ease,border-color .25s ease;
-    }
+.themeDot{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.35);
+}
 
-    select{
-      padding:16px;
-      font-size:16px;
-      appearance:auto;
-    }
+.themeDot.active{border-color:#fff}
 
-    textarea{
-      padding:18px;
-      font-size:18px;
-      line-height:1.55;
-      resize:vertical;
-      min-height:185px;
-      white-space:pre-wrap;
-    }
+.langRow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:14px;
+}
 
-    #output{
-      min-height:230px;
-    }
+select, textarea{
+  width:100%;
+  border:none;
+  outline:none;
+  border-radius:18px;
+  background:var(--card2);
+  color:var(--text);
+  border:1px solid var(--border);
+}
 
-    .email-mode #output{
-      min-height:360px;
-    }
+select{
+  padding:14px;
+  font-size:15px;
+}
 
-    .layout{
-      display:grid;
-      grid-template-columns:minmax(0, 1fr) 330px;
-      gap:18px;
-      align-items:start;
-    }
+textarea{
+  padding:16px;
+  font-size:17px;
+  line-height:1.5;
+  resize:vertical;
+  min-height:160px;
+}
 
-    .mainPanel,
-    .sidePanel{
-      min-width:0;
-    }
+.mainGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
 
-    .sideCard{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius:22px;
-      padding:16px;
-    }
+.card{
+  background:rgba(255,255,255,.025);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:15px;
+}
 
-    .sideSection + .sideSection{
-      margin-top:18px;
-    }
+.cardHead{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+  align-items:center;
+}
 
-    .sectionTitle{
-      font-size:14px;
-      font-weight:700;
-      margin:0 0 10px;
-      color:var(--text);
-    }
+.title{
+  font-weight:700;
+  font-size:15px;
+}
 
-    .pillGroup{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
+.hint{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:4px;
+}
 
-    .pill{
-      border:none;
-      border-radius:18px;
-      padding:12px 16px;
-      background:var(--btn);
-      color:var(--btn-text);
-      cursor:pointer;
-      font-size:14px;
-      line-height:1.2;
-      transition:transform .15s ease,background .25s ease,color .25s ease,box-shadow .25s ease,opacity .2s ease;
-      text-align:center;
-      min-width:96px;
-    }
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
 
-    .pill:hover{transform:translateY(-1px)}
-    .pill.active{
-      background:var(--accent);
-      color:#0f1720;
-      font-weight:700;
-      box-shadow:0 3px 10px rgba(0,0,0,.14);
-    }
+button{
+  border:none;
+  border-radius:16px;
+  padding:13px 15px;
+  cursor:pointer;
+  font-size:14px;
+}
 
-    .pill small{
-      display:block;
-      font-size:11px;
-      opacity:.82;
-      margin-top:3px;
-    }
+.primary{
+  background:var(--accent);
+  color:#0f1720;
+  font-weight:800;
+}
 
-    .panelBlock{
-      background:rgba(255,255,255,.02);
-      border:1px solid var(--border);
-      border-radius:22px;
-      padding:16px;
-    }
+.secondary{
+  background:var(--btn);
+  color:var(--btnText);
+}
 
-    .panelBlock + .panelBlock{
-      margin-top:16px;
-    }
+.big{
+  flex:1;
+  min-width:150px;
+}
 
-    .blockHeader{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      margin-bottom:10px;
-    }
+.tabs,.chips{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:10px 0;
+}
 
-    .blockHeader .left{
-      min-width:0;
-      flex:1;
-    }
+.chip,.tab{
+  background:var(--btn);
+  color:var(--btnText);
+  border-radius:999px;
+  padding:10px 13px;
+  font-size:13px;
+}
 
-    .blockHeader .right{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
+.chip.active,.tab.active{
+  background:var(--accent);
+  color:#0f1720;
+  font-weight:800;
+}
 
-    .blockTitle{
-      margin:0;
-      font-size:15px;
-      font-weight:700;
-    }
+.status{
+  color:var(--muted);
+  font-size:14px;
+  margin-top:14px;
+}
 
-    .blockHint{
-      margin-top:3px;
-      font-size:12px;
-      color:var(--muted);
-    }
+.drawerOverlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  z-index:20;
+}
 
-    .rowActions{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      margin-top:12px;
-      flex-wrap:wrap;
-    }
+.drawer{
+  position:fixed;
+  top:0;
+  right:-390px;
+  width:380px;
+  max-width:92vw;
+  height:100vh;
+  background:var(--card);
+  border-left:1px solid var(--border);
+  z-index:30;
+  padding:20px;
+  transition:right .25s ease;
+  overflow:auto;
+}
 
-    .rowActions.split{
-      justify-content:space-between;
-    }
+.drawer.open{right:0}
+.drawerOverlay.open{display:block}
 
-    .leftActions,
-    .rightActions{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
+.drawerHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+}
 
-    button.action{
-      border:none;
-      border-radius:18px;
-      padding:14px 18px;
-      font-size:15px;
-      cursor:pointer;
-      transition:transform .15s ease,opacity .15s ease,background .25s ease,color .25s ease;
-    }
+.section{
+  margin:18px 0;
+}
 
-    button.action:hover{transform:translateY(-1px)}
-    button.action:disabled{
-      opacity:.55;
-      cursor:not-allowed;
-      transform:none;
-    }
+.sectionTitle{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:8px;
+  font-weight:700;
+  text-transform:uppercase;
+}
 
-    #micBtn{
-      background:var(--accent);
-      color:#0f1720;
-      font-weight:700;
-      min-width:140px;
-    }
+.historyPanel,.dialoguePanel,.cameraPanel{
+  display:none;
+}
 
-    #translateBtn{
-      flex:1;
-      min-width:220px;
-      background:var(--btn);
-      color:var(--btn-text);
-      font-weight:700;
-    }
+.historyPanel.open,.dialoguePanel.open,.cameraPanel.open{
+  display:block;
+}
 
-    .secondaryBtn{
-      background:var(--btn);
-      color:var(--btn-text);
-    }
+.historyItem{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:12px;
+  margin-bottom:10px;
+}
 
-    .status{
-      margin-top:16px;
-      min-height:20px;
-      color:var(--muted);
-      font-size:14px;
-    }
+.historyItem small{
+  color:var(--muted);
+}
 
-    @media (max-width: 980px){
-      .layout{
-        grid-template-columns:1fr;
-      }
+.dialogueList{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:10px;
+}
 
-      .sidePanel{
-        order:-1;
-      }
+.bubble{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:12px;
+}
 
-      .sideCard{
-        display:grid;
-        grid-template-columns:1fr 1fr;
-        gap:18px;
-      }
+.bubble .original{
+  color:var(--text);
+}
 
-      .sideSection + .sideSection{
-        margin-top:0;
-      }
-    }
+.bubble .translated{
+  color:var(--muted);
+  margin-top:6px;
+}
 
-    @media (max-width: 760px){
-      body{padding:14px}
-      .app{padding:18px}
-      .selectors{
-        grid-template-columns:1fr;
-      }
-      .topbar{
-        flex-direction:column;
-      }
-      .sideCard{
-        grid-template-columns:1fr;
-      }
-      .blockHeader{
-        flex-direction:column;
-        align-items:flex-start;
-      }
-      .blockHeader .right{
-        justify-content:flex-start;
-      }
-      .rowActions.split{
-        flex-direction:column;
-        align-items:stretch;
-      }
-      .leftActions,
-      .rightActions{
-        width:100%;
-      }
-      .leftActions button,
-      .rightActions button{
-        flex:1;
-      }
-      #translateBtn{
-        width:100%;
-      }
-    }
-  </style>
+.fileInput{
+  width:100%;
+  background:var(--card2);
+  border:1px dashed var(--accent);
+  padding:20px;
+  border-radius:18px;
+  color:var(--muted);
+}
+
+@media(max-width:850px){
+  body{padding:10px}
+  .app{padding:14px;border-radius:22px}
+  .mainGrid{grid-template-columns:1fr}
+  .langRow{grid-template-columns:1fr}
+  h1{font-size:21px}
+  textarea{min-height:135px}
+  .top{flex-direction:column}
+  .iconBtns{justify-content:flex-start}
+}
+</style>
 </head>
+
 <body>
-  <div class="app" id="appRoot">
-    <div class="topbar">
-      <div>
-        <h1>AI Voice Translator</h1>
-        <div class="subtitle">Speak naturally → clean text + real English</div>
-      </div>
+<div class="app">
 
-      <div class="themeDots" id="themeDots">
-        <div class="themeDot active" data-theme="dark" style="background:#6f95d8"></div>
-        <div class="themeDot" data-theme="olive" style="background:#90a765"></div>
-        <div class="themeDot" data-theme="blue" style="background:#5d8ec0"></div>
-        <div class="themeDot" data-theme="rose" style="background:#c88a91"></div>
-        <div class="themeDot" data-theme="lavender" style="background:#8877b8"></div>
-      </div>
-    </div>
+  <div class="top">
+    <div>
+      <h1>AI Slang and Business Translator</h1>
+      <div class="subtitle">Voice, slang, business English, email, camera and real conversation translation.</div>
 
-    <div class="selectors">
-      <div>
-        <label for="sourceLang">Input language</label>
-        <select id="sourceLang">
-          <option value="en">English</option>
-          <option value="uk" selected>Ukrainian</option>
-          <option value="ru">Russian</option>
-          <option value="pl">Polish</option>
-          <option value="ro">Romanian (Romania / Moldova)</option>
-          <option value="lt">Lithuanian</option>
-          <option value="lv">Latvian</option>
-          <option value="pt">Portuguese</option>
-          <option value="es">Spanish</option>
-          <option value="it">Italian</option>
-          <option value="de">German</option>
-          <option value="fr">French</option>
-          <option value="nl">Dutch</option>
-          <option value="tr">Turkish</option>
-          <option value="ar">Arabic</option>
-          <option value="hi">Hindi</option>
-          <option value="zh">Chinese</option>
-          <option value="ja">Japanese</option>
-          <option value="ko">Korean</option>
-          <option value="cs">Czech</option>
-          <option value="bg">Bulgarian</option>
-        </select>
-      </div>
-
-      <div>
-        <label for="targetVariant">English variant</label>
-        <select id="targetVariant">
-          <option value="en-US">English (US)</option>
-          <option value="en-GB" selected>English (UK)</option>
-        </select>
-      </div>
-
-      <div>
-        <label for="format">Output format</label>
-        <select id="format">
-          <option value="chat" selected>Chat Version</option>
-          <option value="email">Email Version</option>
-        </select>
+      <div class="themeDots">
+        <button class="themeDot active" data-theme="dark" style="background:#6f95d8"></button>
+        <button class="themeDot" data-theme="olive" style="background:#90a765"></button>
+        <button class="themeDot" data-theme="blue" style="background:#5d8ec0"></button>
+        <button class="themeDot" data-theme="rose" style="background:#c88a91"></button>
+        <button class="themeDot" data-theme="lavender" style="background:#8877b8"></button>
       </div>
     </div>
 
-    <div class="layout">
-      <div class="mainPanel">
-        <div class="panelBlock">
-          <div class="blockHeader">
-            <div class="left">
-              <div class="blockTitle">Original text</div>
-              <div class="blockHint">Speak or type in the source language.</div>
-            </div>
-            <div class="right">
-              <button id="copyInputBtn" class="action secondaryBtn">Copy Original</button>
-              <button id="clearBtn" class="action secondaryBtn">Clear</button>
-            </div>
-          </div>
+    <div class="iconBtns">
+      <button class="iconBtn" id="cameraBtn">📷</button>
+      <button class="iconBtn" id="dialogueBtn">💬 Dialogue</button>
+      <button class="iconBtn" id="historyBtn">🕘 History</button>
+      <button class="iconBtn" id="settingsBtn">✨ Settings</button>
+    </div>
+  </div>
 
-          <textarea id="input" placeholder="Speak or type here..."></textarea>
+  <div class="langRow">
+    <select id="sourceLang">
+      <option value="en">English</option>
+      <option value="uk" selected>Ukrainian</option>
+      <option value="ru">Russian</option>
+      <option value="pl">Polish</option>
+      <option value="fr">French</option>
+      <option value="es">Spanish</option>
+      <option value="de">German</option>
+      <option value="it">Italian</option>
+      <option value="ro">Romanian / Moldova</option>
+      <option value="hu">Hungarian</option>
+      <option value="pt">Portuguese</option>
+      <option value="tr">Turkish</option>
+      <option value="ar">Arabic</option>
+      <option value="hi">Hindi</option>
+      <option value="zh">Chinese</option>
+      <option value="ja">Japanese</option>
+      <option value="ko">Korean</option>
+      <option value="cs">Czech</option>
+      <option value="bg">Bulgarian</option>
+    </select>
 
-          <div class="rowActions">
-            <button id="micBtn" class="action">🎤 Start recording</button>
-            <button id="translateBtn" class="action">Translate</button>
-          </div>
+    <select id="targetVariant">
+      <option value="en-GB" selected>English UK</option>
+      <option value="en-US">English US</option>
+    </select>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-result="message">Message</button>
+    <button class="tab" data-result="email">Email</button>
+    <button class="tab" data-result="clean">Clean</button>
+  </div>
+
+  <div class="mainGrid" id="translatePanel">
+    <div class="card">
+      <div class="cardHead">
+        <div>
+          <div class="title">Input</div>
+          <div class="hint">Speak or type naturally.</div>
         </div>
-
-        <div class="panelBlock">
-          <div class="blockHeader">
-            <div class="left">
-              <div class="blockTitle">English translation</div>
-              <div class="blockHint">Chat stays compact. Email gives a full formatted letter.</div>
-            </div>
-          </div>
-
-          <textarea id="output" placeholder="Translation will appear here..." readonly></textarea>
-
-          <div class="rowActions split">
-            <div class="leftActions">
-              <button id="speakBtn" class="action secondaryBtn">🔊 Speak Translation</button>
-            </div>
-            <div class="rightActions">
-              <button id="copyOutputBtn" class="action secondaryBtn">Copy Translation</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="status" id="status">Ready</div>
+        <button class="secondary" id="clearBtn">Clear</button>
       </div>
 
-      <div class="sidePanel">
-        <div class="sideCard">
-          <div class="sideSection">
-            <div class="sectionTitle">English level</div>
-            <div class="pillGroup" id="levelGroup">
-              <button class="pill active" data-level="elementary">Elementary<small>A1–A2</small></button>
-              <button class="pill" data-level="everyday">Everyday<small>B1–B2</small></button>
-              <button class="pill" data-level="advanced">Advanced<small>C1–C2</small></button>
-              <button class="pill" data-level="native">Native</button>
-            </div>
-          </div>
+      <textarea id="input" placeholder="Speak or type here..."></textarea>
 
-          <div class="sideSection">
-            <div class="sectionTitle">Style</div>
-            <div class="pillGroup" id="styleGroup">
-              <button class="pill active" data-style="friendly">Friendly Talk</button>
-              <button class="pill" data-style="street">Real Talk: Slang & Swearing 🔥</button>
-              <button class="pill" data-style="formal">Formal & Professional</button>
-            </div>
-          </div>
+      <div class="actions">
+        <button class="primary big" id="micBtn">🎤 Start recording</button>
+        <button class="secondary big" id="translateBtn">Translate</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="cardHead">
+        <div>
+          <div class="title">Ready result</div>
+          <div class="hint">Copy, speak or refine the result.</div>
         </div>
+        <button class="secondary" id="copyBtn">Copy</button>
+      </div>
+
+      <textarea id="output" readonly placeholder="Translation will appear here..."></textarea>
+
+      <div class="actions">
+        <button class="secondary" id="speakBtn">🔊 Speak</button>
+        <button class="secondary refine" data-refine="shorter">Shorter</button>
+        <button class="secondary refine" data-refine="warmer">Warmer</button>
+        <button class="secondary refine" data-refine="professional">Professional</button>
+        <button class="secondary refine" data-refine="soften">Soften</button>
+        <button class="secondary refine" data-refine="regenerate">Regenerate</button>
       </div>
     </div>
   </div>
 
-  <script>
-    const appRoot = document.getElementById("appRoot");
-    const input = document.getElementById("input");
-    const output = document.getElementById("output");
-    const micBtn = document.getElementById("micBtn");
-    const translateBtn = document.getElementById("translateBtn");
-    const clearBtn = document.getElementById("clearBtn");
-    const copyInputBtn = document.getElementById("copyInputBtn");
-    const copyOutputBtn = document.getElementById("copyOutputBtn");
-    const speakBtn = document.getElementById("speakBtn");
-    const statusEl = document.getElementById("status");
-    const sourceLang = document.getElementById("sourceLang");
-    const targetVariant = document.getElementById("targetVariant");
-    const format = document.getElementById("format");
-    const themeDots = document.querySelectorAll(".themeDot");
+  <div class="dialoguePanel" id="dialoguePanel">
+    <div class="card">
+      <div class="cardHead">
+        <div>
+          <div class="title">Live Dialogue Mode</div>
+          <div class="hint">Each phrase becomes a separate translated reply.</div>
+        </div>
+        <button class="secondary" id="closeDialogue">Close</button>
+      </div>
 
-    let selectedLevel = "elementary";
-    let selectedStyle = "friendly";
+      <div class="dialogueList" id="dialogueList"></div>
 
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let isRecording = false;
-    let mediaStream = null;
-    let retranslateTimer = null;
+      <div class="actions">
+        <button class="primary big" id="dialogueRecordBtn">🎤 Record reply</button>
+        <button class="secondary" id="clearDialogueBtn">Clear dialogue</button>
+      </div>
+    </div>
+  </div>
 
-    const themes = {
-      dark: {
-        "--bg":"#0f131a",
-        "--card":"#141a22",
-        "--card-2":"#1f2733",
-        "--text":"#f4f7fb",
-        "--muted":"#a4afbc",
-        "--accent":"#6f95d8",
-        "--btn":"#2a3442",
-        "--btn-text":"#f4f7fb"
-      },
-      olive: {
-        "--bg":"#626f52",
-        "--card":"#6e7d5d",
-        "--card-2":"#dcd8cc",
-        "--text":"#f7f4ec",
-        "--muted":"#e0dacd",
-        "--accent":"#90a765",
-        "--btn":"#7b8969",
-        "--btn-text":"#f7f4ec"
-      },
-      blue: {
-        "--bg":"#dbe3ed",
-        "--card":"#eaf0f6",
-        "--card-2":"#f3f7fb",
-        "--text":"#203142",
-        "--muted":"#617488",
-        "--accent":"#5d8ec0",
-        "--btn":"#7fa1c6",
-        "--btn-text":"#ffffff"
-      },
-      rose: {
-        "--bg":"#eddfe1",
-        "--card":"#f4e8ea",
-        "--card-2":"#fbf3f4",
-        "--text":"#4a3639",
-        "--muted":"#8b7377",
-        "--accent":"#c88a91",
-        "--btn":"#d39aa0",
-        "--btn-text":"#ffffff"
-      },
-      lavender: {
-        "--bg":"#e4deee",
-        "--card":"#ede7f5",
-        "--card-2":"#f6f2fb",
-        "--text":"#403755",
-        "--muted":"#7b7292",
-        "--accent":"#8877b8",
-        "--btn":"#9b8cc6",
-        "--btn-text":"#ffffff"
+  <div class="cameraPanel" id="cameraPanel">
+    <div class="card">
+      <div class="cardHead">
+        <div>
+          <div class="title">Photo Translate</div>
+          <div class="hint">Take or upload a photo with text.</div>
+        </div>
+        <button class="secondary" id="closeCamera">Close</button>
+      </div>
+
+      <input class="fileInput" id="photoInput" type="file" accept="image/*" capture="environment" />
+
+      <div class="actions">
+        <button class="primary big" id="photoTranslateBtn">📷 Translate photo</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="historyPanel" id="historyPanel">
+    <div class="card">
+      <div class="cardHead">
+        <div>
+          <div class="title">History</div>
+          <div class="hint">Saved translations from this device.</div>
+        </div>
+        <button class="secondary" id="closeHistory">Close</button>
+      </div>
+
+      <div class="chips">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="email">Email</button>
+        <button class="chip" data-filter="message">Message</button>
+        <button class="chip" data-filter="clean">Clean</button>
+        <button class="chip" data-filter="slang">Slang</button>
+      </div>
+
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <div class="status" id="status">Ready</div>
+</div>
+
+<div class="drawerOverlay" id="drawerOverlay"></div>
+
+<div class="drawer" id="drawer">
+  <div class="drawerHeader">
+    <h2>Style Settings</h2>
+    <button class="secondary" id="closeDrawer">Close</button>
+  </div>
+
+  <div class="section">
+    <div class="sectionTitle">English Style</div>
+    <div class="chips" id="styleChips">
+      <button class="chip active" data-style="simple">Simple</button>
+      <button class="chip" data-style="natural">Natural</button>
+      <button class="chip" data-style="polished">Polished</button>
+      <button class="chip" data-style="native">Native-like</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sectionTitle">Tone</div>
+    <div class="chips" id="toneChips">
+      <button class="chip active" data-tone="casual">Casual</button>
+      <button class="chip" data-tone="warm">Warm</button>
+      <button class="chip" data-tone="professional">Professional</button>
+      <button class="chip" data-tone="direct">Direct</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sectionTitle">Slang & Swearing</div>
+    <div class="chips" id="slangChips">
+      <button class="chip active" data-slang="soften">Soften</button>
+      <button class="chip" data-slang="keep">Keep</button>
+      <button class="chip" data-slang="strong">Strong</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const input = document.getElementById("input");
+const output = document.getElementById("output");
+const statusEl = document.getElementById("status");
+const sourceLang = document.getElementById("sourceLang");
+const targetVariant = document.getElementById("targetVariant");
+const micBtn = document.getElementById("micBtn");
+const translateBtn = document.getElementById("translateBtn");
+
+let resultType = "message";
+let englishStyle = "simple";
+let tone = "casual";
+let slang = "soften";
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+let stream = null;
+let lastRefine = "";
+
+const themes = {
+  dark:{bg:"#0f131a",card:"#141a22",card2:"#1f2733",text:"#f4f7fb",muted:"#a4afbc",accent:"#6f95d8",btn:"#2a3442",btnText:"#f4f7fb"},
+  olive:{bg:"#626f52",card:"#6e7d5d",card2:"#dcd8cc",text:"#f7f4ec",muted:"#e0dacd",accent:"#90a765",btn:"#7b8969",btnText:"#f7f4ec"},
+  blue:{bg:"#dbe3ed",card:"#eaf0f6",card2:"#f3f7fb",text:"#203142",muted:"#617488",accent:"#5d8ec0",btn:"#7fa1c6",btnText:"#fff"},
+  rose:{bg:"#eddfe1",card:"#f4e8ea",card2:"#fbf3f4",text:"#4a3639",muted:"#8b7377",accent:"#c88a91",btn:"#d39aa0",btnText:"#fff"},
+  lavender:{bg:"#e4deee",card:"#ede7f5",card2:"#f6f2fb",text:"#403755",muted:"#7b7292",accent:"#8877b8",btn:"#9b8cc6",btnText:"#fff"}
+};
+
+function applyTheme(name){
+  const t = themes[name];
+  document.documentElement.style.setProperty("--bg",t.bg);
+  document.documentElement.style.setProperty("--card",t.card);
+  document.documentElement.style.setProperty("--card2",t.card2);
+  document.documentElement.style.setProperty("--text",t.text);
+  document.documentElement.style.setProperty("--muted",t.muted);
+  document.documentElement.style.setProperty("--accent",t.accent);
+  document.documentElement.style.setProperty("--btn",t.btn);
+  document.documentElement.style.setProperty("--btnText",t.btnText);
+  localStorage.setItem("theme",name);
+  document.querySelectorAll(".themeDot").forEach(b=>b.classList.remove("active"));
+  document.querySelector(`[data-theme="${name}"]`)?.classList.add("active");
+}
+
+document.querySelectorAll(".themeDot").forEach(b=>b.onclick=()=>applyTheme(b.dataset.theme));
+applyTheme(localStorage.getItem("theme") || "dark");
+
+function activate(group, el, key){
+  group.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
+  el.classList.add("active");
+  if(key==="result") resultType = el.dataset.result;
+  if(key==="style") englishStyle = el.dataset.style;
+  if(key==="tone") tone = el.dataset.tone;
+  if(key==="slang") slang = el.dataset.slang;
+  if(output.value.trim()) runTranslate();
+}
+
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>activate(document.querySelector(".tabs"),b,"result"));
+document.querySelectorAll("#styleChips .chip").forEach(b=>b.onclick=()=>activate(document.getElementById("styleChips"),b,"style"));
+document.querySelectorAll("#toneChips .chip").forEach(b=>b.onclick=()=>activate(document.getElementById("toneChips"),b,"tone"));
+document.querySelectorAll("#slangChips .chip").forEach(b=>b.onclick=()=>activate(document.getElementById("slangChips"),b,"slang"));
+
+function openDrawer(){
+  document.getElementById("drawer").classList.add("open");
+  document.getElementById("drawerOverlay").classList.add("open");
+}
+function closeDrawer(){
+  document.getElementById("drawer").classList.remove("open");
+  document.getElementById("drawerOverlay").classList.remove("open");
+}
+document.getElementById("settingsBtn").onclick=openDrawer;
+document.getElementById("closeDrawer").onclick=closeDrawer;
+document.getElementById("drawerOverlay").onclick=closeDrawer;
+
+async function runTranslate(extraRefine=""){
+  const text = input.value.trim();
+  if(!text){ statusEl.textContent="Enter text first"; return; }
+
+  statusEl.textContent="Translating...";
+  translateBtn.disabled=true;
+
+  try{
+    const res = await fetch("/api/translate",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        text,
+        sourceLanguage:sourceLang.options[sourceLang.selectedIndex].text,
+        targetVariant:targetVariant.value,
+        resultType,
+        englishStyle,
+        tone,
+        slang,
+        refine:extraRefine
+      })
+    });
+
+    const data = await res.json();
+    if(!res.ok){ statusEl.textContent=data.error || "Translation failed"; return; }
+
+    output.value = data.translation || "";
+    saveHistory(text, output.value);
+    statusEl.textContent="Done";
+  }catch(e){
+    statusEl.textContent="Server error";
+  }finally{
+    translateBtn.disabled=false;
+  }
+}
+
+async function startRecording(){
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    audioChunks=[];
+    const mimeType = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "audio/mp4";
+    mediaRecorder = new MediaRecorder(stream,{mimeType});
+
+    mediaRecorder.ondataavailable=e=>{
+      if(e.data.size>0) audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop=async()=>{
+      statusEl.textContent="Transcribing...";
+      const blob = new Blob(audioChunks,{type:mediaRecorder.mimeType || "audio/webm"});
+      const buffer = await blob.arrayBuffer();
+
+      try{
+        const res = await fetch("/api/transcribe",{
+          method:"POST",
+          headers:{
+            "Content-Type":blob.type,
+            "x-source-language":sourceLang.value
+          },
+          body:buffer
+        });
+        const data = await res.json();
+        if(!res.ok){ statusEl.textContent=data.error || "Transcription failed"; return; }
+
+        const text = (data.text || "").trim();
+        if(!text){ statusEl.textContent="No speech detected"; return; }
+
+        input.value = input.value ? input.value + " " + text : text;
+        await runTranslate();
+      }catch(e){
+        statusEl.textContent="Transcription failed";
+      }finally{
+        stream?.getTracks().forEach(t=>t.stop());
+        isRecording=false;
+        micBtn.textContent="🎤 Start recording";
       }
     };
 
-    function applyTheme(name) {
-      const theme = themes[name];
-      for (const key in theme) {
-        document.documentElement.style.setProperty(key, theme[key]);
-      }
-      localStorage.setItem("ai_voice_theme", name);
-      themeDots.forEach(dot => dot.classList.remove("active"));
-      document.querySelector(`.themeDot[data-theme="${name}"]`)?.classList.add("active");
-    }
+    mediaRecorder.start();
+    isRecording=true;
+    micBtn.textContent="⏹ Stop recording";
+    statusEl.textContent="Recording...";
+  }catch(e){
+    statusEl.textContent="Microphone access denied";
+  }
+}
 
-    themeDots.forEach(dot => {
-      dot.addEventListener("click", () => applyTheme(dot.dataset.theme));
-    });
+function stopRecording(){
+  if(mediaRecorder && isRecording) mediaRecorder.stop();
+}
 
-    applyTheme(localStorage.getItem("ai_voice_theme") || "dark");
+micBtn.onclick=()=> isRecording ? stopRecording() : startRecording();
+translateBtn.onclick=()=>runTranslate();
 
-    document.querySelectorAll("#levelGroup .pill").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll("#levelGroup .pill").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        selectedLevel = btn.dataset.level;
-        scheduleRetranslate();
-      });
-    });
+document.getElementById("clearBtn").onclick=()=>{
+  input.value="";
+  output.value="";
+  statusEl.textContent="Cleared";
+};
 
-    document.querySelectorAll("#styleGroup .pill").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll("#styleGroup .pill").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        selectedStyle = btn.dataset.style;
-        scheduleRetranslate();
-      });
-    });
+document.getElementById("copyBtn").onclick=async()=>{
+  await navigator.clipboard.writeText(output.value);
+  statusEl.textContent="Copied";
+};
 
-    function updateOutputModeUI() {
-      if (format.value === "email") {
-        appRoot.classList.add("email-mode");
-      } else {
-        appRoot.classList.remove("email-mode");
-      }
-      scheduleRetranslate();
-    }
+document.getElementById("speakBtn").onclick=()=>{
+  if(!output.value.trim()) return;
+  const u = new SpeechSynthesisUtterance(output.value);
+  u.lang = targetVariant.value;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+};
 
-    format.addEventListener("change", updateOutputModeUI);
-    targetVariant.addEventListener("change", scheduleRetranslate);
-    updateOutputModeUI();
+document.querySelectorAll(".refine").forEach(b=>{
+  b.onclick=()=>runTranslate(b.dataset.refine);
+});
 
-    async function startRecording() {
-      try {
-        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        audioChunks = [];
+function saveHistory(original, translation){
+  if(!translation) return;
+  const items = JSON.parse(localStorage.getItem("history") || "[]");
+  items.unshift({
+    date:new Date().toLocaleString(),
+    type:resultType,
+    slang,
+    original,
+    translation
+  });
+  localStorage.setItem("history",JSON.stringify(items.slice(0,50)));
+  renderHistory();
+}
 
-        const mimeType = MediaRecorder.isTypeSupported("audio/webm")
-          ? "audio/webm"
-          : "audio/mp4";
+function renderHistory(filter="all"){
+  const list = document.getElementById("historyList");
+  const items = JSON.parse(localStorage.getItem("history") || "[]");
+  const filtered = filter==="all" ? items : items.filter(i=>i.type===filter || i.slang===filter);
 
-        mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
+  list.innerHTML = filtered.length ? "" : "<p>No history yet.</p>";
 
-        let silenceTimer = null;
-        let audioContext = null;
-        let analyser = null;
-        let source = null;
-        let dataArray = null;
-        let animationId = null;
+  filtered.forEach(item=>{
+    const div=document.createElement("div");
+    div.className="historyItem";
+    div.innerHTML=`
+      <small>${item.date} • ${item.type}</small>
+      <div><b>${item.original.slice(0,80)}</b></div>
+      <div style="color:var(--muted);margin-top:5px">${item.translation.slice(0,120)}</div>
+      <div class="actions">
+        <button class="secondary">Reuse</button>
+      </div>
+    `;
+    div.querySelector("button").onclick=()=>{
+      input.value=item.original;
+      output.value=item.translation;
+      showPanel("translate");
+    };
+    list.appendChild(div);
+  });
+}
 
-        function stopBecauseOfSilence() {
-          if (isRecording && mediaRecorder && mediaRecorder.state === "recording") {
-            mediaRecorder.stop();
-          }
-        }
+document.querySelectorAll("#historyPanel .chip").forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll("#historyPanel .chip").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    renderHistory(b.dataset.filter);
+  };
+});
 
-        function monitorSilence() {
-          if (!analyser) return;
+function showPanel(panel){
+  document.getElementById("translatePanel").style.display = panel==="translate" ? "grid" : "none";
+  document.getElementById("dialoguePanel").classList.toggle("open",panel==="dialogue");
+  document.getElementById("historyPanel").classList.toggle("open",panel==="history");
+  document.getElementById("cameraPanel").classList.toggle("open",panel==="camera");
+}
 
-          analyser.getByteTimeDomainData(dataArray);
+document.getElementById("historyBtn").onclick=()=>{renderHistory();showPanel("history")};
+document.getElementById("closeHistory").onclick=()=>showPanel("translate");
+document.getElementById("dialogueBtn").onclick=()=>showPanel("dialogue");
+document.getElementById("closeDialogue").onclick=()=>showPanel("translate");
+document.getElementById("cameraBtn").onclick=()=>showPanel("camera");
+document.getElementById("closeCamera").onclick=()=>showPanel("translate");
 
-          let sum = 0;
-          for (let i = 0; i < dataArray.length; i++) {
-            const value = (dataArray[i] - 128) / 128;
-            sum += value * value;
-          }
+const dialogueList = document.getElementById("dialogueList");
 
-          const volume = Math.sqrt(sum / dataArray.length);
+function addDialogue(original, translated){
+  const div=document.createElement("div");
+  div.className="bubble";
+  div.innerHTML=`
+    <div class="original">${original}</div>
+    <div class="translated">${translated}</div>
+    <div class="actions"><button class="secondary">🔊 Speak</button></div>
+  `;
+  div.querySelector("button").onclick=()=>{
+    const u=new SpeechSynthesisUtterance(translated);
+    u.lang=targetVariant.value;
+    speechSynthesis.speak(u);
+  };
+  dialogueList.appendChild(div);
+}
 
-          if (volume > 0.02) {
-            if (silenceTimer) {
-              clearTimeout(silenceTimer);
-              silenceTimer = null;
-            }
-          } else {
-            if (!silenceTimer) {
-              silenceTimer = setTimeout(() => {
-                stopBecauseOfSilence();
-              }, 1800);
-            }
-          }
+document.getElementById("dialogueRecordBtn").onclick=async()=>{
+  const before = input.value;
+  input.value="";
+  await startRecording();
+};
 
-          animationId = requestAnimationFrame(monitorSilence);
-        }
+document.getElementById("clearDialogueBtn").onclick=()=>{
+  dialogueList.innerHTML="";
+};
 
-        mediaRecorder.ondataavailable = (event) => {
-          if (event.data && event.data.size > 0) {
-            audioChunks.push(event.data);
-          }
-        };
-
-        mediaRecorder.onstop = async () => {
-          try {
-            if (silenceTimer) clearTimeout(silenceTimer);
-            if (animationId) cancelAnimationFrame(animationId);
-            if (audioContext) await audioContext.close();
-
-            statusEl.textContent = "Transcribing...";
-
-            const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || "audio/webm" });
-            const arrayBuffer = await blob.arrayBuffer();
-
-            const response = await fetch("/api/transcribe", {
-              method: "POST",
-              headers: {
-                "Content-Type": blob.type || "audio/webm",
-                "x-source-language": sourceLang.value
-              },
-              body: arrayBuffer
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-              statusEl.textContent = data.error || "Transcription failed";
-              return;
-            }
-
-            const transcribed = (data.text || "").trim();
-
-            if (!transcribed) {
-              statusEl.textContent = "No speech detected";
-              return;
-            }
-
-            input.value = input.value
-              ? `${input.value.trim()} ${transcribed}`.replace(/\s+/g, " ").trim()
-              : transcribed;
-
-            statusEl.textContent = "Speech captured";
-            await runTranslate();
-          } catch (error) {
-            statusEl.textContent = "Transcription failed";
-          } finally {
-            if (mediaStream) {
-              mediaStream.getTracks().forEach(track => track.stop());
-              mediaStream = null;
-            }
-            isRecording = false;
-            micBtn.textContent = "🎤 Start recording";
-          }
-        };
-
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        source = audioContext.createMediaStreamSource(mediaStream);
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 2048;
-        dataArray = new Uint8Array(analyser.fftSize);
-        source.connect(analyser);
-
-        mediaRecorder.start();
-        isRecording = true;
-        micBtn.textContent = "⏹ Stop recording";
-        statusEl.textContent = "Recording...";
-
-        monitorSilence();
-      } catch (error) {
-        statusEl.textContent = "Microphone access denied";
-      }
-    }
-
-    function stopRecording() {
-      if (mediaRecorder && isRecording) {
-        mediaRecorder.stop();
-      }
-      isRecording = false;
-      micBtn.textContent = "🎤 Start recording";
-    }
-
-    micBtn.addEventListener("click", async () => {
-      if (isRecording) {
-        stopRecording();
-      } else {
-        await startRecording();
-      }
-    });
-
-    async function runTranslate() {
-      const text = input.value.trim();
-
-      if (!text) {
-        statusEl.textContent = "Enter text first";
-        return;
-      }
-
-      translateBtn.disabled = true;
-      statusEl.textContent = "Translating...";
-      output.value = "";
-
-      try {
-        const response = await fetch("/api/translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            text,
-            sourceLanguage: sourceLang.options[sourceLang.selectedIndex].text,
-            targetVariant: targetVariant.value,
-            level: selectedLevel,
-            mode: selectedStyle,
-            format: format.value
-          })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          statusEl.textContent = data.error || "Translation failed";
-          return;
-        }
-
-        if (data.translation) {
-          output.value = data.translation;
-          statusEl.textContent = "Done";
-        } else {
-          statusEl.textContent = "Translation failed";
-        }
-      } catch (error) {
-        statusEl.textContent = "Server error";
-      } finally {
-        translateBtn.disabled = false;
-      }
-    }
-
-    function scheduleRetranslate() {
-      if (!input.value.trim() || !output.value.trim()) return;
-
-      clearTimeout(retranslateTimer);
-      retranslateTimer = setTimeout(() => {
-        runTranslate();
-      }, 300);
-    }
-
-    translateBtn.addEventListener("click", runTranslate);
-
-    clearBtn.addEventListener("click", () => {
-      if (isRecording) {
-        stopRecording();
-      }
-      input.value = "";
-      output.value = "";
-      statusEl.textContent = "Cleared";
-    });
-
-    copyInputBtn.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(input.value);
-        statusEl.textContent = "Original copied";
-      } catch {
-        statusEl.textContent = "Could not copy original";
-      }
-    });
-
-    copyOutputBtn.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(output.value);
-        statusEl.textContent = "Translation copied";
-      } catch {
-        statusEl.textContent = "Could not copy translation";
-      }
-    });
-
-    speakBtn.addEventListener("click", () => {
-      if (!output.value.trim()) {
-        statusEl.textContent = "Nothing to speak";
-        return;
-      }
-
-      const utterance = new SpeechSynthesisUtterance(output.value);
-      utterance.lang = targetVariant.value;
-      utterance.rate = 1;
-      utterance.pitch = 1;
-
-      speechSynthesis.cancel();
-      speechSynthesis.speak(utterance);
-      statusEl.textContent = "Playing voice...";
-    });
-  </script>
+document.getElementById("photoTranslateBtn").onclick=async()=>{
+  const file = document.getElementById("photoInput").files[0];
+  if(!file){ statusEl.textContent="Choose a photo first"; return; }
+  statusEl.textContent="Photo Translate backend will be connected in next file.";
+};
+</script>
 </body>
 </html>
