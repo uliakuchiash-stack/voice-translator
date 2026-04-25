@@ -8,9 +8,11 @@ export default async function handler(req, res) {
       text,
       sourceLanguage = "Ukrainian",
       targetVariant = "en-GB",
-      level = "elementary",
-      mode = "friendly",
-      format = "chat"
+      resultType = "message",
+      englishStyle = "simple",
+      tone = "casual",
+      slang = "soften",
+      refine = ""
     } = req.body || {};
 
     if (!text || !text.trim()) {
@@ -21,171 +23,164 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Missing API key" });
     }
 
-    const targetInstruction =
+    const englishVariant =
       targetVariant === "en-US"
-        ? `
-Translate into natural American English.
-Prefer American vocabulary, spelling, punctuation, and phrasing.
-`
-        : `
-Translate into natural British English.
-Prefer British vocabulary, spelling, punctuation, and phrasing.
-`;
+        ? "Use natural American English."
+        : "Use natural British English.";
 
-    const levelRules = {
-      elementary: `
-English Level: Elementary (A1–A2).
-- Use very simple words and short sentences.
-- Keep grammar easy and clear.
-- Avoid idioms, slang, phrasal verbs, and difficult vocabulary unless absolutely necessary.
-- Prioritise clarity over style.
-- Output should feel beginner-friendly.
-`,
-      everyday: `
-English Level: Everyday (B1–B2).
-- Use natural daily English.
-- Easy to understand, but more natural than beginner English.
-- Moderate vocabulary is okay.
-- Sound like a normal person in everyday life.
-`,
-      advanced: `
-English Level: Advanced (C1–C2).
-- Use fluent, expressive, polished English.
-- More nuanced phrasing is welcome.
-- Sound educated and natural, but not stiff.
-`,
-      native: `
-English Level: Native.
-- Sound fully fluent, idiomatic, and natural.
-- Use the most human, natural phrasing a native speaker would actually use.
-- Contractions, rhythm, and phrasing should feel genuinely native.
-`
-    };
-
-    const modeRules = {
-      friendly: `
-Style: Friendly Talk.
-- Translate into warm, natural, everyday English.
-- Preserve emotion and context.
-- If the source contains rude words used casually, soften them naturally but keep the attitude and subtext.
-- Do not flatten the meaning.
-- This style should sound clearly different from Formal & Professional and from Real Talk.
-- Friendly does NOT mean formal.
-`,
-      street: `
-Style: Real Talk: Slang & Swearing.
-- Translate into natural spoken English with slang where appropriate.
-- Preserve profanity, swearing, emotional force, and attitude.
-- Do not censor unless absolutely necessary.
-- This style must sound clearly more casual, raw, and street-like than Friendly Talk.
-- If the source uses profanity, translate it into the closest natural English profanity for the context.
-- Do not use weird or outdated insults if they sound unnatural.
-`,
-      formal: `
-Style: Formal & Professional.
-- Translate into polite, respectful, professional English.
-- Never use raw profanity, slang, bro, man, yo, or rude wording.
-- If the source contains swearing, insults, or rude speech, fully reframe it into clean professional English.
-- This style must sound clearly more formal than the other modes.
-- If format is email, make it sound like a proper email.
-`
-    };
-
-    const formatRules = {
-      chat: `
-Output Format: Chat Version.
-- Output natural chat-style English.
+    const resultRules = {
+      message: `
+Result type: Message.
+- Output a natural ready-to-send message.
 - No subject line.
-- No email greeting or sign-off.
-- Keep it concise and ready to paste into chat.
+- No email signature.
+- Keep it suitable for chat, WhatsApp, SMS, or social messages.
 `,
       email: `
-Output Format: Email Version.
-- Output a properly structured email in English.
-- Do NOT include a subject line.
-- Use this exact structure:
+Result type: Email.
+- Convert the user's message into a properly structured English email.
+- Do not invent a totally new request, but you may expand slightly to make it sound natural and professional.
+- Include a short subject line only if it is useful.
+- Use this structure:
+
+Subject: ...
 
 Greeting
 
-Body paragraph(s)
+Body
 
 Closing
 (your name)
 
-- Use natural line breaks.
-- Avoid "Hi there" unless the source is clearly very casual.
-- For formal tone, prefer greetings such as "Hello," or "Dear [Name],".
-- Never end with "bye".
-- Use closings like "Best regards," or "Kind regards," depending on context.
-- Always put "(your name)" on the final line.
-- Make it ready to copy into email.
+- Use professional formatting and line breaks.
+`,
+      clean: `
+Result type: Clean.
+- Clean and improve the text without making it too emotional or too formal.
+- Make it clear, correct, natural, and easy to understand.
 `
     };
 
-    const sourceCleanupRules = `
-Rules for polished_source:
-- Keep the text in the original source language.
-- Preserve the same language and script as the user originally spoke or typed.
-- Fix punctuation, sentence boundaries, capitalization, and spacing.
-- Make it clearly cleaner than raw speech-to-text.
-- If the user speaks several thoughts, separate them properly.
-- Do not leave awkward random capital letters in the middle of sentences.
-- If the raw text is clumsy because of speech recognition, lightly repair it based on likely meaning.
-- Preserve meaning and tone.
-- Do not over-rewrite.
-`;
+    const styleRules = {
+      simple: `
+English style: Simple.
+- Use easy words and short sentences.
+- Suitable for beginner or intermediate English.
+`,
+      natural: `
+English style: Natural.
+- Use normal everyday English.
+- Sound human, clear, and not robotic.
+`,
+      polished: `
+English style: Polished.
+- Make the output smooth, confident, and well-written.
+- Suitable for work, emails, and serious communication.
+`,
+      native: `
+English style: Native-like.
+- Sound fluent, idiomatic, and natural, like a native speaker.
+- Use contractions and natural rhythm where appropriate.
+`
+    };
 
-    const translationCoreRules = `
-Additional translation rules:
-- Prioritise natural meaning over literal wording.
-- Preserve context, tone, intent, and subtext.
-- If the wording is ambiguous, choose the most natural human interpretation from context.
-- The selected style must be clearly visible in the final output.
-- The selected level must also be clearly visible in the final output.
-- If outputs across styles or levels are too similar, push the differences more.
-- Example contrast:
-  Friendly: "Hey, how are you doing?"
-  Street: "Yo, how you doin'?" / "Hey bro, what's up?"
-  Formal: "Hello, how are you?" / "I hope you're doing well."
-- Never output explanations or notes.
-- Return JSON only.
-`;
+    const toneRules = {
+      casual: `
+Tone: Casual.
+- Relaxed, simple, conversational.
+`,
+      warm: `
+Tone: Warm.
+- Friendly, kind, emotionally soft, polite.
+`,
+      professional: `
+Tone: Professional.
+- Respectful, businesslike, clear, and appropriate for work.
+`,
+      direct: `
+Tone: Direct.
+- Clear, concise, confident, and straight to the point.
+`
+    };
+
+    const slangRules = {
+      soften: `
+Slang and swearing: Soften.
+- If the original contains slang, rude words, or swearing, soften it.
+- Keep the emotional meaning, but avoid harsh profanity.
+`,
+      keep: `
+Slang and swearing: Keep.
+- Preserve slang and swearing when it is important to the meaning.
+- Translate profanity naturally, not literally.
+- Avoid weird wrong insults.
+`,
+      strong: `
+Slang and swearing: Strong.
+- Keep the raw emotional force.
+- Use natural English slang or profanity if the source uses it.
+- Do not translate "kurwa" as "bastard" unless the context truly means bastard.
+- Polish "kurwa" may mean "fuck", "shit", "damn", "for fuck's sake", or "bitch" depending on context.
+`
+    };
+
+    const refineRules = {
+      shorter: "Make the result shorter and more concise.",
+      warmer: "Make the result warmer and friendlier.",
+      professional: "Make the result more professional and polished.",
+      soften: "Soften rude, aggressive, or too emotional wording.",
+      regenerate: "Regenerate the result with a better, more natural version."
+    };
 
     const systemPrompt = `
-You are an expert multilingual-to-English communication assistant.
+You are an expert multilingual AI communication assistant.
 
-Your task:
-1. Clean and normalise the source text in its original language.
-2. Translate it into English according to the selected English variant, level, style, and format.
+Your job:
+Transform the user's text from ${sourceLanguage} into high-quality English.
 
-Return ONLY valid JSON in this exact format:
+Important:
+- This is not only literal translation.
+- Preserve meaning, context, emotion, and intent.
+- Make the result useful for real communication.
+- Return ONLY valid JSON.
+
+JSON format:
 {
-  "polished_source": "...",
   "translation": "..."
 }
 
-Source language: ${sourceLanguage}
-Target English variant: ${targetVariant}
+Target:
+${englishVariant}
 
-${sourceCleanupRules}
+Rules:
+${resultRules[resultType] || resultRules.message}
+${styleRules[englishStyle] || styleRules.simple}
+${toneRules[tone] || toneRules.casual}
+${slangRules[slang] || slangRules.soften}
 
-Rules for translation:
-${targetInstruction}
-${levelRules[level] || levelRules.elementary}
-${modeRules[mode] || modeRules.friendly}
-${formatRules[format] || formatRules.chat}
-${translationCoreRules}
+Refine instruction:
+${refine ? refineRules[refine] || refine : "No extra refine instruction."}
+
+Extra rules:
+- Do not explain.
+- Do not add notes.
+- Do not say you are an AI.
+- If the user asks to write an email, you may format it as an email.
+- If the user provides a simple rough request, improve it into natural English.
+- If result type is Email, make it ready to send.
+- If result type is Message, make it ready to paste into chat.
+- If result type is Clean, make it clean and clear.
 `;
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        temperature: 0.6,
+        temperature: 0.55,
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: systemPrompt },
@@ -211,12 +206,11 @@ ${translationCoreRules}
     let parsed;
     try {
       parsed = JSON.parse(content);
-    } catch (error) {
+    } catch {
       return res.status(500).json({ error: "Invalid JSON returned by model" });
     }
 
     return res.status(200).json({
-      polished_source: parsed.polished_source || "",
       translation: parsed.translation || ""
     });
   } catch (error) {
