@@ -11,16 +11,11 @@
 body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:14px}
 .app{max-width:1220px;margin:auto;background:var(--card);border:1px solid var(--border);border-radius:28px;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.3)}
 .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:16px}
-h1{margin:0;font-size:24px;line-height:1.1}
-.subtitle{color:var(--muted);font-size:14px;margin-top:6px}
+h1{margin:0;font-size:24px;line-height:1.1}.subtitle{color:var(--muted);font-size:14px;margin-top:6px}
 .iconBtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 button{border:none;border-radius:16px;padding:12px 14px;cursor:pointer;font-size:14px}
-.iconBtn,.secondary{background:var(--btn);color:var(--btnText)}
-.primary{background:var(--accent);color:#0f1720;font-weight:800}
-.big{flex:1;min-width:150px}
-.themeDots{display:flex;gap:8px;margin-top:10px}
-.themeDot{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.35);cursor:pointer}
-.themeDot.active{border-color:#fff}
+.iconBtn,.secondary{background:var(--btn);color:var(--btnText)}.primary{background:var(--accent);color:#0f1720;font-weight:800}.big{flex:1;min-width:150px}
+.themeDots{display:flex;gap:8px;margin-top:10px}.themeDot{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.35);cursor:pointer}.themeDot.active{border-color:#fff}
 .langRow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 select,textarea{width:100%;border:none;outline:none;border-radius:18px;background:var(--card2);color:var(--text);border:1px solid var(--border)}
 select{padding:14px;font-size:15px}
@@ -28,32 +23,29 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
 .mainGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .card{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:24px;padding:15px}
 .cardHead{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;align-items:center}
-.title{font-weight:700;font-size:15px}
-.hint{color:var(--muted);font-size:12px;margin-top:4px}
+.title{font-weight:700;font-size:15px}.hint{color:var(--muted);font-size:12px;margin-top:4px}
 .actions,.tabs,.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .chip,.tab{background:var(--btn);color:var(--btnText);border-radius:999px;padding:10px 13px;font-size:13px}
 .chip.active,.tab.active{background:var(--accent);color:#0f1720;font-weight:800}
 .status{color:var(--muted);font-size:14px;margin-top:14px}
 .drawerOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20}
 .drawer{position:fixed;top:0;right:-390px;width:380px;max-width:92vw;height:100vh;background:var(--card);border-left:1px solid var(--border);z-index:30;padding:20px;transition:right .25s ease;overflow:auto}
-.drawer.open{right:0}
-.drawerOverlay.open{display:block}
+.drawer.open{right:0}.drawerOverlay.open{display:block}
 .drawerHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.section{margin:18px 0}
-.sectionTitle{font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:700;text-transform:uppercase}
-.panel{display:none}
-.panel.open{display:block}
+.section{margin:18px 0}.sectionTitle{font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:700;text-transform:uppercase}
+.panel{display:none}.panel.open{display:block}
 .historyItem,.bubble{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:12px;margin-bottom:10px}
-.historyItem small{color:var(--muted)}
-.bubble .translated{color:var(--muted);margin-top:6px}
+.historyItem small{color:var(--muted)}.bubble .translated{color:var(--muted);margin-top:6px}
 .fileInput{display:none}
 .photoBox{background:var(--card2);border:1px dashed var(--accent);padding:18px;border-radius:18px;color:var(--muted);margin-top:10px}
 .emojiBox{display:none;background:var(--card2);border:1px solid var(--border);border-radius:18px;padding:10px;margin-top:10px}
 .emojiBox.open{display:flex;gap:8px;flex-wrap:wrap}
-.kissIcon{font-size:20px}
-.fireTrident{position:relative;display:inline-block;width:28px;height:24px}
-.fireTrident .fire{position:absolute;left:2px;top:0;font-size:23px;filter:saturate(1.25)}
-.fireTrident .trident{position:absolute;left:3px;top:0;font-size:23px;text-shadow:0 0 4px #ffb703,0 0 9px #fb5607;color:#ffd166}
+.kissCombo{display:inline-flex;align-items:center;gap:1px}
+.kissCombo .bigLip{font-size:21px}
+.kissCombo .smallLip{font-size:12px;margin-left:-2px}
+.fireTrident{position:relative;display:inline-block;width:30px;height:26px}
+.fireTrident .fire{position:absolute;left:2px;top:2px;font-size:25px;filter:saturate(1.25)}
+.fireTrident .trident{position:absolute;left:4px;top:0;font-size:24px;text-shadow:0 0 5px #ffb703,0 0 10px #fb5607}
 @media(max-width:850px){body{padding:10px}.app{padding:14px;border-radius:22px}.mainGrid{grid-template-columns:1fr}.langRow{grid-template-columns:1fr}h1{font-size:21px}textarea{min-height:135px}.top{flex-direction:column}.iconBtns{justify-content:flex-start}}
 </style>
 </head>
@@ -119,15 +111,10 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
   <div class="mainGrid" id="translatePanel">
     <div class="card">
       <div class="cardHead">
-        <div>
-          <div class="title">Input</div>
-          <div class="hint">Speak or type naturally.</div>
-        </div>
+        <div><div class="title">Input</div><div class="hint">Speak or type naturally.</div></div>
         <button class="secondary" id="clearBtn">Clear</button>
       </div>
-
       <textarea id="input" placeholder="Speak or type here..."></textarea>
-
       <div class="actions">
         <button class="primary big" id="micBtn">🎤 Start recording</button>
         <button class="secondary big" id="translateBtn">Translate</button>
@@ -136,15 +123,10 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
 
     <div class="card">
       <div class="cardHead">
-        <div>
-          <div class="title">Ready result</div>
-          <div class="hint">Copy, speak, refine or add ending.</div>
-        </div>
+        <div><div class="title">Ready result</div><div class="hint">Copy, speak, refine or add ending.</div></div>
         <button class="secondary" id="copyBtn">Copy</button>
       </div>
-
       <textarea id="output" readonly placeholder="Translation will appear here..."></textarea>
-
       <div class="actions">
         <button class="secondary" id="speakBtn">🔊 Speak</button>
         <button class="secondary" id="emojiBtn">😊 Ending</button>
@@ -162,8 +144,12 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
         <button class="secondary ending">😢</button>
         <button class="secondary ending">🥳</button>
         <button class="secondary ending">😡</button>
-        <button class="secondary ending" data-ending="💋"><span class="kissIcon">💋</span></button>
-        <button class="secondary ending" data-ending="🔱🔥"><span class="fireTrident"><span class="fire">🔥</span><span class="trident">🔱</span></span></button>
+        <button class="secondary ending" data-ending="💋💋">
+          <span class="kissCombo"><span class="bigLip">💋</span><span class="smallLip">💋</span><span class="smallLip">💋</span></span>
+        </button>
+        <button class="secondary ending" data-ending="🔱🔥">
+          <span class="fireTrident"><span class="fire">🔥</span><span class="trident">🔱</span></span>
+        </button>
         <button class="secondary ending">👍</button>
       </div>
     </div>
@@ -172,15 +158,10 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
   <div class="panel" id="dialoguePanel">
     <div class="card">
       <div class="cardHead">
-        <div>
-          <div class="title">Live Dialogue Mode</div>
-          <div class="hint">Two-way conversation translation.</div>
-        </div>
+        <div><div class="title">Live Dialogue Mode</div><div class="hint">Two-way conversation translation.</div></div>
         <button class="secondary" id="closeDialogue">Close</button>
       </div>
-
       <div id="dialogueList"></div>
-
       <div class="actions">
         <button class="primary big" id="dialogueRecordBtn">🎤 Record reply</button>
         <button class="secondary" id="clearDialogueBtn">Clear dialogue</button>
@@ -191,23 +172,16 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
   <div class="panel" id="cameraPanel">
     <div class="card">
       <div class="cardHead">
-        <div>
-          <div class="title">Photo Translate</div>
-          <div class="hint">Take a photo or upload an image with text.</div>
-        </div>
+        <div><div class="title">Photo Translate</div><div class="hint">Take a photo or upload an image with text.</div></div>
         <button class="secondary" id="closeCamera">Close</button>
       </div>
-
       <input class="fileInput" id="takePhotoInput" type="file" accept="image/*" capture="environment">
       <input class="fileInput" id="uploadPhotoInput" type="file" accept="image/*">
-
       <div class="photoBox" id="photoName">No photo selected</div>
-
       <div class="actions">
         <button class="primary big" id="takePhotoBtn">📷 Take photo</button>
         <button class="secondary big" id="uploadPhotoBtn">🖼 Upload</button>
       </div>
-
       <div class="actions">
         <button class="primary big" id="photoTranslateBtn">Translate photo</button>
       </div>
@@ -217,13 +191,9 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
   <div class="panel" id="historyPanel">
     <div class="card">
       <div class="cardHead">
-        <div>
-          <div class="title">History</div>
-          <div class="hint">Saved translations from this device.</div>
-        </div>
+        <div><div class="title">History</div><div class="hint">Saved translations from this device.</div></div>
         <button class="secondary" id="closeHistory">Close</button>
       </div>
-
       <div class="chips">
         <button class="chip active" data-filter="all">All</button>
         <button class="chip" data-filter="email">Email</button>
@@ -231,7 +201,6 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
         <button class="chip" data-filter="plain">Plain</button>
         <button class="chip" data-filter="slang">Slang</button>
       </div>
-
       <div id="historyList"></div>
     </div>
   </div>
@@ -333,14 +302,11 @@ function applyTheme(n){
 document.querySelectorAll(".themeDot").forEach(b=>b.onclick=()=>applyTheme(b.dataset.theme));
 applyTheme(localStorage.getItem("theme")||"dark");
 
-function autoUpdate(){
-  if(output.value.trim()&&input.value.trim())runTranslate();
-}
+function autoUpdate(){if(output.value.trim()&&input.value.trim())runTranslate()}
 
 function toggleChip(group,el,key){
   const active=el.classList.contains("active");
   group.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
-
   if(active){
     if(key==="style")englishStyle="";
     if(key==="audience")audience="";
@@ -351,7 +317,6 @@ function toggleChip(group,el,key){
     if(key==="audience")audience=el.dataset.audience;
     if(key==="slang")slang=el.dataset.slang;
   }
-
   autoUpdate();
 }
 
@@ -373,10 +338,8 @@ drawerOverlay.onclick=document.getElementById("closeDrawer").onclick;
 async function runTranslate(refine=""){
   const text=input.value.trim();
   if(!text){statusEl.textContent="Enter text first";return}
-
   statusEl.textContent="Translating...";
   translateBtn.disabled=true;
-
   try{
     const res=await fetch("/api/translate",{
       method:"POST",
@@ -392,62 +355,41 @@ async function runTranslate(refine=""){
         refine
       })
     });
-
     const data=await res.json();
-
-    if(!res.ok){
-      statusEl.textContent=data.error||"Translation failed";
-      return;
-    }
-
+    if(!res.ok){statusEl.textContent=data.error||"Translation failed";return}
     output.value=data.translation||"";
     saveHistory(text,output.value);
     statusEl.textContent="Done";
-  }catch(e){
-    statusEl.textContent="Server error";
-  }finally{
-    translateBtn.disabled=false;
-  }
+  }catch(e){statusEl.textContent="Server error"}finally{translateBtn.disabled=false}
 }
 
 async function transcribeAudio(){
   const blob=new Blob(audioChunks,{type:mediaRecorder?.mimeType||"audio/webm"});
   const buffer=await blob.arrayBuffer();
-
   const res=await fetch("/api/transcribe",{
     method:"POST",
     headers:{"Content-Type":blob.type,"x-source-language":sourceLang.value},
     body:buffer
   });
-
   const data=await res.json();
-
   if(!res.ok)throw new Error(data.error||"Transcription failed");
   return(data.text||"").trim();
 }
 
 function monitorSilence(){
   if(!analyser||!isRecording)return;
-
   const arr=new Uint8Array(analyser.fftSize);
   analyser.getByteTimeDomainData(arr);
-
   let sum=0;
-  for(let i=0;i<arr.length;i++){
-    const v=(arr[i]-128)/128;
-    sum+=v*v;
-  }
-
+  for(let i=0;i<arr.length;i++){const v=(arr[i]-128)/128;sum+=v*v}
   const volume=Math.sqrt(sum/arr.length);
   const elapsed=Date.now()-recordStart;
-
   if(volume>0.035){
     heardVoice=true;
     if(silenceTimer){clearTimeout(silenceTimer);silenceTimer=null}
   }else if(heardVoice&&elapsed>1200&&!silenceTimer){
     silenceTimer=setTimeout(()=>{if(isRecording)stopRecording()},1800);
   }
-
   rafId=requestAnimationFrame(monitorSilence);
 }
 
@@ -458,66 +400,41 @@ async function startRecording(callback){
     audioChunks=[];
     heardVoice=false;
     recordStart=Date.now();
-
-    const mimeType=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-      ?"audio/webm;codecs=opus"
-      :(MediaRecorder.isTypeSupported("audio/webm")?"audio/webm":"audio/mp4");
-
+    const mimeType=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")?"audio/webm;codecs=opus":(MediaRecorder.isTypeSupported("audio/webm")?"audio/webm":"audio/mp4");
     mediaRecorder=new MediaRecorder(stream,{mimeType});
     mediaRecorder.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data)};
-
     mediaRecorder.onstop=async()=>{
       if(silenceTimer)clearTimeout(silenceTimer);
       if(rafId)cancelAnimationFrame(rafId);
       try{if(audioContext)await audioContext.close()}catch(e){}
       stream?.getTracks().forEach(t=>t.stop());
-
       isRecording=false;
       micBtn.textContent="🎤 Start recording";
       document.getElementById("dialogueRecordBtn").textContent="🎤 Record reply";
-
-      if(!heardVoice || Date.now()-recordStart<700){
-        statusEl.textContent="No speech detected";
-        return;
-      }
-
+      if(!heardVoice||Date.now()-recordStart<700){statusEl.textContent="No speech detected";return}
       statusEl.textContent="Transcribing...";
-
       try{
         const text=await transcribeAudio();
         if(!text){statusEl.textContent="No speech detected";return}
-
         if(currentRecordCallback){await currentRecordCallback(text)}
-        else{
-          input.value=input.value?input.value+" "+text:text;
-          await runTranslate();
-        }
-      }catch(e){
-        statusEl.textContent=e.message||"Transcription failed";
-      }
+        else{input.value=input.value?input.value+" "+text:text;await runTranslate()}
+      }catch(e){statusEl.textContent=e.message||"Transcription failed"}
     };
-
     mediaRecorder.start(250);
     isRecording=true;
     micBtn.textContent="⏹ Stop recording";
     document.getElementById("dialogueRecordBtn").textContent="⏹ Stop";
     statusEl.textContent="Recording...";
-
     audioContext=new (window.AudioContext||window.webkitAudioContext)();
     const src=audioContext.createMediaStreamSource(stream);
     analyser=audioContext.createAnalyser();
     analyser.fftSize=2048;
     src.connect(analyser);
     monitorSilence();
-  }catch(e){
-    statusEl.textContent="Microphone access denied";
-  }
+  }catch(e){statusEl.textContent="Microphone access denied"}
 }
 
-function stopRecording(){
-  if(mediaRecorder&&isRecording&&mediaRecorder.state==="recording")mediaRecorder.stop();
-}
-
+function stopRecording(){if(mediaRecorder&&isRecording&&mediaRecorder.state==="recording")mediaRecorder.stop()}
 micBtn.onclick=()=>isRecording?stopRecording():startRecording();
 translateBtn.onclick=()=>runTranslate();
 
@@ -526,48 +443,34 @@ document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.w
 
 function speakTextWithLang(txt,lang){
   if(!txt.trim()){statusEl.textContent="Nothing to speak";return}
-
   if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window)){
     statusEl.textContent="Speech not supported on this browser";
     return;
   }
-
   const u=new window.SpeechSynthesisUtterance(txt);
   u.lang=lang;
   u.rate=1;
   u.pitch=1;
-
   window.speechSynthesis.cancel();
   window.speechSynthesis.speak(u);
   statusEl.textContent="Speaking...";
 }
 
-function speakText(txt){
-  speakTextWithLang(txt,targetVariant.value);
-}
-
+function speakText(txt){speakTextWithLang(txt,targetVariant.value)}
 document.getElementById("speakBtn").onclick=()=>speakText(output.value);
 document.querySelectorAll(".refine").forEach(b=>b.onclick=()=>runTranslate(b.dataset.refine));
 document.getElementById("emojiBtn").onclick=()=>emojiBox.classList.toggle("open");
 
 document.querySelectorAll(".ending").forEach(b=>b.onclick=()=>{
-  const value=b.dataset.ending || b.textContent.trim();
+  const value=b.dataset.ending||b.textContent.trim();
   output.value=(output.value.trim()+" "+value).trim();
   emojiBox.classList.remove("open");
 });
 
 function saveHistory(original,translation){
   if(!translation)return;
-
   const items=JSON.parse(localStorage.getItem("history")||"[]");
-  items.unshift({
-    date:new Date().toLocaleString(),
-    type:resultType,
-    slang:slang==="street"?"slang":"",
-    original,
-    translation
-  });
-
+  items.unshift({date:new Date().toLocaleString(),type:resultType,slang:slang==="street"?"slang":"",original,translation});
   localStorage.setItem("history",JSON.stringify(items.slice(0,50)));
   renderHistory();
 }
@@ -575,25 +478,12 @@ function saveHistory(original,translation){
 function renderHistory(filter="all"){
   const items=JSON.parse(localStorage.getItem("history")||"[]");
   const filtered=filter==="all"?items:items.filter(i=>i.type===filter||i.slang===filter);
-
   historyList.innerHTML=filtered.length?"":"<p>No history yet.</p>";
-
   filtered.forEach(item=>{
     const div=document.createElement("div");
     div.className="historyItem";
-    div.innerHTML=`
-      <small>${item.date} • ${item.type}</small>
-      <div><b>${item.original.slice(0,90)}</b></div>
-      <div style="color:var(--muted);margin-top:5px">${item.translation.slice(0,140)}</div>
-      <div class="actions"><button class="secondary">Reuse</button></div>
-    `;
-
-    div.querySelector("button").onclick=()=>{
-      input.value=item.original;
-      output.value=item.translation;
-      showPanel("translate");
-    };
-
+    div.innerHTML=`<small>${item.date} • ${item.type}</small><div><b>${item.original.slice(0,90)}</b></div><div style="color:var(--muted);margin-top:5px">${item.translation.slice(0,140)}</div><div class="actions"><button class="secondary">Reuse</button></div>`;
+    div.querySelector("button").onclick=()=>{input.value=item.original;output.value=item.translation;showPanel("translate")};
     historyList.appendChild(div);
   });
 }
@@ -619,42 +509,15 @@ document.getElementById("cameraBtn").onclick=()=>showPanel("camera");
 document.getElementById("closeCamera").onclick=()=>showPanel("translate");
 
 function getUserSpeakLang(){
-  const map={
-    uk:"uk-UA",
-    ru:"ru-RU",
-    pl:"pl-PL",
-    fr:"fr-FR",
-    es:"es-ES",
-    de:"de-DE",
-    it:"it-IT",
-    ro:"ro-RO",
-    hu:"hu-HU",
-    pt:"pt-PT",
-    tr:"tr-TR",
-    ar:"ar-SA",
-    hi:"hi-IN",
-    zh:"zh-CN",
-    ja:"ja-JP",
-    ko:"ko-KR",
-    cs:"cs-CZ",
-    bg:"bg-BG",
-    en:targetVariant.value
-  };
+  const map={uk:"uk-UA",ru:"ru-RU",pl:"pl-PL",fr:"fr-FR",es:"es-ES",de:"de-DE",it:"it-IT",ro:"ro-RO",hu:"hu-HU",pt:"pt-PT",tr:"tr-TR",ar:"ar-SA",hi:"hi-IN",zh:"zh-CN",ja:"ja-JP",ko:"ko-KR",cs:"cs-CZ",bg:"bg-BG",en:targetVariant.value};
   return map[sourceLang.value]||"en-GB";
 }
 
 function addDialogue(original,translated,speakLang){
   const div=document.createElement("div");
   div.className="bubble";
-
-  div.innerHTML=`
-    <div>${original}</div>
-    <div class="translated">${translated}</div>
-    <div class="actions"><button class="secondary">🔊 Speak</button></div>
-  `;
-
+  div.innerHTML=`<div>${original}</div><div class="translated">${translated}</div><div class="actions"><button class="secondary">🔊 Speak</button></div>`;
   const lang=speakLang==="user"?getUserSpeakLang():targetVariant.value;
-
   div.querySelector("button").onclick=()=>speakTextWithLang(translated,lang);
   dialogueList.appendChild(div);
 
@@ -665,7 +528,6 @@ function addDialogue(original,translated,speakLang){
 
 document.getElementById("dialogueRecordBtn").onclick=()=>isRecording?stopRecording():startRecording(async(text)=>{
   statusEl.textContent="Dialogue translating...";
-
   try{
     const res=await fetch("/api/dialogue-translate",{
       method:"POST",
@@ -676,19 +538,11 @@ document.getElementById("dialogueRecordBtn").onclick=()=>isRecording?stopRecordi
         englishVariant:targetVariant.value==="en-US"?"English US":"English UK"
       })
     });
-
     const data=await res.json();
-
-    if(!res.ok){
-      statusEl.textContent=data.error||"Dialogue translation failed";
-      return;
-    }
-
+    if(!res.ok){statusEl.textContent=data.error||"Dialogue translation failed";return}
     addDialogue(text,data.translation||"",data.speakLang||"en");
     statusEl.textContent="Done";
-  }catch(e){
-    statusEl.textContent="Dialogue backend error";
-  }
+  }catch(e){statusEl.textContent="Dialogue backend error"}
 });
 
 document.getElementById("clearDialogueBtn").onclick=()=>dialogueList.innerHTML="";
@@ -708,24 +562,19 @@ function resizeImage(file,maxWidth=1200,quality=0.72){
   return new Promise((resolve,reject)=>{
     const img=new Image();
     const reader=new FileReader();
-
     reader.onload=e=>{
       img.onload=()=>{
         const scale=Math.min(1,maxWidth/img.width);
         const canvas=document.createElement("canvas");
         canvas.width=Math.round(img.width*scale);
         canvas.height=Math.round(img.height*scale);
-
         const ctx=canvas.getContext("2d");
         ctx.drawImage(img,0,0,canvas.width,canvas.height);
-
         resolve(canvas.toDataURL("image/jpeg",quality));
       };
-
       img.onerror=reject;
       img.src=e.target.result;
     };
-
     reader.onerror=reject;
     reader.readAsDataURL(file);
   });
@@ -733,18 +582,11 @@ function resizeImage(file,maxWidth=1200,quality=0.72){
 
 document.getElementById("photoTranslateBtn").onclick=async()=>{
   const file=selectedPhotoFile;
-
-  if(!file){
-    statusEl.textContent="Choose or take a photo first";
-    return;
-  }
-
+  if(!file){statusEl.textContent="Choose or take a photo first";return}
   statusEl.textContent="Preparing photo...";
-
   try{
     const compressedImage=await resizeImage(file);
     statusEl.textContent="Translating photo...";
-
     const res=await fetch("/api/photo-translate",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -758,23 +600,14 @@ document.getElementById("photoTranslateBtn").onclick=async()=>{
         slang
       })
     });
-
     const data=await res.json();
-
-    if(!res.ok){
-      statusEl.textContent=data.error||"Photo translation failed";
-      return;
-    }
-
+    if(!res.ok){statusEl.textContent=data.error||"Photo translation failed";return}
     input.value=data.detectedText||"";
     output.value=data.translation||"";
-
     saveHistory(input.value,output.value);
     showPanel("translate");
     statusEl.textContent="Photo translated";
-  }catch(e){
-    statusEl.textContent="Photo backend error";
-  }
+  }catch(e){statusEl.textContent="Photo backend error"}
 };
 </script>
 </body>
