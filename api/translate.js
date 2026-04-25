@@ -10,7 +10,7 @@ export default async function handler(req, res) {
       targetVariant = "en-GB",
       resultType = "message",
       englishStyle = "",
-      tone = "",
+      audience = "",
       slang = "",
       refine = ""
     } = req.body || {};
@@ -77,44 +77,46 @@ English level: Native-like.
 `
     };
 
-    const toneRules = {
-      casual: `
-Tone: Casual.
-- Relaxed, simple, conversational.
-- Use casual phrasing only when appropriate.
+    const audienceRules = {
+      friend: `
+Audience: Friend.
+- Make it friendly, natural and suitable for a friend.
+- Casual wording is allowed.
+- Do not add swearing unless the original clearly uses it and slang mode allows it.
 `,
-      warm: `
-Tone: Warm.
-- Friendly, kind, soft and polite.
-- Good for friends, family and gentle messages.
+      family: `
+Audience: Family.
+- Make it warm, caring and natural.
+- Suitable for relatives or close people.
+- Keep it soft and human.
 `,
-      professional: `
-Tone: Professional.
-- Respectful, clear, businesslike.
-- Avoid slang and overly casual greetings.
+      boss: `
+Audience: Boss.
+- Make it respectful, professional and clear.
+- Avoid overly casual words like "hey" unless the user clearly asks for casual style.
 - Prefer "Hello" or "Dear" in email.
 `,
-      direct: `
-Tone: Direct.
-- Clear, concise and straight to the point.
-- No unnecessary softness.
+      client_official: `
+Audience: Client / Official.
+- Make it formal, polite and safe for clients, companies, landlords, HR, support, official requests and services.
+- Avoid slang, jokes and overly casual wording.
 `
     };
 
     const slangRules = {
       soften: `
-Slang and swearing: Soften.
-- If the source contains slang or swearing, soften it naturally.
+Slang and bad words: No bad words.
+- If the source contains slang, rude words, or swearing, soften it naturally.
 - Keep the meaning and emotion, but avoid harsh profanity.
 `,
       keep: `
-Slang and swearing: Keep.
+Slang and bad words: Keep original.
 - Preserve slang and swearing when it matters.
 - Translate profanity naturally, not literally.
 - Do not invent weird insults.
 `,
       strong: `
-Slang and swearing: Strong.
+Slang and bad words: Strong slang.
 - Keep strong emotional force.
 - Use natural English slang or profanity if the source uses it.
 - Do not translate Polish "kurwa" as "bastard" unless the context truly means bastard.
@@ -124,19 +126,19 @@ Slang and swearing: Strong.
 
     const refineRules = {
       shorter: "Make the result shorter and more concise.",
-      warmer: "Make the result warmer and friendlier.",
       professional: "Make the result more professional, polished and work-appropriate.",
-      soften: "Soften rude, aggressive or too emotional wording.",
+      friendlier: "Make the result friendlier, warmer and more natural.",
       regenerate: "Regenerate a better, more natural version."
     };
 
     const defaultRules = `
 Default behaviour:
 - If no English level is selected, use natural clear English.
-- If no tone is selected, choose the tone that best fits the context.
+- If no audience is selected, infer the best audience from context.
 - If no slang option is selected, do not force slang into the result.
-- For professional or email contexts, avoid "Hi" unless the source clearly asks for a casual tone.
+- For professional, boss, client or official contexts, avoid "Hi" unless the source clearly asks for casual tone.
 - Prefer "Hello" or "Dear" in professional emails.
+- For friend/family contexts, relaxed wording is allowed.
 `;
 
     const systemPrompt = `
@@ -150,7 +152,7 @@ ${variantRule}
 ${resultRules[resultType] || resultRules.message}
 
 ${englishStyle ? styleRules[englishStyle] || "" : ""}
-${tone ? toneRules[tone] || "" : ""}
+${audience ? audienceRules[audience] || "" : ""}
 ${slang ? slangRules[slang] || "" : ""}
 
 ${defaultRules}
