@@ -4,53 +4,44 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>AI Slang and Business Translator</title>
+
 <style>
 :root{--bg:#0f131a;--card:#141a22;--card2:#1f2733;--text:#f4f7fb;--muted:#a4afbc;--accent:#6f95d8;--btn:#2a3442;--btnText:#f4f7fb;--border:rgba(255,255,255,.08)}
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:14px}
 .app{max-width:1220px;margin:auto;background:var(--card);border:1px solid var(--border);border-radius:28px;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.3)}
 .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:16px}
-h1{margin:0;font-size:24px;line-height:1.1}
-.subtitle{color:var(--muted);font-size:14px;margin-top:6px}
+h1{margin:0;font-size:24px;line-height:1.1}.subtitle{color:var(--muted);font-size:14px;margin-top:6px}
 .iconBtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 button{border:none;border-radius:16px;padding:12px 14px;cursor:pointer;font-size:14px}
-.iconBtn,.secondary{background:var(--btn);color:var(--btnText)}
-.primary{background:var(--accent);color:#0f1720;font-weight:800}
-.big{flex:1;min-width:150px}
-.themeDots{display:flex;gap:8px;margin-top:10px}
-.themeDot{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.35);cursor:pointer}
-.themeDot.active{border-color:#fff}
+.iconBtn,.secondary{background:var(--btn);color:var(--btnText)}.primary{background:var(--accent);color:#0f1720;font-weight:800}.big{flex:1;min-width:150px}
+.themeDots{display:flex;gap:8px;margin-top:10px}.themeDot{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.35);cursor:pointer}.themeDot.active{border-color:#fff}
 .langRow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 select,textarea{width:100%;border:none;outline:none;border-radius:18px;background:var(--card2);color:var(--text);border:1px solid var(--border)}
-select{padding:14px;font-size:15px}
-textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:160px}
+select{padding:14px;font-size:15px}textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:160px}
 .mainGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .card{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:24px;padding:15px}
-.cardHead{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;align-items:center}
-.title{font-weight:700;font-size:15px}
-.hint{color:var(--muted);font-size:12px;margin-top:4px}
-.actions,.tabs,.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.chip,.tab{background:var(--btn);color:var(--btnText);border-radius:999px;padding:10px 13px;font-size:13px}
+.cardHead{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;align-items:center}.title{font-weight:700;font-size:15px}.hint{color:var(--muted);font-size:12px;margin-top:4px}
+.actions,.tabs,.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.chip,.tab{background:var(--btn);color:var(--btnText);border-radius:999px;padding:10px 13px;font-size:13px}
 .chip.active,.tab.active{background:var(--accent);color:#0f1720;font-weight:800}
 .status{color:var(--muted);font-size:14px;margin-top:14px}
 .drawerOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20}
 .drawer{position:fixed;top:0;right:-390px;width:380px;max-width:92vw;height:100vh;background:var(--card);border-left:1px solid var(--border);z-index:30;padding:20px;transition:right .25s ease;overflow:auto}
 .drawer.open{right:0}.drawerOverlay.open{display:block}
 .drawerHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.section{margin:18px 0}
-.sectionTitle{font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:700;text-transform:uppercase}
-.panel{display:none}
-.panel.open{display:block}
+.section{margin:18px 0}.sectionTitle{font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:700;text-transform:uppercase}
+.panel{display:none}.panel.open{display:block}
 .historyItem,.bubble{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:12px;margin-bottom:10px}
-.historyItem small{color:var(--muted)}
-.bubble .translated{color:var(--muted);margin-top:6px}
+.historyItem small{color:var(--muted)}.bubble .translated{color:var(--muted);margin-top:6px}
 .fileInput{display:none}
 .photoBox{background:var(--card2);border:1px dashed var(--accent);padding:18px;border-radius:18px;color:var(--muted);margin-top:10px}
 .emojiBox{display:none;background:var(--card2);border:1px solid var(--border);border-radius:18px;padding:10px;margin-top:10px}
 .emojiBox.open{display:flex;gap:8px;flex-wrap:wrap}
+.fire-trident{font-size:17px;color:#ffd166;text-shadow:0 0 4px #ffb703,0 0 8px #fb5607,0 0 14px #ff006e}
 @media(max-width:850px){body{padding:10px}.app{padding:14px;border-radius:22px}.mainGrid{grid-template-columns:1fr}.langRow{grid-template-columns:1fr}h1{font-size:21px}textarea{min-height:135px}.top{flex-direction:column}.iconBtns{justify-content:flex-start}}
 </style>
 </head>
+
 <body>
 <div class="app">
   <div class="top">
@@ -65,6 +56,7 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
         <button class="themeDot" data-theme="lavender" style="background:#8877b8"></button>
       </div>
     </div>
+
     <div class="iconBtns">
       <button class="iconBtn" id="cameraBtn">📷 Camera</button>
       <button class="iconBtn" id="dialogueBtn">💬 Dialogue</button>
@@ -77,6 +69,7 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
     <select id="sourceLang">
       <option value="en">English</option><option value="uk" selected>Ukrainian</option><option value="ru">Russian</option><option value="pl">Polish</option><option value="fr">French</option><option value="es">Spanish</option><option value="de">German</option><option value="it">Italian</option><option value="ro">Romanian / Moldova</option><option value="hu">Hungarian</option><option value="pt">Portuguese</option><option value="tr">Turkish</option><option value="ar">Arabic</option><option value="hi">Hindi</option><option value="zh">Chinese</option><option value="ja">Japanese</option><option value="ko">Korean</option><option value="cs">Czech</option><option value="bg">Bulgarian</option>
     </select>
+
     <select id="targetVariant">
       <option value="en-GB" selected>English UK</option>
       <option value="en-US">English US</option>
@@ -95,7 +88,9 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
         <div><div class="title">Input</div><div class="hint">Speak or type naturally.</div></div>
         <button class="secondary" id="clearBtn">Clear</button>
       </div>
+
       <textarea id="input" placeholder="Speak or type here..."></textarea>
+
       <div class="actions">
         <button class="primary big" id="micBtn">🎤 Start recording</button>
         <button class="secondary big" id="translateBtn">Translate</button>
@@ -107,7 +102,9 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
         <div><div class="title">Ready result</div><div class="hint">Copy, speak, refine or add ending.</div></div>
         <button class="secondary" id="copyBtn">Copy</button>
       </div>
+
       <textarea id="output" readonly placeholder="Translation will appear here..."></textarea>
+
       <div class="actions">
         <button class="secondary" id="speakBtn">🔊 Speak</button>
         <button class="secondary" id="emojiBtn">😊 Ending</button>
@@ -116,6 +113,7 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
         <button class="secondary refine" data-refine="friendlier">Friendlier</button>
         <button class="secondary refine" data-refine="regenerate">Regenerate</button>
       </div>
+
       <div class="emojiBox" id="emojiBox">
         <button class="secondary ending">Xxx</button>
         <button class="secondary ending">😊</button>
@@ -124,8 +122,8 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
         <button class="secondary ending">😢</button>
         <button class="secondary ending">🥳</button>
         <button class="secondary ending">😡</button>
-        <button class="secondary ending">💋 💋</button>
-        <button class="secondary ending">🔱🔥</button>
+        <button class="secondary ending">💋</button>
+        <button class="secondary ending"><span class="fire-trident">🔱</span></button>
         <button class="secondary ending">👍</button>
       </div>
     </div>
@@ -152,8 +150,8 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
         <button class="secondary" id="closeCamera">Close</button>
       </div>
 
-      <input class="fileInput" id="takePhotoInput" type="file" accept="image/*" capture="environment" />
-      <input class="fileInput" id="uploadPhotoInput" type="file" accept="image/*" />
+      <input class="fileInput" id="takePhotoInput" type="file" accept="image/*" capture="environment">
+      <input class="fileInput" id="uploadPhotoInput" type="file" accept="image/*">
 
       <div class="photoBox" id="photoName">No photo selected</div>
 
@@ -189,8 +187,12 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
 </div>
 
 <div class="drawerOverlay" id="drawerOverlay"></div>
+
 <div class="drawer" id="drawer">
-  <div class="drawerHeader"><h2>Settings</h2><button class="secondary" id="closeDrawer">Close</button></div>
+  <div class="drawerHeader">
+    <h2>Settings</h2>
+    <button class="secondary" id="closeDrawer">Close</button>
+  </div>
 
   <div class="section">
     <div class="sectionTitle">English Level</div>
@@ -233,6 +235,7 @@ document.querySelectorAll(".themeDot").forEach(b=>b.onclick=()=>applyTheme(b.dat
 
 function autoUpdate(){if(output.value.trim()&&input.value.trim())runTranslate()}
 function toggleChip(group,el,key){const active=el.classList.contains("active");group.querySelectorAll("button").forEach(b=>b.classList.remove("active"));if(active){if(key==="style")englishStyle="";if(key==="audience")audience="";if(key==="slang")slang=""}else{el.classList.add("active");if(key==="style")englishStyle=el.dataset.style;if(key==="audience")audience=el.dataset.audience;if(key==="slang")slang=el.dataset.slang}autoUpdate()}
+
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");resultType=b.dataset.result;autoUpdate()});
 document.querySelectorAll("#styleChips .chip").forEach(b=>b.onclick=()=>toggleChip(document.getElementById("styleChips"),b,"style"));
 document.querySelectorAll("#audienceChips .chip").forEach(b=>b.onclick=()=>toggleChip(document.getElementById("audienceChips"),b,"audience"));
@@ -281,7 +284,6 @@ function monitorSilence(){
   }else if(heardVoice&&elapsed>1200&&!silenceTimer){
     silenceTimer=setTimeout(()=>{if(isRecording)stopRecording()},1800);
   }
-
   rafId=requestAnimationFrame(monitorSilence);
 }
 
@@ -295,7 +297,6 @@ async function startRecording(callback){
 
     const mimeType=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")?"audio/webm;codecs=opus":(MediaRecorder.isTypeSupported("audio/webm")?"audio/webm":"audio/mp4");
     mediaRecorder=new MediaRecorder(stream,{mimeType});
-
     mediaRecorder.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data)};
 
     mediaRecorder.onstop=async()=>{
@@ -314,11 +315,9 @@ async function startRecording(callback){
       }
 
       statusEl.textContent="Transcribing...";
-
       try{
         const text=await transcribeAudio();
         if(!text){statusEl.textContent="No speech detected";return}
-
         if(currentRecordCallback){await currentRecordCallback(text)}
         else{input.value=input.value?input.value+" "+text:text;await runTranslate()}
       }catch(e){statusEl.textContent=e.message||"Transcription failed"}
@@ -336,7 +335,6 @@ async function startRecording(callback){
     analyser.fftSize=2048;
     src.connect(analyser);
     monitorSilence();
-
   }catch(e){
     statusEl.textContent="Microphone access denied";
   }
@@ -388,7 +386,14 @@ function renderHistory(filter="all"){
 }
 
 document.querySelectorAll("#historyPanel .chip").forEach(b=>b.onclick=()=>{document.querySelectorAll("#historyPanel .chip").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderHistory(b.dataset.filter)});
-function showPanel(p){translatePanel.style.display=p==="translate"?"grid":"none";dialoguePanel.classList.toggle("open",p==="dialogue");historyPanel.classList.toggle("open",p==="history");cameraPanel.classList.toggle("open",p==="camera")}
+
+function showPanel(p){
+  translatePanel.style.display=p==="translate"?"grid":"none";
+  dialoguePanel.classList.toggle("open",p==="dialogue");
+  historyPanel.classList.toggle("open",p==="history");
+  cameraPanel.classList.toggle("open",p==="camera");
+}
+
 historyBtn.onclick=()=>{renderHistory();showPanel("history")};
 closeHistory.onclick=()=>showPanel("translate");
 dialogueBtn.onclick=()=>showPanel("dialogue");
@@ -426,31 +431,70 @@ function setPhotoFile(file){
 takePhotoInput.onchange=e=>setPhotoFile(e.target.files[0]);
 uploadPhotoInput.onchange=e=>setPhotoFile(e.target.files[0]);
 
+function resizeImage(file,maxWidth=1200,quality=0.72){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    const reader=new FileReader();
+
+    reader.onload=e=>{
+      img.onload=()=>{
+        const scale=Math.min(1,maxWidth/img.width);
+        const canvas=document.createElement("canvas");
+        canvas.width=Math.round(img.width*scale);
+        canvas.height=Math.round(img.height*scale);
+        const ctx=canvas.getContext("2d");
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        resolve(canvas.toDataURL("image/jpeg",quality));
+      };
+      img.onerror=reject;
+      img.src=e.target.result;
+    };
+
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 photoTranslateBtn.onclick=async()=>{
   const file=selectedPhotoFile;
   if(!file){statusEl.textContent="Choose or take a photo first";return}
 
-  statusEl.textContent="Reading photo...";
+  statusEl.textContent="Preparing photo...";
 
-  const reader=new FileReader();
+  try{
+    const compressedImage=await resizeImage(file);
+    statusEl.textContent="Translating photo...";
 
-  reader.onload=async()=>{
-    try{
-      const res=await fetch("/api/photo-translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:reader.result,sourceLanguage:sourceLang.options[sourceLang.selectedIndex].text,targetVariant:targetVariant.value,resultType,englishStyle,audience,slang})});
-      const data=await res.json();
+    const res=await fetch("/api/photo-translate",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        image:compressedImage,
+        sourceLanguage:sourceLang.options[sourceLang.selectedIndex].text,
+        targetVariant:targetVariant.value,
+        resultType,
+        englishStyle,
+        audience,
+        slang
+      })
+    });
 
-      if(!res.ok){statusEl.textContent=data.error||"Photo translation failed";return}
+    const data=await res.json();
 
-      input.value=data.detectedText||"";
-      output.value=data.translation||"";
-      saveHistory(input.value,output.value);
-      statusEl.textContent="Photo translated";
-    }catch(e){
-      statusEl.textContent="Photo backend error";
+    if(!res.ok){
+      statusEl.textContent=data.error||"Photo translation failed";
+      return;
     }
-  };
 
-  reader.readAsDataURL(file);
+    input.value=data.detectedText||"";
+    output.value=data.translation||"";
+
+    saveHistory(input.value,output.value);
+    showPanel("translate");
+    statusEl.textContent="Photo translated";
+  }catch(e){
+    statusEl.textContent="Photo backend error";
+  }
 };
 </script>
 </body>
