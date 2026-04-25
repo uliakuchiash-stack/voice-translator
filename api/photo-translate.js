@@ -4,42 +4,29 @@ export default async function handler(req, res) {
   }
 
   try {
-    const {
-      image,
-      sourceLanguage = "Ukrainian",
-      targetVariant = "en-GB"
-    } = req.body || {};
+    const { image, sourceLanguage = "Ukrainian" } = req.body || {};
 
-    if (!image) {
-      return res.status(400).json({ error: "No image provided" });
-    }
-
-    if (!process.env.OPENAI_API_KEY) {
-      return res.status(500).json({ error: "Missing API key" });
-    }
-
-    const targetEnglish = targetVariant === "en-US" ? "American English" : "British English";
+    if (!image) return res.status(400).json({ error: "No image provided" });
+    if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: "Missing API key" });
 
     const prompt = `
-You are a photo text translator.
+You are a photo OCR translator.
 
-Read the text in the image and TRANSLATE it.
+Read ALL visible text from the image.
 
-Do NOT just copy the original text.
+Translate ALL readable text into ${sourceLanguage}.
 
-Rules:
-- If a line is in English, translate it into ${sourceLanguage}.
-- If a line is in ${sourceLanguage} or any non-English language, translate it into ${targetEnglish}.
-- If the image has mixed English and non-English text, translate every line separately.
-- Never return the same text unchanged unless it is a name, brand, email, phone number, address, or code.
-- Keep the original order.
-- If there is no readable text, return "No readable text found."
+Important:
+- Do not keep English text in English.
+- Do not keep Ukrainian/Russian/Polish/etc. unchanged unless it is already ${sourceLanguage}.
+- Translate the full photo text into ${sourceLanguage}.
+- Keep names, brands, emails, phone numbers, addresses and codes unchanged.
+- Return ONLY JSON.
 
-Return ONLY JSON:
-
+JSON format:
 {
-  "detectedText": "original text from image",
-  "translation": "translated text only"
+  "detectedText": "original text from the image",
+  "translation": "full translation into ${sourceLanguage}"
 }
 `;
 
@@ -50,7 +37,7 @@ Return ONLY JSON:
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         temperature: 0,
         response_format: { type: "json_object" },
         messages: [
@@ -74,13 +61,9 @@ Return ONLY JSON:
     }
 
     const content = data?.choices?.[0]?.message?.content?.trim();
-
-    if (!content) {
-      return res.status(500).json({ error: "Empty model response" });
-    }
+    if (!content) return res.status(500).json({ error: "Empty model response" });
 
     let parsed;
-
     try {
       parsed = JSON.parse(content);
     } catch {
