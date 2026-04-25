@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>AI Slang and Business Translator</title>
-
 <style>
 :root{--bg:#0f131a;--card:#141a22;--card2:#1f2733;--text:#f4f7fb;--muted:#a4afbc;--accent:#6f95d8;--btn:#2a3442;--btnText:#f4f7fb;--border:rgba(255,255,255,.08)}
 *{box-sizing:border-box}
@@ -14,7 +13,9 @@ body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text
 h1{margin:0;font-size:24px;line-height:1.1}.subtitle{color:var(--muted);font-size:14px;margin-top:6px}
 .iconBtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 button{border:none;border-radius:16px;padding:12px 14px;cursor:pointer;font-size:14px}
-.iconBtn,.secondary{background:var(--btn);color:var(--btnText)}.primary{background:var(--accent);color:#0f1720;font-weight:800}.big{flex:1;min-width:150px}
+.iconBtn,.secondary{background:var(--btn);color:var(--btnText)}
+.danger{background:#7d3434;color:#fff}
+.primary{background:var(--accent);color:#0f1720;font-weight:800}.big{flex:1;min-width:150px}
 .themeDots{display:flex;gap:8px;margin-top:10px}.themeDot{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.35);cursor:pointer}.themeDot.active{border-color:#fff}
 .langRow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 select,textarea{width:100%;border:none;outline:none;border-radius:18px;background:var(--card2);color:var(--text);border:1px solid var(--border)}
@@ -43,9 +44,7 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
 .kissCombo{display:inline-flex;align-items:center;gap:1px}
 .kissCombo .bigLip{font-size:21px}
 .kissCombo .smallLip{font-size:12px;margin-left:-2px}
-.fireTrident{position:relative;display:inline-block;width:30px;height:26px}
-.fireTrident .fire{position:absolute;left:2px;top:2px;font-size:25px;filter:saturate(1.25)}
-.fireTrident .trident{position:absolute;left:4px;top:0;font-size:24px;text-shadow:0 0 5px #ffb703,0 0 10px #fb5607}
+.fireTridentText{font-size:20px;letter-spacing:-2px}
 @media(max-width:850px){body{padding:10px}.app{padding:14px;border-radius:22px}.mainGrid{grid-template-columns:1fr}.langRow{grid-template-columns:1fr}h1{font-size:21px}textarea{min-height:135px}.top{flex-direction:column}.iconBtns{justify-content:flex-start}}
 </style>
 </head>
@@ -64,7 +63,6 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
         <button class="themeDot" data-theme="lavender" style="background:#8877b8"></button>
       </div>
     </div>
-
     <div class="iconBtns">
       <button class="iconBtn" id="cameraBtn">📷 Camera</button>
       <button class="iconBtn" id="dialogueBtn">💬 Dialogue</button>
@@ -95,7 +93,6 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
       <option value="cs">Czech</option>
       <option value="bg">Bulgarian</option>
     </select>
-
     <select id="targetVariant">
       <option value="en-GB" selected>English UK</option>
       <option value="en-US">English US</option>
@@ -135,7 +132,6 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
         <button class="secondary refine" data-refine="friendlier">Friendlier</button>
         <button class="secondary refine" data-refine="regenerate">Regenerate</button>
       </div>
-
       <div class="emojiBox" id="emojiBox">
         <button class="secondary ending">Xxx</button>
         <button class="secondary ending">😊</button>
@@ -147,8 +143,8 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
         <button class="secondary ending" data-ending="💋💋">
           <span class="kissCombo"><span class="bigLip">💋</span><span class="smallLip">💋</span><span class="smallLip">💋</span></span>
         </button>
-        <button class="secondary ending" data-ending="🔱🔥">
-          <span class="fireTrident"><span class="fire">🔥</span><span class="trident">🔱</span></span>
+        <button class="secondary ending" data-ending="🔥🔱🔥">
+          <span class="fireTridentText">🔥🔱🔥</span>
         </button>
         <button class="secondary ending">👍</button>
       </div>
@@ -194,6 +190,11 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
         <div><div class="title">History</div><div class="hint">Saved translations from this device.</div></div>
         <button class="secondary" id="closeHistory">Close</button>
       </div>
+
+      <div class="actions">
+        <button class="danger" id="clearHistoryBtn">Delete history</button>
+      </div>
+
       <div class="chips">
         <button class="chip active" data-filter="all">All</button>
         <button class="chip" data-filter="email">Email</button>
@@ -201,6 +202,7 @@ textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:
         <button class="chip" data-filter="plain">Plain</button>
         <button class="chip" data-filter="slang">Slang</button>
       </div>
+
       <div id="historyList"></div>
     </div>
   </div>
@@ -266,22 +268,8 @@ const takePhotoInput=document.getElementById("takePhotoInput");
 const uploadPhotoInput=document.getElementById("uploadPhotoInput");
 const photoName=document.getElementById("photoName");
 
-let resultType="message";
-let englishStyle="";
-let audience="";
-let slang="";
-let mediaRecorder=null;
-let audioChunks=[];
-let isRecording=false;
-let stream=null;
-let audioContext=null;
-let analyser=null;
-let silenceTimer=null;
-let rafId=null;
-let currentRecordCallback=null;
-let recordStart=0;
-let heardVoice=false;
-let selectedPhotoFile=null;
+let resultType="message",englishStyle="",audience="",slang="";
+let mediaRecorder=null,audioChunks=[],isRecording=false,stream=null,audioContext=null,analyser=null,silenceTimer=null,rafId=null,currentRecordCallback=null,recordStart=0,heardVoice=false,selectedPhotoFile=null;
 
 const themes={
   dark:{bg:"#0f131a",card:"#141a22",card2:"#1f2733",text:"#f4f7fb",muted:"#a4afbc",accent:"#6f95d8",btn:"#2a3442",btnText:"#f4f7fb"},
@@ -307,26 +295,12 @@ function autoUpdate(){if(output.value.trim()&&input.value.trim())runTranslate()}
 function toggleChip(group,el,key){
   const active=el.classList.contains("active");
   group.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
-  if(active){
-    if(key==="style")englishStyle="";
-    if(key==="audience")audience="";
-    if(key==="slang")slang="";
-  }else{
-    el.classList.add("active");
-    if(key==="style")englishStyle=el.dataset.style;
-    if(key==="audience")audience=el.dataset.audience;
-    if(key==="slang")slang=el.dataset.slang;
-  }
+  if(active){if(key==="style")englishStyle="";if(key==="audience")audience="";if(key==="slang")slang=""}
+  else{el.classList.add("active");if(key==="style")englishStyle=el.dataset.style;if(key==="audience")audience=el.dataset.audience;if(key==="slang")slang=el.dataset.slang}
   autoUpdate();
 }
 
-document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{
-  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active");
-  resultType=b.dataset.result;
-  autoUpdate();
-});
-
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");resultType=b.dataset.result;autoUpdate()});
 document.querySelectorAll("#styleChips .chip").forEach(b=>b.onclick=()=>toggleChip(document.getElementById("styleChips"),b,"style"));
 document.querySelectorAll("#audienceChips .chip").forEach(b=>b.onclick=()=>toggleChip(document.getElementById("audienceChips"),b,"audience"));
 document.querySelectorAll("#slangChips .chip").forEach(b=>b.onclick=()=>toggleChip(document.getElementById("slangChips"),b,"slang"));
@@ -341,20 +315,7 @@ async function runTranslate(refine=""){
   statusEl.textContent="Translating...";
   translateBtn.disabled=true;
   try{
-    const res=await fetch("/api/translate",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        text,
-        sourceLanguage:sourceLang.options[sourceLang.selectedIndex].text,
-        targetVariant:targetVariant.value,
-        resultType,
-        englishStyle,
-        audience,
-        slang,
-        refine
-      })
-    });
+    const res=await fetch("/api/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,sourceLanguage:sourceLang.options[sourceLang.selectedIndex].text,targetVariant:targetVariant.value,resultType,englishStyle,audience,slang,refine})});
     const data=await res.json();
     if(!res.ok){statusEl.textContent=data.error||"Translation failed";return}
     output.value=data.translation||"";
@@ -366,11 +327,7 @@ async function runTranslate(refine=""){
 async function transcribeAudio(){
   const blob=new Blob(audioChunks,{type:mediaRecorder?.mimeType||"audio/webm"});
   const buffer=await blob.arrayBuffer();
-  const res=await fetch("/api/transcribe",{
-    method:"POST",
-    headers:{"Content-Type":blob.type,"x-source-language":sourceLang.value},
-    body:buffer
-  });
+  const res=await fetch("/api/transcribe",{method:"POST",headers:{"Content-Type":blob.type,"x-source-language":sourceLang.value},body:buffer});
   const data=await res.json();
   if(!res.ok)throw new Error(data.error||"Transcription failed");
   return(data.text||"").trim();
@@ -384,12 +341,8 @@ function monitorSilence(){
   for(let i=0;i<arr.length;i++){const v=(arr[i]-128)/128;sum+=v*v}
   const volume=Math.sqrt(sum/arr.length);
   const elapsed=Date.now()-recordStart;
-  if(volume>0.035){
-    heardVoice=true;
-    if(silenceTimer){clearTimeout(silenceTimer);silenceTimer=null}
-  }else if(heardVoice&&elapsed>1200&&!silenceTimer){
-    silenceTimer=setTimeout(()=>{if(isRecording)stopRecording()},1800);
-  }
+  if(volume>0.035){heardVoice=true;if(silenceTimer){clearTimeout(silenceTimer);silenceTimer=null}}
+  else if(heardVoice&&elapsed>1200&&!silenceTimer){silenceTimer=setTimeout(()=>{if(isRecording)stopRecording()},1800)}
   rafId=requestAnimationFrame(monitorSilence);
 }
 
@@ -443,10 +396,7 @@ document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.w
 
 function speakTextWithLang(txt,lang){
   if(!txt.trim()){statusEl.textContent="Nothing to speak";return}
-  if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window)){
-    statusEl.textContent="Speech not supported on this browser";
-    return;
-  }
+  if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window)){statusEl.textContent="Speech not supported on this browser";return}
   const u=new window.SpeechSynthesisUtterance(txt);
   u.lang=lang;
   u.rate=1;
@@ -488,11 +438,15 @@ function renderHistory(filter="all"){
   });
 }
 
-document.querySelectorAll("#historyPanel .chip").forEach(b=>b.onclick=()=>{
-  document.querySelectorAll("#historyPanel .chip").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active");
-  renderHistory(b.dataset.filter);
-});
+document.getElementById("clearHistoryBtn").onclick=()=>{
+  const ok=confirm("Delete all translation history on this device?");
+  if(!ok)return;
+  localStorage.removeItem("history");
+  renderHistory();
+  statusEl.textContent="History deleted";
+};
+
+document.querySelectorAll("#historyPanel .chip").forEach(b=>b.onclick=()=>{document.querySelectorAll("#historyPanel .chip").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderHistory(b.dataset.filter)});
 
 function showPanel(p){
   translatePanel.style.display=p==="translate"?"grid":"none";
@@ -520,24 +474,13 @@ function addDialogue(original,translated,speakLang){
   const lang=speakLang==="user"?getUserSpeakLang():targetVariant.value;
   div.querySelector("button").onclick=()=>speakTextWithLang(translated,lang);
   dialogueList.appendChild(div);
-
-  if(speakLang==="en"){
-    speakTextWithLang(translated,targetVariant.value);
-  }
+  if(speakLang==="en"){speakTextWithLang(translated,targetVariant.value)}
 }
 
 document.getElementById("dialogueRecordBtn").onclick=()=>isRecording?stopRecording():startRecording(async(text)=>{
   statusEl.textContent="Dialogue translating...";
   try{
-    const res=await fetch("/api/dialogue-translate",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        text,
-        userLanguage:sourceLang.options[sourceLang.selectedIndex].text,
-        englishVariant:targetVariant.value==="en-US"?"English US":"English UK"
-      })
-    });
+    const res=await fetch("/api/dialogue-translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,userLanguage:sourceLang.options[sourceLang.selectedIndex].text,englishVariant:targetVariant.value==="en-US"?"English US":"English UK"})});
     const data=await res.json();
     if(!res.ok){statusEl.textContent=data.error||"Dialogue translation failed";return}
     addDialogue(text,data.translation||"",data.speakLang||"en");
@@ -587,19 +530,7 @@ document.getElementById("photoTranslateBtn").onclick=async()=>{
   try{
     const compressedImage=await resizeImage(file);
     statusEl.textContent="Translating photo...";
-    const res=await fetch("/api/photo-translate",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        image:compressedImage,
-        sourceLanguage:sourceLang.options[sourceLang.selectedIndex].text,
-        targetVariant:targetVariant.value,
-        resultType,
-        englishStyle,
-        audience,
-        slang
-      })
-    });
+    const res=await fetch("/api/photo-translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:compressedImage,targetLanguage:sourceLang.options[sourceLang.selectedIndex].text,sourceLanguage:sourceLang.options[sourceLang.selectedIndex].text,targetVariant:targetVariant.value,resultType,englishStyle,audience,slang})});
     const data=await res.json();
     if(!res.ok){statusEl.textContent=data.error||"Photo translation failed";return}
     input.value=data.detectedText||"";
