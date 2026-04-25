@@ -25,9 +25,11 @@ export default async function handler(req, res) {
             content: [
               {
                 type: "text",
-                text: `Read all visible text from this image. Return ONLY JSON:
+                text: `Read ALL visible text from this image exactly as it appears.
+Keep line breaks and order.
+Return ONLY JSON:
 {
-  "detectedText": "all readable text from the image"
+  "detectedText": "..."
 }`
               },
               {
@@ -49,6 +51,7 @@ export default async function handler(req, res) {
     }
 
     let ocrParsed;
+
     try {
       ocrParsed = JSON.parse(ocrData?.choices?.[0]?.message?.content || "{}");
     } catch {
@@ -71,22 +74,28 @@ export default async function handler(req, res) {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
-        temperature: 0.2,
+        model: "gpt-4o",
+        temperature: 0,
         response_format: { type: "json_object" },
         messages: [
           {
             role: "system",
-            content: `You are a strict translator.
+            content: `You are a strict photo text translator.
 
-Translate the user's text fully into ${sourceLanguage}.
+Translate the ENTIRE text fully into ${sourceLanguage}.
 
-Rules:
-- Do not leave English unchanged.
+Very important rules:
+- Translate every normal word into ${sourceLanguage}.
+- Do NOT leave English, Chinese, Turkish, Polish, Russian or any other language unchanged.
+- Translate words even if they are next to numbers, letters, slashes, brackets, dashes or exercise labels.
+- Translate textbook/interface words such as page, unit, lesson, exercise, task, part, section, reading, writing, listening, speaking, grammar, vocabulary, complete, choose, match, answer, question, develop.
+- Keep only pure numbers, exercise labels and punctuation unchanged, for example: 1, 2A, 3B, a), b), /, -, ?.
+- If a line says "1 a long time / for / Have / you..." translate the words, but keep the numbering and symbols.
 - Keep names, brands, emails, phone numbers, addresses and codes unchanged.
-- But translate normal textbook/interface words such as page, chapter, unit, lesson, exercise, task, part, section, develop, reading, writing, listening, speaking.
-- Keep numbers unchanged.
-- Return ONLY JSON:
+- Preserve the original order and line breaks as much as possible.
+- Return translated text only, not explanations.
+
+Return ONLY JSON:
 {
   "translation": "..."
 }`
@@ -108,6 +117,7 @@ Rules:
     }
 
     let translatedParsed;
+
     try {
       translatedParsed = JSON.parse(translateData?.choices?.[0]?.message?.content || "{}");
     } catch {
