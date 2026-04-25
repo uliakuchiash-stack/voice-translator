@@ -1,191 +1,383 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>AI Slang and Business Translator</title>
-
 <style>
-:root{
-  --bg:#f4efff;
-  --card:#ffffff;
-  --text:#2f2a3d;
-  --muted:#6d6780;
-  --btn:#9a86d8;
-  --btnActive:#7e68c7;
-  --btnText:#ffffff;
-  --border:#ddd6f7;
-}
-
+:root{--bg:#0f131a;--card:#141a22;--card2:#1f2733;--text:#f4f7fb;--muted:#a4afbc;--accent:#6f95d8;--btn:#2a3442;--btnText:#f4f7fb;--border:rgba(255,255,255,.08)}
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  padding:14px;
-}
-
-.app{
-  max-width:760px;
-  margin:auto;
-}
-
-h1{
-  margin:0 0 8px;
-  font-size:32px;
-}
-
-.sub{
-  color:var(--muted);
-  margin-bottom:18px;
-}
-
-.panel{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:22px;
-  padding:18px;
-  margin-bottom:16px;
-}
-
-select, textarea{
-  width:100%;
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:14px;
-  font-size:16px;
-  background:#fff;
-}
-
-textarea{
-  min-height:160px;
-  resize:vertical;
-}
-
-.row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin:12px 0;
-}
-
-button{
-  border:none;
-  border-radius:18px;
-  padding:12px 18px;
-  cursor:pointer;
-  font-size:15px;
-  background:var(--btn);
-  color:var(--btnText);
-}
-
-button.secondary{
-  background:#ece7fb;
-  color:var(--text);
-}
-
-button.active{
-  background:var(--btnActive);
-}
-
-.top-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:14px;
-}
-
-.hidden{
-  display:none;
-}
-
-.emoji-box{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.small{
-  font-size:14px;
-  color:var(--muted);
-}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:14px}
+.app{max-width:1220px;margin:auto;background:var(--card);border:1px solid var(--border);border-radius:28px;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.3)}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:16px}
+h1{margin:0;font-size:24px;line-height:1.1}
+.subtitle{color:var(--muted);font-size:14px;margin-top:6px}
+.iconBtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+button{border:none;border-radius:16px;padding:12px 14px;cursor:pointer;font-size:14px}
+.iconBtn,.secondary{background:var(--btn);color:var(--btnText)}
+.primary{background:var(--accent);color:#0f1720;font-weight:800}
+.big{flex:1;min-width:150px}
+.themeDots{display:flex;gap:8px;margin-top:10px}
+.themeDot{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.35);cursor:pointer}
+.themeDot.active{border-color:#fff}
+.langRow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+select,textarea{width:100%;border:none;outline:none;border-radius:18px;background:var(--card2);color:var(--text);border:1px solid var(--border)}
+select{padding:14px;font-size:15px}
+textarea{padding:16px;font-size:17px;line-height:1.5;resize:vertical;min-height:160px}
+.mainGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:24px;padding:15px}
+.cardHead{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;align-items:center}
+.title{font-weight:700;font-size:15px}
+.hint{color:var(--muted);font-size:12px;margin-top:4px}
+.actions,.tabs,.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chip,.tab{background:var(--btn);color:var(--btnText);border-radius:999px;padding:10px 13px;font-size:13px}
+.chip.active,.tab.active{background:var(--accent);color:#0f1720;font-weight:800}
+.status{color:var(--muted);font-size:14px;margin-top:14px}
+.drawerOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20}
+.drawer{position:fixed;top:0;right:-390px;width:380px;max-width:92vw;height:100vh;background:var(--card);border-left:1px solid var(--border);z-index:30;padding:20px;transition:right .25s ease;overflow:auto}
+.drawer.open{right:0}.drawerOverlay.open{display:block}
+.drawerHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.section{margin:18px 0}.sectionTitle{font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:700;text-transform:uppercase}
+.panel{display:none}.panel.open{display:block}
+.historyItem,.bubble{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:12px;margin-bottom:10px}
+.historyItem small{color:var(--muted)}
+.bubble .translated{color:var(--muted);margin-top:6px}
+.fileInput{width:100%;background:var(--card2);border:1px dashed var(--accent);padding:20px;border-radius:18px;color:var(--muted)}
+.emojiBox{display:none;background:var(--card2);border:1px solid var(--border);border-radius:18px;padding:10px;margin-top:10px}
+.emojiBox.open{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:850px){body{padding:10px}.app{padding:14px;border-radius:22px}.mainGrid{grid-template-columns:1fr}.langRow{grid-template-columns:1fr}h1{font-size:21px}textarea{min-height:135px}.top{flex-direction:column}.iconBtns{justify-content:flex-start}}
 </style>
 </head>
 <body>
-
 <div class="app">
+  <div class="top">
+    <div>
+      <h1>AI Slang and Business Translator</h1>
+      <div class="subtitle">Voice, slang, business English, email, camera and dialogue translation.</div>
+      <div class="themeDots">
+        <button class="themeDot active" data-theme="dark" style="background:#6f95d8"></button>
+        <button class="themeDot" data-theme="olive" style="background:#90a765"></button>
+        <button class="themeDot" data-theme="blue" style="background:#5d8ec0"></button>
+        <button class="themeDot" data-theme="rose" style="background:#c88a91"></button>
+        <button class="themeDot" data-theme="lavender" style="background:#8877b8"></button>
+      </div>
+    </div>
+    <div class="iconBtns">
+      <button class="iconBtn" id="cameraBtn">📷 Camera</button>
+      <button class="iconBtn" id="dialogueBtn">💬 Dialogue</button>
+      <button class="iconBtn" id="historyBtn">🕘 History</button>
+      <button class="iconBtn" id="settingsBtn">⚙ Settings</button>
+    </div>
+  </div>
 
-<h1>AI Slang and Business Translator</h1>
-<div class="sub">
-Voice, slang, business English, email, camera and real conversation translation.
+  <div class="langRow">
+    <select id="sourceLang">
+      <option value="en">English</option><option value="uk" selected>Ukrainian</option><option value="ru">Russian</option><option value="pl">Polish</option><option value="fr">French</option><option value="es">Spanish</option><option value="de">German</option><option value="it">Italian</option><option value="ro">Romanian / Moldova</option><option value="hu">Hungarian</option><option value="pt">Portuguese</option><option value="tr">Turkish</option><option value="ar">Arabic</option><option value="hi">Hindi</option><option value="zh">Chinese</option><option value="ja">Japanese</option><option value="ko">Korean</option><option value="cs">Czech</option><option value="bg">Bulgarian</option>
+    </select>
+    <select id="targetVariant">
+      <option value="en-GB" selected>English UK</option>
+      <option value="en-US">English US</option>
+    </select>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-result="message">Message</button>
+    <button class="tab" data-result="email">Email</button>
+    <button class="tab" data-result="plain">Plain Translate</button>
+  </div>
+
+  <div class="mainGrid" id="translatePanel">
+    <div class="card">
+      <div class="cardHead">
+        <div><div class="title">Input</div><div class="hint">Speak or type naturally.</div></div>
+        <button class="secondary" id="clearBtn">Clear</button>
+      </div>
+      <textarea id="input" placeholder="Speak or type here..."></textarea>
+      <div class="actions">
+        <button class="primary big" id="micBtn">🎤 Start recording</button>
+        <button class="secondary big" id="translateBtn">Translate</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="cardHead">
+        <div><div class="title">Ready result</div><div class="hint">Copy, speak, refine or add ending.</div></div>
+        <button class="secondary" id="copyBtn">Copy</button>
+      </div>
+      <textarea id="output" readonly placeholder="Translation will appear here..."></textarea>
+      <div class="actions">
+        <button class="secondary" id="speakBtn">🔊 Speak</button>
+        <button class="secondary" id="emojiBtn">😊 Ending</button>
+        <button class="secondary refine" data-refine="shorter">Shorter</button>
+        <button class="secondary refine" data-refine="warmer">Warmer</button>
+        <button class="secondary refine" data-refine="professional">Professional</button>
+        <button class="secondary refine" data-refine="soften">Soften</button>
+        <button class="secondary refine" data-refine="regenerate">Regenerate</button>
+      </div>
+      <div class="emojiBox" id="emojiBox">
+        <button class="secondary ending">xx</button><button class="secondary ending">xxx</button><button class="secondary ending">😊</button><button class="secondary ending">❤️</button><button class="secondary ending">😉</button><button class="secondary ending">👍</button><button class="secondary ending">🙏</button><button class="secondary ending">Thanks xx</button><button class="secondary ending">See you soon xx</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="dialoguePanel">
+    <div class="card">
+      <div class="cardHead">
+        <div><div class="title">Live Dialogue Mode</div><div class="hint">One phrase = one translated reply.</div></div>
+        <button class="secondary" id="closeDialogue">Close</button>
+      </div>
+      <div id="dialogueList"></div>
+      <div class="actions">
+        <button class="primary big" id="dialogueRecordBtn">🎤 Record reply</button>
+        <button class="secondary" id="clearDialogueBtn">Clear dialogue</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="cameraPanel">
+    <div class="card">
+      <div class="cardHead">
+        <div><div class="title">Photo Translate</div><div class="hint">Take or upload a photo with text.</div></div>
+        <button class="secondary" id="closeCamera">Close</button>
+      </div>
+      <input class="fileInput" id="photoInput" type="file" accept="image/*" capture="environment" />
+      <div class="actions"><button class="primary big" id="photoTranslateBtn">📷 Translate photo</button></div>
+    </div>
+  </div>
+
+  <div class="panel" id="historyPanel">
+    <div class="card">
+      <div class="cardHead">
+        <div><div class="title">History</div><div class="hint">Saved translations from this device.</div></div>
+        <button class="secondary" id="closeHistory">Close</button>
+      </div>
+      <div class="chips">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="email">Email</button>
+        <button class="chip" data-filter="message">Message</button>
+        <button class="chip" data-filter="plain">Plain</button>
+        <button class="chip" data-filter="slang">Slang</button>
+      </div>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <div class="status" id="status">Ready</div>
 </div>
 
-<div class="top-actions">
-<button class="secondary">📷 Camera</button>
-<button class="secondary">💬 Dialogue</button>
-<button class="secondary">🕘 History</button>
-<button class="secondary">⚙ Settings</button>
+<div class="drawerOverlay" id="drawerOverlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawerHeader"><h2>Settings</h2><button class="secondary" id="closeDrawer">Close</button></div>
+
+  <div class="section">
+    <div class="sectionTitle">English Level</div>
+    <div class="chips" id="styleChips">
+      <button class="chip" data-style="elementary">Elementary</button>
+      <button class="chip" data-style="everyday">Everyday</button>
+      <button class="chip" data-style="professional">Professional</button>
+      <button class="chip" data-style="native">Native-like</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sectionTitle">Tone</div>
+    <div class="chips" id="toneChips">
+      <button class="chip" data-tone="casual">Casual</button>
+      <button class="chip" data-tone="warm">Warm</button>
+      <button class="chip" data-tone="professional">Professional</button>
+      <button class="chip" data-tone="direct">Direct</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sectionTitle">Slang & Swearing</div>
+    <div class="chips" id="slangChips">
+      <button class="chip" data-slang="soften">Soften</button>
+      <button class="chip" data-slang="keep">Keep</button>
+      <button class="chip" data-slang="strong">Strong</button>
+    </div>
+  </div>
 </div>
 
-<div class="panel">
+<script>
+const input=document.getElementById("input"),output=document.getElementById("output"),statusEl=document.getElementById("status"),sourceLang=document.getElementById("sourceLang"),targetVariant=document.getElementById("targetVariant"),micBtn=document.getElementById("micBtn"),translateBtn=document.getElementById("translateBtn");
+const drawer=document.getElementById("drawer"),drawerOverlay=document.getElementById("drawerOverlay"),settingsBtn=document.getElementById("settingsBtn"),closeDrawerBtn=document.getElementById("closeDrawer");
+let resultType="message",englishStyle="",tone="",slang="",mediaRecorder=null,audioChunks=[],isRecording=false,stream=null;
+const themes={dark:{bg:"#0f131a",card:"#141a22",card2:"#1f2733",text:"#f4f7fb",muted:"#a4afbc",accent:"#6f95d8",btn:"#2a3442",btnText:"#f4f7fb"},olive:{bg:"#626f52",card:"#6e7d5d",card2:"#dcd8cc",text:"#f7f4ec",muted:"#e0dacd",accent:"#90a765",btn:"#7b8969",btnText:"#f7f4ec"},blue:{bg:"#dbe3ed",card:"#eaf0f6",card2:"#f3f7fb",text:"#203142",muted:"#617488",accent:"#5d8ec0",btn:"#7fa1c6",btnText:"#fff"},rose:{bg:"#eddfe1",card:"#f4e8ea",card2:"#fbf3f4",text:"#4a3639",muted:"#8b7377",accent:"#c88a91",btn:"#d39aa0",btnText:"#fff"},lavender:{bg:"#e4deee",card:"#ede7f5",card2:"#f6f2fb",text:"#403755",muted:"#7b7292",accent:"#8877b8",btn:"#9b8cc6",btnText:"#fff"}};
 
-<div class="row">
-<select>
-<option>Ukrainian</option>
-<option>Russian</option>
-<option>Polish</option>
-</select>
+function applyTheme(n){const t=themes[n];for(const k in t)document.documentElement.style.setProperty("--"+k,t[k]);localStorage.setItem("theme",n);document.querySelectorAll(".themeDot").forEach(b=>b.classList.remove("active"));document.querySelector(`[data-theme="${n}"]`)?.classList.add("active")}
+document.querySelectorAll(".themeDot").forEach(b=>b.onclick=()=>applyTheme(b.dataset.theme));applyTheme(localStorage.getItem("theme")||"dark");
 
-<select>
-<option>English UK</option>
-<option>English US</option>
-</select>
-</div>
+function autoUpdate(){if(output.value.trim()&&input.value.trim())runTranslate()}
 
-<div class="row">
-<button class="secondary">Message</button>
-<button class="secondary">Email</button>
-<button class="secondary">Plain Translate</button>
-</div>
+function toggleChip(group,el,key){
+  const active=el.classList.contains("active");
+  group.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
+  if(active){
+    if(key==="style")englishStyle="";
+    if(key==="tone")tone="";
+    if(key==="slang")slang="";
+  }else{
+    el.classList.add("active");
+    if(key==="style")englishStyle=el.dataset.style;
+    if(key==="tone")tone=el.dataset.tone;
+    if(key==="slang")slang=el.dataset.slang;
+  }
+  autoUpdate();
+}
 
-<div class="row">
-<button class="secondary">😊</button>
-<button class="secondary">😘</button>
-<button class="secondary">😂</button>
-<button class="secondary">❤️</button>
-<button class="secondary">xxx</button>
-</div>
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");resultType=b.dataset.result;autoUpdate()});
+document.querySelectorAll("#styleChips .chip").forEach(b=>b.onclick=()=>toggleChip(document.getElementById("styleChips"),b,"style"));
+document.querySelectorAll("#toneChips .chip").forEach(b=>b.onclick=()=>toggleChip(document.getElementById("toneChips"),b,"tone"));
+document.querySelectorAll("#slangChips .chip").forEach(b=>b.onclick=()=>toggleChip(document.getElementById("slangChips"),b,"slang"));
 
-<div class="panel">
-<h3>Input</h3>
-<div class="small">Speak or type naturally.</div>
-<textarea placeholder="Speak or type here..."></textarea>
+function openDrawer(){drawer.classList.add("open");drawerOverlay.classList.add("open")}
+function closeDrawer(){drawer.classList.remove("open");drawerOverlay.classList.remove("open")}
+settingsBtn.onclick=openDrawer;closeDrawerBtn.onclick=closeDrawer;drawerOverlay.onclick=closeDrawer;
 
-<div class="row">
-<button>🎤 Start recording</button>
-<button>Translate</button>
-</div>
-</div>
+async function runTranslate(refine=""){
+  const text=input.value.trim();
+  if(!text){statusEl.textContent="Enter text first";return}
+  statusEl.textContent="Translating...";
+  translateBtn.disabled=true;
+  try{
+    const res=await fetch("/api/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,sourceLanguage:sourceLang.options[sourceLang.selectedIndex].text,targetVariant:targetVariant.value,resultType,englishStyle,tone,slang,refine})});
+    const data=await res.json();
+    if(!res.ok){statusEl.textContent=data.error||"Translation failed";return}
+    output.value=data.translation||"";
+    saveHistory(text,output.value);
+    statusEl.textContent="Done";
+  }catch(e){statusEl.textContent="Server error"}finally{translateBtn.disabled=false}
+}
 
-<div class="panel">
-<h3>Ready result</h3>
-<div class="small">Copy, speak or refine the result.</div>
-<textarea placeholder="Translation will appear here..."></textarea>
+async function transcribeAudio(){
+  const blob=new Blob(audioChunks,{type:mediaRecorder?.mimeType||"audio/webm"});
+  const buffer=await blob.arrayBuffer();
+  const res=await fetch("/api/transcribe",{method:"POST",headers:{"Content-Type":blob.type,"x-source-language":sourceLang.value},body:buffer});
+  const data=await res.json();
+  if(!res.ok)throw new Error(data.error||"Transcription failed");
+  return(data.text||"").trim();
+}
 
-<div class="row">
-<button class="secondary">🔊 Speak</button>
-<button class="secondary">Shorter</button>
-<button class="secondary">Warmer</button>
-<button class="secondary">Professional</button>
-<button class="secondary">Soften</button>
-<button class="secondary">Regenerate</button>
-</div>
-</div>
+async function startRecording(callback){
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    audioChunks=[];
+    const mimeType=MediaRecorder.isTypeSupported("audio/webm")?"audio/webm":"audio/mp4";
+    mediaRecorder=new MediaRecorder(stream,{mimeType});
+    mediaRecorder.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data)};
+    mediaRecorder.onstop=async()=>{
+      statusEl.textContent="Transcribing...";
+      try{
+        const text=await transcribeAudio();
+        if(!text){statusEl.textContent="No speech detected";return}
+        if(callback){await callback(text)}
+        else{input.value=input.value?input.value+" "+text:text;await runTranslate()}
+      }catch(e){statusEl.textContent=e.message||"Transcription failed"}
+      finally{
+        stream?.getTracks().forEach(t=>t.stop());
+        isRecording=false;
+        micBtn.textContent="🎤 Start recording";
+        document.getElementById("dialogueRecordBtn").textContent="🎤 Record reply";
+      }
+    };
+    mediaRecorder.start();
+    isRecording=true;
+    micBtn.textContent="⏹ Stop recording";
+    document.getElementById("dialogueRecordBtn").textContent="⏹ Stop";
+    statusEl.textContent="Recording...";
+  }catch(e){statusEl.textContent="Microphone access denied"}
+}
 
-</div>
-</div>
+function stopRecording(){if(mediaRecorder&&isRecording)mediaRecorder.stop()}
+micBtn.onclick=()=>isRecording?stopRecording():startRecording();
+translateBtn.onclick=()=>runTranslate();
 
+document.getElementById("clearBtn").onclick=()=>{input.value="";output.value="";statusEl.textContent="Cleared"};
+document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(output.value);statusEl.textContent="Copied"};
+document.getElementById("speakBtn").onclick=()=>speakText(output.value);
+
+function speakText(txt){if(!txt.trim())return;const u=new SpeechSynthesisUtterance(txt);u.lang=targetVariant.value;speechSynthesis.cancel();speechSynthesis.speak(u)}
+
+document.querySelectorAll(".refine").forEach(b=>b.onclick=()=>runTranslate(b.dataset.refine));
+document.getElementById("emojiBtn").onclick=()=>document.getElementById("emojiBox").classList.toggle("open");
+document.querySelectorAll(".ending").forEach(b=>b.onclick=()=>{output.value=(output.value.trim()+" "+b.textContent).trim();document.getElementById("emojiBox").classList.remove("open")});
+
+function saveHistory(original,translation){
+  if(!translation)return;
+  const items=JSON.parse(localStorage.getItem("history")||"[]");
+  items.unshift({date:new Date().toLocaleString(),type:resultType,slang:slang?"slang":"",original,translation});
+  localStorage.setItem("history",JSON.stringify(items.slice(0,50)));
+  renderHistory();
+}
+
+function renderHistory(filter="all"){
+  const list=document.getElementById("historyList");
+  const items=JSON.parse(localStorage.getItem("history")||"[]");
+  const filtered=filter==="all"?items:items.filter(i=>i.type===filter||i.slang===filter);
+  list.innerHTML=filtered.length?"":"<p>No history yet.</p>";
+  filtered.forEach(item=>{
+    const div=document.createElement("div");
+    div.className="historyItem";
+    div.innerHTML=`<small>${item.date} • ${item.type}</small><div><b>${item.original.slice(0,90)}</b></div><div style="color:var(--muted);margin-top:5px">${item.translation.slice(0,140)}</div><div class="actions"><button class="secondary">Reuse</button></div>`;
+    div.querySelector("button").onclick=()=>{input.value=item.original;output.value=item.translation;showPanel("translate")};
+    list.appendChild(div);
+  });
+}
+
+document.querySelectorAll("#historyPanel .chip").forEach(b=>b.onclick=()=>{document.querySelectorAll("#historyPanel .chip").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderHistory(b.dataset.filter)});
+
+function showPanel(p){
+  document.getElementById("translatePanel").style.display=p==="translate"?"grid":"none";
+  document.getElementById("dialoguePanel").classList.toggle("open",p==="dialogue");
+  document.getElementById("historyPanel").classList.toggle("open",p==="history");
+  document.getElementById("cameraPanel").classList.toggle("open",p==="camera");
+}
+
+document.getElementById("historyBtn").onclick=()=>{renderHistory();showPanel("history")};
+document.getElementById("closeHistory").onclick=()=>showPanel("translate");
+document.getElementById("dialogueBtn").onclick=()=>showPanel("dialogue");
+document.getElementById("closeDialogue").onclick=()=>showPanel("translate");
+document.getElementById("cameraBtn").onclick=()=>showPanel("camera");
+document.getElementById("closeCamera").onclick=()=>showPanel("translate");
+
+function addDialogue(original,translated){
+  const div=document.createElement("div");
+  div.className="bubble";
+  div.innerHTML=`<div>${original}</div><div class="translated">${translated}</div><div class="actions"><button class="secondary">🔊 Speak</button></div>`;
+  div.querySelector("button").onclick=()=>speakText(translated);
+  document.getElementById("dialogueList").appendChild(div);
+  speakText(translated);
+}
+
+document.getElementById("dialogueRecordBtn").onclick=()=>isRecording?stopRecording():startRecording(async(text)=>{
+  const old=input.value;
+  input.value=text;
+  await runTranslate();
+  addDialogue(text,output.value);
+  input.value=old;
+});
+
+document.getElementById("clearDialogueBtn").onclick=()=>document.getElementById("dialogueList").innerHTML="";
+
+document.getElementById("photoTranslateBtn").onclick=async()=>{
+  const file=document.getElementById("photoInput").files[0];
+  if(!file){statusEl.textContent="Choose a photo first";return}
+  statusEl.textContent="Reading photo...";
+  const reader=new FileReader();
+  reader.onload=async()=>{
+    try{
+      const res=await fetch("/api/photo-translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:reader.result,sourceLanguage:sourceLang.options[sourceLang.selectedIndex].text,targetVariant:targetVariant.value,resultType,englishStyle,tone,slang})});
+      const data=await res.json();
+      if(!res.ok){statusEl.textContent=data.error||"Photo translation failed";return}
+      input.value=data.detectedText||data.text||"";
+      output.value=data.translation||data.text||"";
+      saveHistory(input.value,output.value);
+      statusEl.textContent="Photo processed";
+    }catch(e){statusEl.textContent="Photo backend error"}
+  };
+  reader.readAsDataURL(file);
+};
+</script>
 </body>
 </html>
