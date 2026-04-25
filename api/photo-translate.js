@@ -28,32 +28,31 @@ export default async function handler(req, res) {
     const prompt = `
 You are an OCR and translation assistant.
 
-Task:
-1. Read all visible text from the image.
-2. Detect the language of the text in the image.
-3. Translate it using this direction logic:
+Read all visible text from the image.
 
-- If the detected image text is English, translate it into ${sourceLanguage}.
-- If the detected image text is NOT English, translate it into ${targetEnglish}.
+Translation direction rules:
+- If a text fragment is English, translate that fragment into ${sourceLanguage}.
+- If a text fragment is NOT English, translate that fragment into ${targetEnglish}.
+- If the image contains mixed languages, translate EACH line or block separately using the rules above.
+- Do not decide direction based on the whole image only.
+- Preserve the original order of the text blocks.
+- Keep names, brands, addresses, emails, phone numbers and codes unchanged unless they are part of a normal sentence.
+- If the image has no readable text, return detectedText as empty and translation as "No readable text found."
 
 User selected:
 Main language: ${sourceLanguage}
 English variant: ${targetEnglish}
 
+Style context:
 Result type: ${resultType}
 English level: ${englishStyle || "default"}
 Audience: ${audience || "infer from context"}
 Slang setting: ${slang || "default"}
 
-Important:
-- Preserve meaning and context.
-- If the image contains no readable text, return detectedText as empty and translation as "No readable text found."
-- Do not add explanations.
-- Return ONLY valid JSON.
+Return ONLY valid JSON.
 
 JSON format:
 {
-  "detectedLanguage": "...",
   "detectedText": "...",
   "translation": "..."
 }
@@ -67,17 +66,14 @@ JSON format:
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        temperature: 0.2,
+        temperature: 0.15,
         response_format: { type: "json_object" },
         messages: [
           {
             role: "user",
             content: [
               { type: "text", text: prompt },
-              {
-                type: "image_url",
-                image_url: { url: image }
-              }
+              { type: "image_url", image_url: { url: image } }
             ]
           }
         ]
@@ -107,7 +103,6 @@ JSON format:
     }
 
     return res.status(200).json({
-      detectedLanguage: parsed.detectedLanguage || "",
       detectedText: parsed.detectedText || "",
       translation: parsed.translation || ""
     });
