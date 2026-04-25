@@ -9,28 +9,7 @@ export default async function handler(req, res) {
     if (!image) return res.status(400).json({ error: "No image provided" });
     if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: "Missing API key" });
 
-    const prompt = `
-You are a photo OCR translator.
-
-Read ALL visible text from the image.
-
-Translate ALL readable text into ${sourceLanguage}.
-
-Important:
-- Do not keep English text in English.
-- Do not keep Ukrainian/Russian/Polish/etc. unchanged unless it is already ${sourceLanguage}.
-- Translate the full photo text into ${sourceLanguage}.
-- Keep names, brands, emails, phone numbers, addresses and codes unchanged.
-- Return ONLY JSON.
-
-JSON format:
-{
-  "detectedText": "original text from the image",
-  "translation": "full translation into ${sourceLanguage}"
-}
-`;
-
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const ocrResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -44,35 +23,91 @@ JSON format:
           {
             role: "user",
             content: [
-              { type: "text", text: prompt },
-              { type: "image_url", image_url: { url: image } }
+              {
+                type: "text",
+                text: `Read all visible text from this image. Return ONLY JSON:
+{
+  "detectedText": "all readable text from the image"
+}`
+              },
+              {
+                type: "image_url",
+                image_url: { url: image }
+              }
             ]
           }
         ]
       })
     });
 
-    const data = await response.json();
+    const ocrData = await ocrResponse.json();
 
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: data?.error?.message || "Photo translation failed"
+    if (!ocrResponse.ok) {
+      return res.status(ocrResponse.status).json({
+        error: ocrData?.error?.message || "Photo OCR failed"
       });
     }
 
-    const content = data?.choices?.[0]?.message?.content?.trim();
-    if (!content) return res.status(500).json({ error: "Empty model response" });
-
-    let parsed;
+    let ocrParsed;
     try {
-      parsed = JSON.parse(content);
+      ocrParsed = JSON.parse(ocrData?.choices?.[0]?.message?.content || "{}");
     } catch {
-      return res.status(500).json({ error: "Invalid JSON returned by model" });
+      return res.status(500).json({ error: "Invalid OCR response" });
+    }
+
+    const detectedText = (ocrParsed.detectedText || "").trim();
+
+    if (!detectedText) {
+      return res.status(200).json({
+        detectedText: "",
+        translation: "No readable text found."
+      });
+    }
+
+    const translateResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        temperature: 0.2,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content: `You are a strict translator. Translate the user's text fully into ${sourceLanguage}. Do not leave English unchanged. Keep names, brands, numbers and codes unchanged. Return ONLY JSON:
+{
+  "translation": "..."
+}`
+          },
+          {
+            role: "user",
+            content: detectedText
+          }
+        ]
+      })
+    });
+
+    const translateData = await translateResponse.json();
+
+    if (!translateResponse.ok) {
+      return res.status(translateResponse.status).json({
+        error: translateData?.error?.message || "Photo translation failed"
+      });
+    }
+
+    let translatedParsed;
+    try {
+      translatedParsed = JSON.parse(translateData?.choices?.[0]?.message?.content || "{}");
+    } catch {
+      return res.status(500).json({ error: "Invalid translation response" });
     }
 
     return res.status(200).json({
-      detectedText: parsed.detectedText || "",
-      translation: parsed.translation || ""
+      detectedText,
+      translation: translatedParsed.translation || ""
     });
 
   } catch (error) {
