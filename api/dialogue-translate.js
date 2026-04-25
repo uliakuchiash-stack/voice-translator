@@ -3,28 +3,33 @@ export default async function handler(req, res) {
 
   try {
     const { text, userLanguage = "Ukrainian", englishVariant = "English UK" } = req.body || {};
-
     if (!text?.trim()) return res.status(400).json({ error: "No text provided" });
+    if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: "Missing API key" });
+
+    const cleanText = text.trim();
+
+    const hasLatin = /[A-Za-z]/.test(cleanText);
+    const hasCyrillic = /[А-Яа-яЁёІіЇїЄєҐґ]/.test(cleanText);
+
+    const isEnglish = hasLatin && !hasCyrillic;
+
+    const targetLanguage = isEnglish ? userLanguage : englishVariant;
+    const speakLang = isEnglish ? "user" : "en";
 
     const prompt = `
-You are a live conversation translator.
+You are a live two-way conversation translator.
 
-User language: ${userLanguage}
-English variant: ${englishVariant}
+Translate the user's phrase into ${targetLanguage}.
 
-Detect the language of the user's phrase.
-
-Rules:
-- If the phrase is English, translate it into ${userLanguage}.
-- If the phrase is NOT English, translate it into ${englishVariant}.
-- Return only the translation.
+Important:
+- If the phrase is already in ${targetLanguage}, still rewrite it naturally in ${targetLanguage}.
+- Do not return the original text unchanged.
 - Do not explain.
-- Keep it natural and conversational.
+- Return ONLY JSON.
 
-Return ONLY JSON:
+JSON:
 {
-  "translation": "...",
-  "speakLang": "en" or "user"
+  "translation": "..."
 }
 `;
 
@@ -36,11 +41,11 @@ Return ONLY JSON:
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        temperature: 0.3,
+        temperature: 0.2,
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: prompt },
-          { role: "user", content: text.trim() }
+          { role: "user", content: cleanText }
         ]
       })
     });
@@ -55,7 +60,7 @@ Return ONLY JSON:
 
     return res.status(200).json({
       translation: parsed.translation || "",
-      speakLang: parsed.speakLang || "en"
+      speakLang
     });
 
   } catch {
