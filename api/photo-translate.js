@@ -77,7 +77,16 @@ export default async function handler(req, res) {
         messages: [
           {
             role: "system",
-            content: `You are a strict translator. Translate the user's text fully into ${sourceLanguage}. Do not leave English unchanged. Keep names, brands, numbers and codes unchanged. Return ONLY JSON:
+            content: `You are a strict translator.
+
+Translate the user's text fully into ${sourceLanguage}.
+
+Rules:
+- Do not leave English unchanged.
+- Keep names, brands, emails, phone numbers, addresses and codes unchanged.
+- But translate normal textbook/interface words such as page, chapter, unit, lesson, exercise, task, part, section, develop, reading, writing, listening, speaking.
+- Keep numbers unchanged.
+- Return ONLY JSON:
 {
   "translation": "..."
 }`
