@@ -5,16 +5,10 @@ export default async function handler(req, res) {
 
   try {
     const { image, targetLanguage, sourceLanguage } = req.body || {};
-
     const finalTargetLanguage = targetLanguage || sourceLanguage || "Ukrainian";
 
-    if (!image) {
-      return res.status(400).json({ error: "No image provided" });
-    }
-
-    if (!process.env.OPENAI_API_KEY) {
-      return res.status(500).json({ error: "Missing API key" });
-    }
+    if (!image) return res.status(400).json({ error: "No image provided" });
+    if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: "Missing API key" });
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -29,20 +23,25 @@ export default async function handler(req, res) {
         messages: [
           {
             role: "system",
-            content: `You are a strict OCR and photo translator.
+            content: `You are a strict OCR and mixed-language photo translator.
+
+Target language: ${finalTargetLanguage}
 
 Your task:
 1. Read ALL visible text from the image.
-2. Translate the ENTIRE readable text into ${finalTargetLanguage}.
+2. Translate the ENTIRE text into ${finalTargetLanguage}.
 
-Important rules:
-- Output translation MUST be in ${finalTargetLanguage}.
-- Do NOT translate into English unless ${finalTargetLanguage} is English.
-- Do NOT leave English unchanged.
-- Do NOT leave Chinese, Japanese, Turkish, Polish, Ukrainian, Russian or any other language unchanged unless it is already ${finalTargetLanguage}.
-- Translate normal words even if they are near numbers, letters, slashes, brackets, dashes, page numbers or exercise labels.
-- Keep only pure numbers, punctuation, emails, phone numbers, addresses, names, brands and special codes unchanged.
-- Preserve order and line breaks as much as possible.
+Critical rules:
+- The final translation must be fully in ${finalTargetLanguage}.
+- Mixed-language text must also be translated fully.
+- If a line contains Ukrainian + English, translate the English parts too.
+- If a line contains Russian + English, translate the English parts too.
+- If a line contains Chinese/Japanese/Turkish/Polish + English, translate everything into ${finalTargetLanguage}.
+- Do NOT leave English unchanged unless the target language is English.
+- Do NOT leave textbook words unchanged: page, unit, exercise, task, part, section, dialogue, mode, answer, question, reading, writing, listening, speaking, grammar, vocabulary, choose, match, complete, develop.
+- Translate words even when they are near numbers, A/B/C labels, slashes, dashes, brackets or exercise numbers.
+- Keep only pure numbers, punctuation, names, brands, emails, phone numbers, addresses and special codes unchanged.
+- Preserve original order and line breaks as much as possible.
 - Do not explain anything.
 
 Return ONLY valid JSON:
@@ -56,7 +55,7 @@ Return ONLY valid JSON:
             content: [
               {
                 type: "text",
-                text: `Translate this photo fully into ${finalTargetLanguage}.`
+                text: `Read this image and translate ALL text fully into ${finalTargetLanguage}.`
               },
               {
                 type: "image_url",
@@ -77,13 +76,9 @@ Return ONLY valid JSON:
     }
 
     const content = data?.choices?.[0]?.message?.content?.trim();
-
-    if (!content) {
-      return res.status(500).json({ error: "Empty photo translation response" });
-    }
+    if (!content) return res.status(500).json({ error: "Empty photo translation response" });
 
     let parsed;
-
     try {
       parsed = JSON.parse(content);
     } catch {
