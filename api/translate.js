@@ -25,27 +25,28 @@ export default async function handler(req, res) {
 
     const englishVariant =
       targetVariant === "en-US"
-        ? "Use natural American English."
-        : "Use natural British English.";
+        ? "natural American English"
+        : "natural British English";
 
     const resultRules = {
       message: `
 Create a ready-to-send message.
-No email formatting.
-No subject line.
-Natural for chat, WhatsApp, Telegram, SMS.
+No email subject.
+No email signature.
+Natural for chat, WhatsApp, Telegram or SMS.
 `,
       email: `
 Create a proper English email.
 Do NOT include Subject.
 Start directly with Dear / Hello.
+Use clear paragraphs.
 End politely with Best regards / Kind regards.
 `,
       plain: `
 Translate only.
 No greetings.
 No email formatting.
-No extra text.
+No extra explanation.
 `
     };
 
@@ -61,7 +62,7 @@ Clear and relaxed.
 `,
       professional: `
 Use professional polished English.
-Suitable for work and formal use.
+Suitable for work, clients, HR, landlord, official communication.
 `,
       native: `
 Use fluent native-like English.
@@ -92,31 +93,37 @@ Suitable for landlord, embassy, HR, customer service, official requests.
 
     const slangRules = {
       polite: `
-Use polite safe language.
-Avoid swearing.
-Soften rude expressions naturally.
+Polite mode:
+- Remove or soften rude language.
+- Avoid profanity.
+- Keep the meaning but make it safe and respectful.
 `,
       street: `
-Use real street slang naturally.
-Keep slang alive and authentic.
-Do not sound robotic.
+Street Slang mode:
+- Preserve rude language, slang and emotional force when the source contains it.
+- Do NOT make rude phrases polite.
+- Do NOT over-soften insults.
+- Translate natural profanity into real English profanity when appropriate.
+- For Russian/Ukrainian "сука" depending on context, use natural options like "bitch", "damn", "fuck", "you bitch", "that bitch", or "asshole" when context fits.
+- Do NOT translate "сука" as "cheeky bugger".
+- Do NOT translate Polish "kurwa" as "bastard" unless context truly means bastard.
+- Polish "kurwa" may mean "fuck", "shit", "damn", "for fuck's sake", or "bitch" depending on context.
+- Keep it natural, not theatrical and not cartoonish.
 `
     };
 
     const refineRules = {
       shorter: "Make it shorter and more concise.",
-      professional: "Make it more professional.",
-      friendlier: "Make it warmer and friendlier.",
-      regenerate: "Create a better improved version."
+      professional: "Make it more professional and polished.",
+      friendlier: "Make it warmer, friendlier and more human.",
+      regenerate: "Create a better, more natural version."
     };
 
     const prompt = `
 You are an expert AI translator and communication assistant.
 
 Task:
-Transform the user's text from ${sourceLanguage} into excellent English.
-
-${englishVariant}
+Transform the user's text from ${sourceLanguage} into ${englishVariant}.
 
 ${resultRules[resultType] || resultRules.message}
 
@@ -125,47 +132,37 @@ ${audience ? audienceRules[audience] || "" : ""}
 ${slang ? slangRules[slang] || "" : ""}
 
 Refine instruction:
-${refine ? refineRules[refine] || refine : "No refine instruction"}
+${refine ? refineRules[refine] || refine : "No refine instruction."}
 
 Important:
-- Keep original meaning and emotion
-- Sound natural
-- Do not explain
-- Return ONLY JSON
+- Preserve the original meaning, emotion and intent.
+- Translate naturally, not word-for-word.
+- Do not invent facts.
+- Do not add explanations.
+- Return ONLY valid JSON.
 
-Format:
+JSON format:
 {
   "translation": "..."
 }
 `;
 
-    const response = await fetch(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          temperature: 0.5,
-          response_format: {
-            type: "json_object"
-          },
-          messages: [
-            {
-              role: "system",
-              content: prompt
-            },
-            {
-              role: "user",
-              content: text.trim()
-            }
-          ]
-        })
-      }
-    );
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        temperature: 0.45,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: prompt },
+          { role: "user", content: text.trim() }
+        ]
+      })
+    });
 
     const data = await response.json();
 
@@ -175,13 +172,10 @@ Format:
       });
     }
 
-    const content =
-      data?.choices?.[0]?.message?.content?.trim();
+    const content = data?.choices?.[0]?.message?.content?.trim();
 
     if (!content) {
-      return res.status(500).json({
-        error: "Empty model response"
-      });
+      return res.status(500).json({ error: "Empty model response" });
     }
 
     let parsed;
@@ -189,9 +183,7 @@ Format:
     try {
       parsed = JSON.parse(content);
     } catch {
-      return res.status(500).json({
-        error: "Invalid JSON returned"
-      });
+      return res.status(500).json({ error: "Invalid JSON returned" });
     }
 
     return res.status(200).json({
@@ -199,8 +191,6 @@ Format:
     });
 
   } catch (error) {
-    return res.status(500).json({
-      error: "Server error"
-    });
+    return res.status(500).json({ error: "Server error" });
   }
 }
