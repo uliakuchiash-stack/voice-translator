@@ -1,37 +1,24 @@
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
   try {
-    const { text, userLanguage = "Ukrainian", englishVariant = "English UK" } = req.body || {};
-    if (!text?.trim()) return res.status(400).json({ error: "No text provided" });
-    if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: "Missing API key" });
+    const {
+      text,
+      userLanguage = "Ukrainian",
+      englishVariant = "English UK"
+    } = req.body || {};
+
+    if (!text || !text.trim()) {
+      return res.status(400).json({ error: "No text provided" });
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ error: "Missing API key" });
+    }
 
     const cleanText = text.trim();
-
-    const hasLatin = /[A-Za-z]/.test(cleanText);
-    const hasCyrillic = /[А-Яа-яЁёІіЇїЄєҐґ]/.test(cleanText);
-
-    const isEnglish = hasLatin && !hasCyrillic;
-
-    const targetLanguage = isEnglish ? userLanguage : englishVariant;
-    const speakLang = isEnglish ? "user" : "en";
-
-    const prompt = `
-You are a live two-way conversation translator.
-
-Translate the user's phrase into ${targetLanguage}.
-
-Important:
-- If the phrase is already in ${targetLanguage}, still rewrite it naturally in ${targetLanguage}.
-- Do not return the original text unchanged.
-- Do not explain.
-- Return ONLY JSON.
-
-JSON:
-{
-  "translation": "..."
-}
-`;
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -44,8 +31,42 @@ JSON:
         temperature: 0.2,
         response_format: { type: "json_object" },
         messages: [
-          { role: "system", content: prompt },
-          { role: "user", content: cleanText }
+          {
+            role: "system",
+            content: `
+You are a two-way live conversation translator.
+
+User language: ${userLanguage}
+English variant: ${englishVariant}
+
+Your job:
+- If the phrase is English, translate it into ${userLanguage}.
+- If the phrase is NOT English, translate it into ${englishVariant}.
+
+Important:
+- Do not answer the phrase as a chatbot.
+- Do not continue the conversation.
+- Only translate what was said.
+- Keep the meaning natural and conversational.
+- Do not invent names.
+- If the phrase is unclear, translate the most likely meaning.
+- Return ONLY valid JSON.
+
+JSON format:
+{
+  "translation": "...",
+  "speakLang": "en" or "user"
+}
+
+speakLang rules:
+- If translation is English, use "en".
+- If translation is ${userLanguage}, use "user".
+`
+          },
+          {
+            role: "user",
+            content: cleanText
+          }
         ]
       })
     });
@@ -53,17 +74,31 @@ JSON:
     const data = await response.json();
 
     if (!response.ok) {
-      return res.status(response.status).json({ error: data?.error?.message || "Dialogue translation failed" });
+      return res.status(response.status).json({
+        error: data?.error?.message || "Dialogue translation failed"
+      });
     }
 
-    const parsed = JSON.parse(data.choices[0].message.content);
+    const content = data?.choices?.[0]?.message?.content?.trim();
+
+    if (!content) {
+      return res.status(500).json({ error: "Empty dialogue response" });
+    }
+
+    let parsed;
+
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      return res.status(500).json({ error: "Invalid JSON from dialogue translator" });
+    }
 
     return res.status(200).json({
       translation: parsed.translation || "",
-      speakLang
+      speakLang: parsed.speakLang || "en"
     });
 
-  } catch {
+  } catch (error) {
     return res.status(500).json({ error: "Dialogue backend error" });
   }
 }
