@@ -1,849 +1,482 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Slang and Business Translator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Slang and Business Translator</title>
+  <style>
+    :root {
+      --bg: #080814;
+      --bg2: #111126;
+      --card: rgba(20, 20, 39, 0.78);
+      --card2: rgba(255, 255, 255, 0.08);
+      --text: #fff8ea;
+      --muted: #a8a3b8;
+      --gold: #f0b23d;
+      --gold2: #ffd985;
+      --violet: #7c4dff;
+      --violet2: #bd7bff;
+      --danger: #ff5d6c;
+      --ok: #3ee0a3;
+      --border: rgba(255, 255, 255, 0.12);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+      --radius: 28px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
-<style>
-:root{
-  --bg:#f3f6ff;
-  --bg2:#eef2fb;
-  --card:rgba(255,255,255,.78);
-  --card2:rgba(255,255,255,.86);
-  --text:#172033;
-  --muted:#647085;
-  --accent:#6ea8ff;
-  --accent2:#8a6dff;
-  --danger:#d94f5c;
-  --border:rgba(40,60,100,.12);
-  --shadow:0 22px 55px rgba(44,65,115,.18);
-  --inner:inset 0 1px 0 rgba(255,255,255,.9);
-}
+    * { box-sizing: border-box; }
 
-*{box-sizing:border-box}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font);
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 10%, rgba(124, 77, 255, 0.38), transparent 34%),
+        radial-gradient(circle at 78% 22%, rgba(240, 178, 61, 0.16), transparent 30%),
+        linear-gradient(145deg, #05050b 0%, #101026 54%, #090915 100%);
+      display: flex;
+      justify-content: center;
+      padding: 18px;
+    }
 
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  color:var(--text);
-  min-height:100vh;
-  padding:16px;
-  background:
-    radial-gradient(circle at 10% 5%,rgba(110,168,255,.30),transparent 32%),
-    radial-gradient(circle at 95% 0%,rgba(138,109,255,.24),transparent 34%),
-    radial-gradient(circle at 50% 100%,rgba(255,168,76,.16),transparent 34%),
-    linear-gradient(180deg,var(--bg),var(--bg2));
-}
+    body.light {
+      --bg: #f9f3e5;
+      --bg2: #fffaf0;
+      --card: rgba(255, 255, 255, 0.74);
+      --card2: rgba(72, 48, 20, 0.06);
+      --text: #241b12;
+      --muted: #7a6e5f;
+      --border: rgba(130, 92, 36, 0.18);
+      --shadow: 0 26px 70px rgba(122, 87, 38, 0.18);
+      background:
+        radial-gradient(circle at 16% 8%, rgba(255, 211, 126, 0.48), transparent 32%),
+        radial-gradient(circle at 78% 12%, rgba(124, 77, 255, 0.18), transparent 30%),
+        linear-gradient(145deg, #fffaf0 0%, #f3ead9 100%);
+    }
 
-.app{
-  max-width:1280px;
-  margin:auto;
-  padding:24px;
-  border-radius:34px;
-  background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(255,255,255,.58));
-  backdrop-filter:blur(22px);
-  border:1px solid var(--border);
-  box-shadow:var(--shadow),var(--inner);
-}
+    .phone {
+      width: min(100%, 430px);
+      min-height: calc(100vh - 36px);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 34px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)), var(--bg);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.12);
+    }
 
-.top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:18px}
+    .phone::before {
+      content: "";
+      position: absolute;
+      inset: -80px;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(124, 77, 255, 0.26), transparent 35%),
+        radial-gradient(circle at 90% 52%, rgba(240, 178, 61, 0.12), transparent 28%);
+      filter: blur(6px);
+    }
 
-h1{
-  margin:0;
-  font-size:29px;
-  line-height:1.1;
-  font-weight:900;
-  letter-spacing:.2px;
-}
+    .app { position: relative; z-index: 1; padding: 22px 18px 104px; }
 
-.subtitle{color:var(--muted);font-size:14px;margin-top:8px}
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 
-.iconBtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .brand { display: flex; align-items: center; gap: 12px; }
 
-button{
-  border:none;
-  cursor:pointer;
-  border-radius:20px;
-  padding:12px 15px;
-  font-size:14px;
-  transition:.18s ease;
-}
+    .logo {
+      width: 48px; height: 48px; border-radius: 18px; display: grid; place-items: center;
+      background: radial-gradient(circle at 50% 35%, #ffe2a0, #e67422 42%, #240715 70%);
+      box-shadow: 0 0 24px rgba(240, 178, 61, 0.42), inset 0 0 18px rgba(255,255,255,0.16);
+      font-size: 27px;
+    }
 
-button:hover{transform:translateY(-2px)}
-button:active{transform:translateY(1px) scale(.98)}
+    h1 { margin: 0; font-size: 21px; line-height: 1.1; letter-spacing: -0.03em; }
+    .subtitle { margin-top: 4px; color: var(--muted); font-size: 12px; }
 
-.iconBtn,.secondary,.chip,.tab{
-  background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(225,232,248,.82));
-  color:var(--text);
-  border:1px solid var(--border);
-  box-shadow:
-    0 12px 28px rgba(40,60,100,.14),
-    inset 0 1px 0 rgba(255,255,255,.95);
-}
+    .icon-btn, button, select, textarea, input { font: inherit; }
 
-.primary{
-  background:linear-gradient(145deg,var(--accent),var(--accent2));
-  color:#fff;
-  font-weight:900;
-  box-shadow:
-    0 18px 36px rgba(110,168,255,.35),
-    0 0 24px rgba(138,109,255,.28),
-    inset 0 1px 0 rgba(255,255,255,.35);
-}
+    .icon-btn {
+      border: 1px solid var(--border); color: var(--text); background: var(--card2);
+      width: 43px; height: 43px; border-radius: 16px; display: grid; place-items: center;
+      cursor: pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+    }
 
-.danger{
-  background:linear-gradient(145deg,#ff7380,#bd3344);
-  color:#fff;
-  box-shadow:0 16px 34px rgba(217,79,92,.28);
-}
+    .panel {
+      margin-top: 18px; border: 1px solid var(--border); border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.035)), var(--card);
+      box-shadow: 0 18px 42px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.10);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+    }
 
-.big{flex:1;min-width:150px}
+    .section { padding: 18px; }
 
-.themeDots{display:flex;gap:9px;margin-top:12px}
-.themeDot{
-  width:22px;
-  height:22px;
-  border-radius:50%;
-  border:3px solid rgba(255,255,255,.9);
-  cursor:pointer;
-  padding:0;
-  box-shadow:0 8px 18px rgba(30,50,90,.18);
-}
-.themeDot.active{outline:2px solid var(--accent);box-shadow:0 0 18px rgba(110,168,255,.55)}
+    .language-row { display: grid; grid-template-columns: 1fr 44px 1fr; gap: 10px; align-items: center; }
 
-.langRow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:15px}
+    select, textarea, input {
+      width: 100%; color: var(--text); background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border); border-radius: 18px; padding: 13px 14px;
+      outline: none;
+    }
 
-select,textarea{
-  width:100%;
-  border:none;
-  outline:none;
-  border-radius:24px;
-  background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(228,235,249,.84));
-  color:var(--text);
-  border:1px solid var(--border);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.95),
-    0 12px 28px rgba(40,60,100,.10);
-}
+    body.light select, body.light textarea, body.light input { background: rgba(255,255,255,0.58); }
 
-select{padding:16px;font-size:15px}
+    .swap { height: 46px; border-radius: 16px; border: 1px solid var(--border); background: linear-gradient(135deg, rgba(124,77,255,.45), rgba(240,178,61,.25)); color: var(--text); }
 
-textarea{
-  padding:20px;
-  font-size:17px;
-  line-height:1.5;
-  resize:vertical;
-  min-height:165px;
-}
+    .tabs { display: flex; gap: 8px; padding: 7px; border: 1px solid var(--border); border-radius: 20px; background: rgba(255,255,255,0.05); margin-top: 14px; }
 
-.mainGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .tab { flex: 1; border: 0; color: var(--muted); background: transparent; padding: 10px 8px; border-radius: 15px; cursor: pointer; font-weight: 700; font-size: 13px; }
+    .tab.active { color: #160f08; background: linear-gradient(135deg, var(--gold2), var(--gold)); box-shadow: 0 10px 24px rgba(240,178,61,.22); }
 
-.card{
-  background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(232,238,250,.68));
-  border:1px solid var(--border);
-  border-radius:32px;
-  padding:19px;
-  box-shadow:
-    0 24px 55px rgba(44,65,115,.16),
-    inset 0 1px 0 rgba(255,255,255,.95);
-  backdrop-filter:blur(16px);
-}
+    textarea { min-height: 126px; resize: vertical; line-height: 1.45; }
 
-.cardHead{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px;align-items:center}
-.title{font-weight:900;font-size:17px}
-.hint{color:var(--muted);font-size:12px;margin-top:4px}
+    .chat-area { display: flex; flex-direction: column; gap: 12px; }
 
-.actions,.tabs,.chips{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}
+    .bubble {
+      max-width: 92%; padding: 14px 15px; border-radius: 21px; border: 1px solid var(--border);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,0.12);
+      white-space: pre-wrap; word-wrap: break-word;
+    }
 
-.chip,.tab{border-radius:999px;padding:10px 14px;font-size:13px}
+    .bubble.user { align-self: flex-end; color: #251600; background: linear-gradient(135deg, rgba(255,218,130,.96), rgba(208,139,32,.86)); }
+    .bubble.ai { align-self: flex-start; background: linear-gradient(135deg, rgba(124,77,255,.26), rgba(255,255,255,.06)); }
+    .bubble.pro { align-self: flex-start; background: linear-gradient(135deg, rgba(240,178,61,.22), rgba(255,255,255,.06)); }
+    .bubble small { display: block; color: var(--gold2); font-weight: 800; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 7px; font-size: 10px; }
 
-.chip.active,.tab.active{
-  background:linear-gradient(145deg,var(--accent),var(--accent2));
-  color:#fff;
-  font-weight:900;
-  box-shadow:
-    0 16px 30px rgba(110,168,255,.32),
-    0 0 18px rgba(138,109,255,.25);
-}
+    .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
 
-.status{color:var(--muted);font-size:14px;margin-top:16px}
+    .pill {
+      border: 1px solid var(--border); color: var(--text); background: rgba(255,255,255,.07);
+      border-radius: 999px; padding: 10px 13px; cursor: pointer; font-weight: 700; font-size: 13px;
+    }
 
-.drawerOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:20}
+    .pill.primary, .main-action {
+      color: #160f08; background: linear-gradient(135deg, var(--gold2), var(--gold)); border: 0;
+      box-shadow: 0 12px 32px rgba(240,178,61,.30), 0 0 24px rgba(124,77,255,.12);
+    }
 
-.drawer{
-  position:fixed;
-  top:0;
-  right:-390px;
-  width:380px;
-  max-width:92vw;
-  height:100vh;
-  background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(232,238,250,.92));
-  border-left:1px solid var(--border);
-  z-index:30;
-  padding:20px;
-  transition:right .25s ease;
-  overflow:auto;
-  backdrop-filter:blur(22px);
-  box-shadow:-18px 0 50px rgba(44,65,115,.18);
-}
-.drawer.open{right:0}
-.drawerOverlay.open{display:block}
+    .pill.violet, .main-action.violet { color: white; background: linear-gradient(135deg, var(--violet), var(--violet2)); border: 0; }
 
-.drawerHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.section{margin:18px 0}
-.sectionTitle{font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:900;text-transform:uppercase}
+    .main-action { width: 100%; padding: 16px; border-radius: 21px; font-weight: 900; cursor: pointer; margin-top: 12px; }
 
-.panel{display:none}
-.panel.open{display:block}
+    .emoji-row { display: flex; gap: 9px; align-items: center; margin-top: 13px; overflow-x: auto; padding-bottom: 2px; }
+    .emoji { min-width: 44px; height: 44px; border-radius: 16px; border: 1px solid var(--border); background: rgba(255,255,255,.08); display: grid; place-items: center; font-size: 20px; cursor: pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
+    .emoji.fire { min-width: 70px; background: radial-gradient(circle, rgba(240,178,61,.32), rgba(255,255,255,.06)); box-shadow: 0 0 22px rgba(240,178,61,.25); }
 
-.historyItem,.bubble{
-  background:linear-gradient(145deg,rgba(255,255,255,.9),rgba(226,234,248,.74));
-  border:1px solid var(--border);
-  border-radius:20px;
-  padding:14px;
-  margin-bottom:10px;
-  box-shadow:0 14px 30px rgba(44,65,115,.12),inset 0 1px 0 rgba(255,255,255,.9);
-}
+    .bottom-nav {
+      position: absolute; z-index: 10; left: 14px; right: 14px; bottom: 14px;
+      border: 1px solid var(--border); border-radius: 26px; padding: 9px 8px;
+      background: rgba(8,8,20,.78); backdrop-filter: blur(22px); display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;
+      box-shadow: 0 20px 48px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.10);
+    }
 
-.historyItem small{color:var(--muted)}
-.bubble .translated{color:var(--muted);margin-top:6px}
+    body.light .bottom-nav { background: rgba(255,250,240,.82); }
 
-.fileInput{display:none}
+    .nav-item { border: 0; background: transparent; color: var(--muted); display: grid; place-items: center; gap: 3px; padding: 7px 0; border-radius: 18px; font-size: 10px; cursor: pointer; }
+    .nav-item b { font-size: 17px; line-height: 1; }
+    .nav-item.active { color: var(--text); background: rgba(124,77,255,.22); }
 
-.photoBox{
-  background:linear-gradient(145deg,rgba(255,255,255,.9),rgba(226,234,248,.75));
-  border:1px dashed var(--accent);
-  padding:18px;
-  border-radius:22px;
-  color:var(--muted);
-  margin-top:10px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
-}
+    .modal {
+      position: fixed; inset: 0; z-index: 100; display: none; place-items: center; padding: 18px;
+      background: rgba(2,2,8,.66); backdrop-filter: blur(12px);
+    }
+    .modal.open { display: grid; }
+    .modal-card { width: min(100%, 430px); max-height: 90vh; overflow: auto; border-radius: 30px; border: 1px solid var(--border); background: var(--bg); box-shadow: var(--shadow); }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; padding: 18px; border-bottom: 1px solid var(--border); }
+    .modal-head h2 { margin: 0; font-size: 18px; }
 
-.emojiBox{
-  display:none;
-  background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(226,234,248,.74));
-  border:1px solid var(--border);
-  border-radius:26px;
-  padding:12px;
-  margin-top:12px;
-  box-shadow:0 18px 40px rgba(44,65,115,.16),inset 0 1px 0 rgba(255,255,255,.95);
-}
-.emojiBox.open{display:flex;gap:10px;flex-wrap:wrap}
-
-.ending{
-  min-width:64px;
-  min-height:58px;
-  border-radius:22px;
-  background:linear-gradient(145deg,#ffffff,#dfe7f7);
-  box-shadow:
-    0 14px 28px rgba(44,65,115,.20),
-    inset 0 2px 0 rgba(255,255,255,.95),
-    inset 0 -6px 14px rgba(80,100,150,.10);
-  font-size:21px;
-  position:relative;
-  overflow:hidden;
-}
-
-.ending::before{
-  content:"";
-  position:absolute;
-  top:7px;
-  left:11px;
-  right:11px;
-  height:16px;
-  border-radius:50%;
-  background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,0));
-  pointer-events:none;
-}
-
-.sticker{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  filter:
-    drop-shadow(0 8px 9px rgba(30,40,80,.22))
-    drop-shadow(0 0 8px rgba(255,255,255,.45));
-  transform:translateZ(0);
-}
-
-.kissArt{
-  position:relative;
-  width:54px;
-  height:34px;
-  display:inline-block;
-}
-.kissArt .lip{
-  position:absolute;
-  color:#ff2e4f;
-  text-shadow:
-    0 2px 0 #9e1026,
-    0 0 8px rgba(255,60,100,.65),
-    0 8px 12px rgba(140,20,60,.25);
-}
-.kissArt .main{font-size:31px;left:13px;top:0}
-.kissArt .small1{font-size:16px;left:0;top:5px;transform:rotate(-16deg)}
-.kissArt .small2{font-size:15px;right:0;bottom:0;transform:rotate(12deg)}
-
-.tridentFire{
-  position:relative;
-  width:76px;
-  height:42px;
-  display:inline-block;
-}
-.tridentFire .flame{
-  position:absolute;
-  inset:0;
-  border-radius:50% 50% 45% 45%;
-  background:
-    radial-gradient(circle at 50% 70%,rgba(255,220,80,.85),transparent 38%),
-    radial-gradient(circle at 35% 60%,rgba(255,88,0,.75),transparent 42%),
-    radial-gradient(circle at 65% 60%,rgba(255,88,0,.75),transparent 42%);
-  filter:blur(2px);
-  box-shadow:
-    0 0 16px rgba(255,120,0,.85),
-    0 0 28px rgba(255,65,0,.50);
-}
-.tridentFire .tri{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:30px;
-  color:#ffd35a;
-  text-shadow:
-    0 2px 0 #a85f00,
-    0 0 10px rgba(255,230,90,.9),
-    0 0 18px rgba(255,120,0,.85);
-}
-
-@media(max-width:850px){
-  body{padding:10px}
-  .app{padding:14px;border-radius:26px}
-  .mainGrid{grid-template-columns:1fr}
-  .langRow{grid-template-columns:1fr}
-  h1{font-size:23px}
-  textarea{min-height:135px}
-  .top{flex-direction:column}
-  .iconBtns{justify-content:flex-start}
-}
-</style>
+    .history-item, .setting-row, .account-card {
+      padding: 14px; border: 1px solid var(--border); border-radius: 18px; background: rgba(255,255,255,.055); margin-bottom: 10px;
+    }
+    .muted { color: var(--muted); font-size: 13px; }
+    .status { margin-top: 14px; color: var(--muted); font-size: 13px; min-height: 18px; }
+    .hidden { display: none !important; }
+  </style>
 </head>
-
 <body>
-<div class="app">
-  <div class="top">
-    <div>
-      <h1>AI Slang and Business Translator</h1>
-      <div class="subtitle">Voice, slang, business English, email, camera and dialogue translation.</div>
-      <div class="themeDots">
-        <button class="themeDot active" data-theme="light" style="background:#f3f6ff"></button>
-        <button class="themeDot" data-theme="dark" style="background:#111827"></button>
-        <button class="themeDot" data-theme="olive" style="background:#90a765"></button>
-        <button class="themeDot" data-theme="blue" style="background:#5d8ec0"></button>
-        <button class="themeDot" data-theme="rose" style="background:#c88a91"></button>
-        <button class="themeDot" data-theme="lavender" style="background:#8877b8"></button>
-      </div>
+  <main class="phone">
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="logo">🔱</div>
+          <div>
+            <h1>GLOSS</h1>
+            <div class="subtitle">Luxury AI Translation</div>
+          </div>
+        </div>
+        <button class="icon-btn" id="themeBtn" title="Theme">◐</button>
+      </header>
+
+      <section class="panel">
+        <div class="section">
+          <div class="language-row">
+            <select id="sourceLanguage">
+              <option>Ukrainian</option><option>Russian</option><option>Polish</option><option>French</option><option>Spanish</option><option>German</option><option>Italian</option><option>Romanian / Moldova</option><option>Hungarian</option><option>Portuguese</option><option>Turkish</option><option>Arabic</option><option>Hindi</option><option>Chinese</option><option>Japanese</option><option>Korean</option><option>Czech</option><option>Bulgarian</option><option>English</option>
+            </select>
+            <button class="swap" id="swapBtn">⇄</button>
+            <select id="targetVariant">
+              <option value="en-GB">English UK</option>
+              <option value="en-US">English US</option>
+            </select>
+          </div>
+
+          <div class="tabs">
+            <button class="tab active" data-type="message">Message</button>
+            <button class="tab" data-type="email">Email</button>
+            <button class="tab" data-type="plain">Plain Translate</button>
+          </div>
+        </div>
+
+        <div class="section chat-area" id="chatArea">
+          <textarea id="inputText" placeholder="Speak or type here..."></textarea>
+          <div class="actions">
+            <button class="pill primary" id="recordBtn">🎙 Start recording</button>
+            <button class="pill" id="clearBtn">Clear</button>
+          </div>
+          <button class="main-action violet" id="translateBtn">Translate</button>
+          <div class="status" id="status">Ready</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section">
+          <div class="topbar">
+            <div>
+              <h1 style="font-size:20px">Ready result</h1>
+              <div class="subtitle">Copy, speak, refine or add ending.</div>
+            </div>
+            <button class="pill" id="copyBtn">Copy</button>
+          </div>
+
+          <div class="chat-area" id="resultArea" style="margin-top:16px">
+            <div class="bubble ai" id="resultBubble"><small>AI Result</small>Translation will appear here...</div>
+          </div>
+
+          <div class="actions">
+            <button class="pill" id="speakBtn">🎙 Speak</button>
+            <button class="pill" data-refine="professional">Professional</button>
+            <button class="pill" data-refine="friendlier">Friendlier</button>
+            <button class="pill" data-refine="shorter">Shorter</button>
+            <button class="pill" data-refine="regenerate">Regenerate</button>
+          </div>
+
+          <div class="emoji-row">
+            <button class="emoji" data-emoji="😊">😊</button>
+            <button class="emoji" data-emoji="😘">😘</button>
+            <button class="emoji" data-emoji="☹️">☹️</button>
+            <button class="emoji" data-emoji="😢">😢</button>
+            <button class="emoji fire" data-emoji="🔥🔱🔥">🔥🔱🔥</button>
+          </div>
+        </div>
+      </section>
     </div>
 
-    <div class="iconBtns">
-      <button class="iconBtn" id="cameraBtn">📷 Camera</button>
-      <button class="iconBtn" id="dialogueBtn">💬 Dialogue</button>
-      <button class="iconBtn" id="historyBtn">🕘 History</button>
-      <button class="iconBtn" id="settingsBtn">⚙ Settings</button>
-    </div>
-  </div>
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-open="main"><b>↯</b><span>Translate</span></button>
+      <button class="nav-item" data-open="dialogue"><b>💬</b><span>Dialogue</span></button>
+      <button class="nav-item" data-open="vault"><b>▣</b><span>Vault</span></button>
+      <button class="nav-item" data-open="photo"><b>📷</b><span>Photo</span></button>
+      <button class="nav-item" data-open="premium"><b>★</b><span>Premium</span></button>
+      <button class="nav-item" data-open="settings"><b>⚙</b><span>Settings</span></button>
+    </nav>
+  </main>
 
-  <div class="langRow">
-    <select id="sourceLang">
-      <option value="en">English</option>
-      <option value="uk" selected>Ukrainian</option>
-      <option value="ru">Russian</option>
-      <option value="pl">Polish</option>
-      <option value="fr">French</option>
-      <option value="es">Spanish</option>
-      <option value="de">German</option>
-      <option value="it">Italian</option>
-      <option value="ro">Romanian / Moldova</option>
-      <option value="hu">Hungarian</option>
-      <option value="pt">Portuguese</option>
-      <option value="tr">Turkish</option>
-      <option value="ar">Arabic</option>
-      <option value="hi">Hindi</option>
-      <option value="zh">Chinese</option>
-      <option value="ja">Japanese</option>
-      <option value="ko">Korean</option>
-      <option value="cs">Czech</option>
-      <option value="bg">Bulgarian</option>
-    </select>
-    <select id="targetVariant">
-      <option value="en-GB" selected>English UK</option>
-      <option value="en-US">English US</option>
-    </select>
-  </div>
-
-  <div class="tabs">
-    <button class="tab active" data-result="message">Message</button>
-    <button class="tab" data-result="email">Email</button>
-    <button class="tab" data-result="plain">Plain Translate</button>
-  </div>
-
-  <div class="mainGrid" id="translatePanel">
-    <div class="card">
-      <div class="cardHead">
-        <div><div class="title">Input</div><div class="hint">Speak or type naturally.</div></div>
-        <button class="secondary" id="clearBtn">Clear</button>
-      </div>
-      <textarea id="input" placeholder="Speak or type here..."></textarea>
-      <div class="actions">
-        <button class="primary big" id="micBtn">🎤 Start recording</button>
-        <button class="secondary big" id="translateBtn">Translate</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="cardHead">
-        <div><div class="title">Ready result</div><div class="hint">Copy, speak, refine or add ending.</div></div>
-        <button class="secondary" id="copyBtn">Copy</button>
-      </div>
-      <textarea id="output" readonly placeholder="Translation will appear here..."></textarea>
-      <div class="actions">
-        <button class="secondary" id="speakBtn">🔊 Speak</button>
-        <button class="secondary" id="emojiBtn">😊 Ending</button>
-        <button class="secondary refine" data-refine="shorter">Shorter</button>
-        <button class="secondary refine" data-refine="professional">Professional</button>
-        <button class="secondary refine" data-refine="friendlier">Friendlier</button>
-        <button class="secondary refine" data-refine="regenerate">Regenerate</button>
-      </div>
-
-      <div class="emojiBox" id="emojiBox">
-        <button class="secondary ending">Xxx</button>
-        <button class="secondary ending"><span class="sticker">😊</span></button>
-        <button class="secondary ending"><span class="sticker">❤️</span></button>
-        <button class="secondary ending"><span class="sticker">😉</span></button>
-        <button class="secondary ending"><span class="sticker">😢</span></button>
-        <button class="secondary ending"><span class="sticker">🥳</span></button>
-        <button class="secondary ending"><span class="sticker">😡</span></button>
-
-        <button class="secondary ending" data-ending="💋💋">
-          <span class="kissArt">
-            <span class="lip small1">💋</span>
-            <span class="lip main">💋</span>
-            <span class="lip small2">💋</span>
-          </span>
-        </button>
-
-        <button class="secondary ending" data-ending="🔥🔱🔥">
-          <span class="tridentFire">
-            <span class="flame"></span>
-            <span class="tri">🔱</span>
-          </span>
-        </button>
-
-        <button class="secondary ending"><span class="sticker">👍</span></button>
+  <div class="modal" id="dialogueModal">
+    <div class="modal-card">
+      <div class="modal-head"><h2>Live Dialogue</h2><button class="icon-btn close">×</button></div>
+      <div class="section">
+        <div class="language-row"><select id="dialogueUserLang"><option>Ukrainian</option><option>Russian</option><option>Polish</option><option>French</option><option>Spanish</option><option>German</option></select><button class="swap">⇄</button><select id="dialogueEnglish"><option>English UK</option><option>English US</option></select></div>
+        <textarea id="dialogueInput" placeholder="Speak or type one phrase..."></textarea>
+        <button class="main-action" id="dialogueBtn">Translate reply</button>
+        <div class="chat-area" id="dialogueList" style="margin-top:14px"></div>
       </div>
     </div>
   </div>
 
-  <div class="panel" id="dialoguePanel">
-    <div class="card">
-      <div class="cardHead">
-        <div><div class="title">Live Dialogue Mode</div><div class="hint">Two-way conversation translation.</div></div>
-        <button class="secondary" id="closeDialogue">Close</button>
-      </div>
-      <div id="dialogueList"></div>
-      <div class="actions">
-        <button class="primary big" id="dialogueRecordBtn">🎤 Record reply</button>
-        <button class="secondary" id="clearDialogueBtn">Clear dialogue</button>
+  <div class="modal" id="photoModal">
+    <div class="modal-card">
+      <div class="modal-head"><h2>Photo Translate</h2><button class="icon-btn close">×</button></div>
+      <div class="section">
+        <input type="file" accept="image/*" capture="environment" id="photoInput" />
+        <button class="main-action" id="photoBtn">Translate photo</button>
+        <div class="bubble ai" style="margin-top:14px"><small>Detected / Translation</small><div id="photoResult">No photo selected</div></div>
       </div>
     </div>
   </div>
 
-  <div class="panel" id="cameraPanel">
-    <div class="card">
-      <div class="cardHead">
-        <div><div class="title">Photo Translate</div><div class="hint">Take a photo or upload an image with text.</div></div>
-        <button class="secondary" id="closeCamera">Close</button>
-      </div>
-      <input class="fileInput" id="takePhotoInput" type="file" accept="image/*" capture="environment">
-      <input class="fileInput" id="uploadPhotoInput" type="file" accept="image/*">
-      <div class="photoBox" id="photoName">No photo selected</div>
-      <div class="actions">
-        <button class="primary big" id="takePhotoBtn">📷 Take photo</button>
-        <button class="secondary big" id="uploadPhotoBtn">🖼 Upload</button>
-      </div>
-      <div class="actions">
-        <button class="primary big" id="photoTranslateBtn">Translate photo</button>
+  <div class="modal" id="vaultModal">
+    <div class="modal-card">
+      <div class="modal-head"><h2>Vault / History</h2><button class="icon-btn close">×</button></div>
+      <div class="section">
+        <button class="pill" id="deleteHistoryBtn">Delete history</button>
+        <div id="historyList" style="margin-top:14px"></div>
       </div>
     </div>
   </div>
 
-  <div class="panel" id="historyPanel">
-    <div class="card">
-      <div class="cardHead">
-        <div><div class="title">History</div><div class="hint">Saved translations from this device.</div></div>
-        <button class="secondary" id="closeHistory">Close</button>
+  <div class="modal" id="premiumModal">
+    <div class="modal-card">
+      <div class="modal-head"><h2>Premium</h2><button class="icon-btn close">×</button></div>
+      <div class="section">
+        <div class="account-card"><h1>GLOSS Concierge</h1><p class="muted">Professional translation, dialogue mode, photo translate, Vault history and premium tone control.</p><button class="main-action">Upgrade later</button></div>
       </div>
+    </div>
+  </div>
 
-      <div class="actions">
-        <button class="danger" id="clearHistoryBtn">Delete history</button>
+  <div class="modal" id="settingsModal">
+    <div class="modal-card">
+      <div class="modal-head"><h2>Settings</h2><button class="icon-btn close">×</button></div>
+      <div class="section">
+        <div class="setting-row"><b>English Level</b><div class="actions"><button class="pill active-level" data-level="everyday">Everyday</button><button class="pill" data-level="professional">Professional</button><button class="pill" data-level="native">Native-like</button></div></div>
+        <div class="setting-row"><b>Who are you talking to?</b><div class="actions"><button class="pill" data-audience="friend">Friend</button><button class="pill" data-audience="boss">Boss</button><button class="pill" data-audience="client_official">Client / Official</button></div></div>
+        <div class="setting-row"><b>Slang & Bad Words</b><div class="actions"><button class="pill" data-slang="polite">Polite</button><button class="pill" data-slang="street">Street Slang</button></div></div>
+        <div class="setting-row"><b>Profile / Account</b><p class="muted">Login, subscription, billing and privacy can be added later without breaking the translator.</p></div>
       </div>
-
-      <div class="chips">
-        <button class="chip active" data-filter="all">All</button>
-        <button class="chip" data-filter="email">Email</button>
-        <button class="chip" data-filter="message">Message</button>
-        <button class="chip" data-filter="plain">Plain</button>
-        <button class="chip" data-filter="slang">Slang</button>
-      </div>
-
-      <div id="historyList"></div>
     </div>
   </div>
 
-  <div class="status" id="status">Ready</div>
-</div>
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => [...document.querySelectorAll(s)];
+    let resultType = 'message';
+    let lastTranslation = '';
+    let englishStyle = 'everyday';
+    let audience = '';
+    let slang = '';
 
-<div class="drawerOverlay" id="drawerOverlay"></div>
+    const status = (t) => $('#status').textContent = t;
 
-<div class="drawer" id="drawer">
-  <div class="drawerHeader">
-    <h2>Settings</h2>
-    <button class="secondary" id="closeDrawer">Close</button>
-  </div>
+    function saveHistory(input, output, type = resultType) {
+      const history = JSON.parse(localStorage.getItem('glossHistory') || '[]');
+      history.unshift({ input, output, type, date: new Date().toLocaleString() });
+      localStorage.setItem('glossHistory', JSON.stringify(history.slice(0, 60)));
+      renderHistory();
+    }
 
-  <div class="section">
-    <div class="sectionTitle">English Level</div>
-    <div class="chips" id="styleChips">
-      <button class="chip" data-style="elementary">Elementary</button>
-      <button class="chip" data-style="everyday">Everyday</button>
-      <button class="chip" data-style="professional">Professional</button>
-      <button class="chip" data-style="native">Native-like</button>
-    </div>
-  </div>
+    function renderHistory() {
+      const list = $('#historyList');
+      const history = JSON.parse(localStorage.getItem('glossHistory') || '[]');
+      list.innerHTML = history.length ? history.map(item => `<div class="history-item"><b>${item.type}</b><div class="muted">${item.date}</div><p>${escapeHtml(item.input)}</p><p>${escapeHtml(item.output)}</p></div>`).join('') : '<p class="muted">No saved translations yet.</p>';
+    }
 
-  <div class="section">
-    <div class="sectionTitle">Who are you talking to?</div>
-    <div class="chips" id="audienceChips">
-      <button class="chip" data-audience="friend">Friend</button>
-      <button class="chip" data-audience="family">Family</button>
-      <button class="chip" data-audience="boss">Boss</button>
-      <button class="chip" data-audience="client_official">Client / Official</button>
-    </div>
-  </div>
+    function escapeHtml(str) { return String(str || '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
 
-  <div class="section">
-    <div class="sectionTitle">Slang & Bad Words</div>
-    <div class="chips" id="slangChips">
-      <button class="chip" data-slang="polite">Polite</button>
-      <button class="chip" data-slang="street">Street Slang</button>
-    </div>
-  </div>
-</div>
+    async function translate(refine = '') {
+      const text = $('#inputText').value.trim();
+      if (!text) return status('Write or speak something first.');
+      status('Translating...');
+      $('#resultBubble').innerHTML = '<small>AI Result</small>Working...';
+      try {
+        const res = await fetch('/api/translate', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text,
+            sourceLanguage: $('#sourceLanguage').value,
+            targetVariant: $('#targetVariant').value,
+            resultType,
+            englishStyle,
+            audience,
+            slang,
+            refine
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Translation failed');
+        lastTranslation = data.translation || '';
+        $('#resultBubble').innerHTML = `<small>${refine ? 'Refined Result' : 'AI Result'}</small>${escapeHtml(lastTranslation)}`;
+        saveHistory(text, lastTranslation);
+        status('Ready');
+      } catch (e) {
+        $('#resultBubble').innerHTML = `<small>Error</small>${escapeHtml(e.message)}`;
+        status('Error');
+      }
+    }
 
-<script>
-const input=document.getElementById("input");
-const output=document.getElementById("output");
-const statusEl=document.getElementById("status");
-const sourceLang=document.getElementById("sourceLang");
-const targetVariant=document.getElementById("targetVariant");
-const micBtn=document.getElementById("micBtn");
-const translateBtn=document.getElementById("translateBtn");
-const drawer=document.getElementById("drawer");
-const drawerOverlay=document.getElementById("drawerOverlay");
-const translatePanel=document.getElementById("translatePanel");
-const dialoguePanel=document.getElementById("dialoguePanel");
-const cameraPanel=document.getElementById("cameraPanel");
-const historyPanel=document.getElementById("historyPanel");
-const dialogueList=document.getElementById("dialogueList");
-const historyList=document.getElementById("historyList");
-const emojiBox=document.getElementById("emojiBox");
-const takePhotoInput=document.getElementById("takePhotoInput");
-const uploadPhotoInput=document.getElementById("uploadPhotoInput");
-const photoName=document.getElementById("photoName");
+    async function dialogueTranslate() {
+      const text = $('#dialogueInput').value.trim();
+      if (!text) return;
+      const list = $('#dialogueList');
+      list.insertAdjacentHTML('beforeend', `<div class="bubble user"><small>Original</small>${escapeHtml(text)}</div>`);
+      $('#dialogueInput').value = '';
+      try {
+        const res = await fetch('/api/dialogue-translate', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, userLanguage: $('#dialogueUserLang').value, englishVariant: $('#dialogueEnglish').value })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Dialogue failed');
+        list.insertAdjacentHTML('beforeend', `<div class="bubble ai"><small>Translation</small>${escapeHtml(data.translation)}</div>`);
+      } catch(e) { list.insertAdjacentHTML('beforeend', `<div class="bubble ai"><small>Error</small>${escapeHtml(e.message)}</div>`); }
+    }
 
-let resultType="message",englishStyle="",audience="",slang="";
-let mediaRecorder=null,audioChunks=[],isRecording=false,stream=null,audioContext=null,analyser=null,silenceTimer=null,rafId=null,currentRecordCallback=null,recordStart=0,heardVoice=false,selectedPhotoFile=null;
-
-const themes={
-  light:{
-    bg:"#f3f6ff",bg2:"#eef2fb",card:"rgba(255,255,255,.78)",card2:"rgba(255,255,255,.86)",
-    text:"#172033",muted:"#647085",accent:"#6ea8ff",accent2:"#8a6dff",border:"rgba(40,60,100,.12)",
-    shadow:"0 22px 55px rgba(44,65,115,.18)"
-  },
-  dark:{
-    bg:"#070b14",bg2:"#0e1728",card:"rgba(16,26,46,.82)",card2:"rgba(25,38,64,.9)",
-    text:"#f7fbff",muted:"#aebbd1",accent:"#6ea8ff",accent2:"#8a6dff",border:"rgba(255,255,255,.10)",
-    shadow:"0 30px 90px rgba(0,0,0,.45)"
-  },
-  olive:{bg:"#eef2e8",bg2:"#dfe8d6",card:"rgba(255,255,255,.74)",card2:"rgba(255,255,255,.84)",text:"#23301f",muted:"#6a765f",accent:"#a7c96a",accent2:"#789e58",border:"rgba(60,90,40,.14)",shadow:"0 22px 55px rgba(70,95,60,.18)"},
-  blue:{bg:"#edf6ff",bg2:"#deecfb",card:"rgba(255,255,255,.76)",card2:"rgba(255,255,255,.86)",text:"#193047",muted:"#617488",accent:"#74b8ff",accent2:"#577dff",border:"rgba(30,80,130,.14)",shadow:"0 22px 55px rgba(40,90,150,.18)"},
-  rose:{bg:"#fff0f2",bg2:"#f6dde2",card:"rgba(255,255,255,.76)",card2:"rgba(255,255,255,.86)",text:"#43252d",muted:"#8b6670",accent:"#ff9aaa",accent2:"#d46a90",border:"rgba(130,50,70,.14)",shadow:"0 22px 55px rgba(160,60,80,.18)"},
-  lavender:{bg:"#f5f0ff",bg2:"#e9e0fb",card:"rgba(255,255,255,.76)",card2:"rgba(255,255,255,.86)",text:"#2f264a",muted:"#7b7292",accent:"#a795ff",accent2:"#7d68d8",border:"rgba(80,60,130,.14)",shadow:"0 22px 55px rgba(80,60,150,.18)"}
-};
-
-function applyTheme(n){
-  const t=themes[n];
-  for(const k in t)document.documentElement.style.setProperty("--"+k,t[k]);
-  localStorage.setItem("theme",n);
-  document.querySelectorAll(".themeDot").forEach(b=>b.classList.remove("active"));
-  document.querySelector(`[data-theme="${n}"]`)?.classList.add("active");
-}
-document.querySelectorAll(".themeDot").forEach(b=>b.onclick=()=>applyTheme(b.dataset.theme));
-applyTheme(localStorage.getItem("theme")||"light");
-
-function autoUpdate(){if(output.value.trim()&&input.value.trim())runTranslate()}
-
-function toggleChip(group,el,key){
-  const active=el.classList.contains("active");
-  group.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
-  if(active){if(key==="style")englishStyle="";if(key==="audience")audience="";if(key==="slang")slang=""}
-  else{el.classList.add("active");if(key==="style")englishStyle=el.dataset.style;if(key==="audience")audience=el.dataset.audience;if(key==="slang")slang=el.dataset.slang}
-  autoUpdate();
-}
-
-document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");resultType=b.dataset.result;autoUpdate()});
-document.querySelectorAll("#styleChips .chip").forEach(b=>b.onclick=()=>toggleChip(document.getElementById("styleChips"),b,"style"));
-document.querySelectorAll("#audienceChips .chip").forEach(b=>b.onclick=()=>toggleChip(document.getElementById("audienceChips"),b,"audience"));
-document.querySelectorAll("#slangChips .chip").forEach(b=>b.onclick=()=>toggleChip(document.getElementById("slangChips"),b,"slang"));
-
-document.getElementById("settingsBtn").onclick=()=>{drawer.classList.add("open");drawerOverlay.classList.add("open")};
-document.getElementById("closeDrawer").onclick=()=>{drawer.classList.remove("open");drawerOverlay.classList.remove("open")};
-drawerOverlay.onclick=document.getElementById("closeDrawer").onclick;
-
-async function runTranslate(refine=""){
-  const text=input.value.trim();
-  if(!text){statusEl.textContent="Enter text first";return}
-  statusEl.textContent="Translating...";
-  translateBtn.disabled=true;
-  try{
-    const res=await fetch("/api/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,sourceLanguage:sourceLang.options[sourceLang.selectedIndex].text,targetVariant:targetVariant.value,resultType,englishStyle,audience,slang,refine})});
-    const data=await res.json();
-    if(!res.ok){statusEl.textContent=data.error||"Translation failed";return}
-    output.value=data.translation||"";
-    saveHistory(text,output.value);
-    statusEl.textContent="Done";
-  }catch(e){statusEl.textContent="Server error"}finally{translateBtn.disabled=false}
-}
-
-async function transcribeAudio(){
-  const blob=new Blob(audioChunks,{type:mediaRecorder?.mimeType||"audio/webm"});
-  const buffer=await blob.arrayBuffer();
-  const res=await fetch("/api/transcribe",{method:"POST",headers:{"Content-Type":blob.type,"x-source-language":sourceLang.value},body:buffer});
-  const data=await res.json();
-  if(!res.ok)throw new Error(data.error||"Transcription failed");
-  return(data.text||"").trim();
-}
-
-function monitorSilence(){
-  if(!analyser||!isRecording)return;
-  const arr=new Uint8Array(analyser.fftSize);
-  analyser.getByteTimeDomainData(arr);
-  let sum=0;
-  for(let i=0;i<arr.length;i++){const v=(arr[i]-128)/128;sum+=v*v}
-  const volume=Math.sqrt(sum/arr.length);
-  const elapsed=Date.now()-recordStart;
-  if(volume>0.035){heardVoice=true;if(silenceTimer){clearTimeout(silenceTimer);silenceTimer=null}}
-  else if(heardVoice&&elapsed>1200&&!silenceTimer){silenceTimer=setTimeout(()=>{if(isRecording)stopRecording()},1800)}
-  rafId=requestAnimationFrame(monitorSilence);
-}
-
-async function startRecording(callback){
-  try{
-    currentRecordCallback=callback||null;
-    stream=await navigator.mediaDevices.getUserMedia({audio:true});
-    audioChunks=[];
-    heardVoice=false;
-    recordStart=Date.now();
-    const mimeType=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")?"audio/webm;codecs=opus":(MediaRecorder.isTypeSupported("audio/webm")?"audio/webm":"audio/mp4");
-    mediaRecorder=new MediaRecorder(stream,{mimeType});
-    mediaRecorder.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data)};
-    mediaRecorder.onstop=async()=>{
-      if(silenceTimer)clearTimeout(silenceTimer);
-      if(rafId)cancelAnimationFrame(rafId);
-      try{if(audioContext)await audioContext.close()}catch(e){}
-      stream?.getTracks().forEach(t=>t.stop());
-      isRecording=false;
-      micBtn.textContent="🎤 Start recording";
-      document.getElementById("dialogueRecordBtn").textContent="🎤 Record reply";
-      if(!heardVoice||Date.now()-recordStart<700){statusEl.textContent="No speech detected";return}
-      statusEl.textContent="Transcribing...";
-      try{
-        const text=await transcribeAudio();
-        if(!text){statusEl.textContent="No speech detected";return}
-        if(currentRecordCallback){await currentRecordCallback(text)}
-        else{input.value=input.value?input.value+" "+text:text;await runTranslate()}
-      }catch(e){statusEl.textContent=e.message||"Transcription failed"}
-    };
-    mediaRecorder.start(250);
-    isRecording=true;
-    micBtn.textContent="⏹ Stop recording";
-    document.getElementById("dialogueRecordBtn").textContent="⏹ Stop";
-    statusEl.textContent="Recording...";
-    audioContext=new (window.AudioContext||window.webkitAudioContext)();
-    const src=audioContext.createMediaStreamSource(stream);
-    analyser=audioContext.createAnalyser();
-    analyser.fftSize=2048;
-    src.connect(analyser);
-    monitorSilence();
-  }catch(e){statusEl.textContent="Microphone access denied"}
-}
-
-function stopRecording(){if(mediaRecorder&&isRecording&&mediaRecorder.state==="recording")mediaRecorder.stop()}
-micBtn.onclick=()=>isRecording?stopRecording():startRecording();
-translateBtn.onclick=()=>runTranslate();
-
-document.getElementById("clearBtn").onclick=()=>{input.value="";output.value="";statusEl.textContent="Cleared"};
-document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(output.value);statusEl.textContent="Copied"};
-
-function speakTextWithLang(txt,lang){
-  if(!txt.trim()){statusEl.textContent="Nothing to speak";return}
-  if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window)){statusEl.textContent="Speech not supported on this browser";return}
-  const u=new window.SpeechSynthesisUtterance(txt);
-  u.lang=lang;
-  u.rate=1;
-  u.pitch=1;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(u);
-  statusEl.textContent="Speaking...";
-}
-
-function speakText(txt){speakTextWithLang(txt,targetVariant.value)}
-document.getElementById("speakBtn").onclick=()=>speakText(output.value);
-document.querySelectorAll(".refine").forEach(b=>b.onclick=()=>runTranslate(b.dataset.refine));
-document.getElementById("emojiBtn").onclick=()=>emojiBox.classList.toggle("open");
-
-document.querySelectorAll(".ending").forEach(b=>b.onclick=()=>{
-  const value=b.dataset.ending||b.textContent.trim();
-  output.value=(output.value.trim()+" "+value).trim();
-  emojiBox.classList.remove("open");
-});
-
-function saveHistory(original,translation){
-  if(!translation)return;
-  const items=JSON.parse(localStorage.getItem("history")||"[]");
-  items.unshift({date:new Date().toLocaleString(),type:resultType,slang:slang==="street"?"slang":"",original,translation});
-  localStorage.setItem("history",JSON.stringify(items.slice(0,50)));
-  renderHistory();
-}
-
-function renderHistory(filter="all"){
-  const items=JSON.parse(localStorage.getItem("history")||"[]");
-  const filtered=filter==="all"?items:items.filter(i=>i.type===filter||i.slang===filter);
-  historyList.innerHTML=filtered.length?"":"<p>No history yet.</p>";
-  filtered.forEach(item=>{
-    const div=document.createElement("div");
-    div.className="historyItem";
-    div.innerHTML=`<small>${item.date} • ${item.type}</small><div><b>${item.original.slice(0,90)}</b></div><div style="color:var(--muted);margin-top:5px">${item.translation.slice(0,140)}</div><div class="actions"><button class="secondary">Reuse</button></div>`;
-    div.querySelector("button").onclick=()=>{input.value=item.original;output.value=item.translation;showPanel("translate")};
-    historyList.appendChild(div);
-  });
-}
-
-document.getElementById("clearHistoryBtn").onclick=()=>{
-  const ok=confirm("Delete all translation history on this device?");
-  if(!ok)return;
-  localStorage.removeItem("history");
-  renderHistory();
-  statusEl.textContent="History deleted";
-};
-
-document.querySelectorAll("#historyPanel .chip").forEach(b=>b.onclick=()=>{document.querySelectorAll("#historyPanel .chip").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderHistory(b.dataset.filter)});
-
-function showPanel(p){
-  translatePanel.style.display=p==="translate"?"grid":"none";
-  dialoguePanel.classList.toggle("open",p==="dialogue");
-  historyPanel.classList.toggle("open",p==="history");
-  cameraPanel.classList.toggle("open",p==="camera");
-}
-
-document.getElementById("historyBtn").onclick=()=>{renderHistory();showPanel("history")};
-document.getElementById("closeHistory").onclick=()=>showPanel("translate");
-document.getElementById("dialogueBtn").onclick=()=>showPanel("dialogue");
-document.getElementById("closeDialogue").onclick=()=>showPanel("translate");
-document.getElementById("cameraBtn").onclick=()=>showPanel("camera");
-document.getElementById("closeCamera").onclick=()=>showPanel("translate");
-
-function getUserSpeakLang(){
-  const map={uk:"uk-UA",ru:"ru-RU",pl:"pl-PL",fr:"fr-FR",es:"es-ES",de:"de-DE",it:"it-IT",ro:"ro-RO",hu:"hu-HU",pt:"pt-PT",tr:"tr-TR",ar:"ar-SA",hi:"hi-IN",zh:"zh-CN",ja:"ja-JP",ko:"ko-KR",cs:"cs-CZ",bg:"bg-BG",en:targetVariant.value};
-  return map[sourceLang.value]||"en-GB";
-}
-
-function addDialogue(original,translated,speakLang){
-  const div=document.createElement("div");
-  div.className="bubble";
-  div.innerHTML=`<div>${original}</div><div class="translated">${translated}</div><div class="actions"><button class="secondary">🔊 Speak</button></div>`;
-  const lang=speakLang==="user"?getUserSpeakLang():targetVariant.value;
-  div.querySelector("button").onclick=()=>speakTextWithLang(translated,lang);
-  dialogueList.appendChild(div);
-  if(speakLang==="en"){speakTextWithLang(translated,targetVariant.value)}
-}
-
-document.getElementById("dialogueRecordBtn").onclick=()=>isRecording?stopRecording():startRecording(async(text)=>{
-  statusEl.textContent="Dialogue translating...";
-  try{
-    const res=await fetch("/api/dialogue-translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,userLanguage:sourceLang.options[sourceLang.selectedIndex].text,englishVariant:targetVariant.value==="en-US"?"English US":"English UK"})});
-    const data=await res.json();
-    if(!res.ok){statusEl.textContent=data.error||"Dialogue translation failed";return}
-    addDialogue(text,data.translation||"",data.speakLang||"en");
-    statusEl.textContent="Done";
-  }catch(e){statusEl.textContent="Dialogue backend error"}
-});
-
-document.getElementById("clearDialogueBtn").onclick=()=>dialogueList.innerHTML="";
-
-document.getElementById("takePhotoBtn").onclick=()=>takePhotoInput.click();
-document.getElementById("uploadPhotoBtn").onclick=()=>uploadPhotoInput.click();
-
-function setPhotoFile(file){
-  selectedPhotoFile=file||null;
-  photoName.textContent=file?file.name:"No photo selected";
-}
-
-takePhotoInput.onchange=e=>setPhotoFile(e.target.files[0]);
-uploadPhotoInput.onchange=e=>setPhotoFile(e.target.files[0]);
-
-function resizeImage(file,maxWidth=1200,quality=0.72){
-  return new Promise((resolve,reject)=>{
-    const img=new Image();
-    const reader=new FileReader();
-    reader.onload=e=>{
-      img.onload=()=>{
-        const scale=Math.min(1,maxWidth/img.width);
-        const canvas=document.createElement("canvas");
-        canvas.width=Math.round(img.width*scale);
-        canvas.height=Math.round(img.height*scale);
-        const ctx=canvas.getContext("2d");
-        ctx.drawImage(img,0,0,canvas.width,canvas.height);
-        resolve(canvas.toDataURL("image/jpeg",quality));
+    async function photoTranslate() {
+      const file = $('#photoInput').files[0];
+      if (!file) return $('#photoResult').textContent = 'Choose a photo first.';
+      $('#photoResult').textContent = 'Reading image...';
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const res = await fetch('/api/photo-translate', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: reader.result, targetLanguage: $('#sourceLanguage').value })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Photo translation failed');
+          $('#photoResult').innerHTML = `<b>Detected:</b><br>${escapeHtml(data.detectedText || '')}<br><br><b>Translation:</b><br>${escapeHtml(data.translation || '')}`;
+        } catch(e) { $('#photoResult').textContent = e.message; }
       };
-      img.onerror=reject;
-      img.src=e.target.result;
-    };
-    reader.onerror=reject;
-    reader.readAsDataURL(file);
-  });
-}
+      reader.readAsDataURL(file);
+    }
 
-document.getElementById("photoTranslateBtn").onclick=async()=>{
-  const file=selectedPhotoFile;
-  if(!file){statusEl.textContent="Choose or take a photo first";return}
-  statusEl.textContent="Preparing photo...";
-  try{
-    const compressedImage=await resizeImage(file);
-    statusEl.textContent="Translating photo...";
-    const res=await fetch("/api/photo-translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:compressedImage,targetLanguage:sourceLang.options[sourceLang.selectedIndex].text,sourceLanguage:sourceLang.options[sourceLang.selectedIndex].text,targetVariant:targetVariant.value,resultType,englishStyle,audience,slang})});
-    const data=await res.json();
-    if(!res.ok){statusEl.textContent=data.error||"Photo translation failed";return}
-    input.value=data.detectedText||"";
-    output.value=data.translation||"";
-    saveHistory(input.value,output.value);
-    showPanel("translate");
-    statusEl.textContent="Photo translated";
-  }catch(e){statusEl.textContent="Photo backend error"}
-};
-</script>
+    function speak(text = lastTranslation) {
+      if (!text) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = $('#targetVariant').value === 'en-US' ? 'en-US' : 'en-GB';
+      speechSynthesis.cancel(); speechSynthesis.speak(u);
+    }
+
+    function startSpeech() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) { status('Speech recognition is not supported on this browser.'); return; }
+      const rec = new SR();
+      rec.lang = 'uk-UA';
+      rec.interimResults = false;
+      rec.onstart = () => status('Listening...');
+      rec.onresult = e => { $('#inputText').value = e.results[0][0].transcript; status('Voice captured.'); };
+      rec.onerror = () => status('Microphone error.');
+      rec.onend = () => { if ($('#status').textContent === 'Listening...') status('Ready'); };
+      rec.start();
+    }
+
+    $$('.tab').forEach(btn => btn.onclick = () => { $$('.tab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); resultType = btn.dataset.type; });
+    $('#translateBtn').onclick = () => translate();
+    $('#recordBtn').onclick = startSpeech;
+    $('#clearBtn').onclick = () => { $('#inputText').value=''; status('Ready'); };
+    $('#copyBtn').onclick = () => navigator.clipboard.writeText(lastTranslation || $('#resultBubble').textContent.trim());
+    $('#speakBtn').onclick = () => speak();
+    $$('[data-refine]').forEach(b => b.onclick = () => translate(b.dataset.refine));
+    $$('.emoji').forEach(b => b.onclick = () => { $('#inputText').value += ($('#inputText').value ? ' ' : '') + b.dataset.emoji; });
+    $('#themeBtn').onclick = () => document.body.classList.toggle('light');
+    $('#dialogueBtn').onclick = dialogueTranslate;
+    $('#photoBtn').onclick = photoTranslate;
+    $('#deleteHistoryBtn').onclick = () => { localStorage.removeItem('glossHistory'); renderHistory(); };
+
+    $$('[data-open]').forEach(btn => btn.onclick = () => {
+      $$('.nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const id = btn.dataset.open;
+      if (id === 'dialogue') $('#dialogueModal').classList.add('open');
+      if (id === 'photo') $('#photoModal').classList.add('open');
+      if (id === 'vault') { renderHistory(); $('#vaultModal').classList.add('open'); }
+      if (id === 'premium') $('#premiumModal').classList.add('open');
+      if (id === 'settings') $('#settingsModal').classList.add('open');
+    });
+
+    $$('.close').forEach(b => b.onclick = () => b.closest('.modal').classList.remove('open'));
+    $$('[data-level]').forEach(b => b.onclick = () => { englishStyle = b.dataset.level; });
+    $$('[data-audience]').forEach(b => b.onclick = () => { audience = b.dataset.audience; });
+    $$('[data-slang]').forEach(b => b.onclick = () => { slang = b.dataset.slang; });
+    renderHistory();
+  </script>
 </body>
 </html>
