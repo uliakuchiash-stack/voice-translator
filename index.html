@@ -43,6 +43,23 @@ textarea{width:100%;min-height:110px;resize:vertical;line-height:1.42;font-size:
 .nav{position:absolute;z-index:8;left:11px;right:11px;bottom:max(10px,env(safe-area-inset-bottom));border:1px solid var(--border);border-radius:26px;background:rgba(7,7,17,.82);backdrop-filter:blur(22px);display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:7px;box-shadow:0 20px 52px rgba(0,0,0,.40),var(--inner)}body.light .nav{background:rgba(255,250,240,.85)}.nav-btn{min-width:0;border:0;border-radius:18px;background:transparent;color:var(--muted);padding:7px 2px;display:grid;justify-items:center;gap:2px;font-weight:900;font-size:9px}.nav-btn b{font-size:17px;line-height:1}.nav-btn.active{color:var(--text);background:rgba(123,76,255,.24);box-shadow:var(--inner)}
 .setting,.history-item,.profile-card,.price-card{border:1px solid var(--border);border-radius:22px;background:var(--card2);padding:14px;margin-bottom:10px;box-shadow:var(--inner)}.muted{color:var(--muted);font-size:13px}.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.hidden{display:none!important}.photo-box{border:1px dashed var(--gold);border-radius:22px;padding:15px;color:var(--muted);margin-top:10px;background:var(--card2)}
 .drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:20}.drawer{position:fixed;top:0;right:-390px;width:380px;max-width:92vw;height:100svh;background:var(--bg);z-index:30;padding:18px;transition:right .25s ease;overflow:auto;box-shadow:-18px 0 50px rgba(0,0,0,.35);border-left:1px solid var(--border)}.drawer.open{right:0}.drawer-overlay.open{display:block}.drawer-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:60;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(10px)}
+.modal-overlay.open{display:flex}
+.modal-card{width:min(390px,96vw);border:1px solid var(--border);border-radius:30px;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04)),var(--bg);box-shadow:0 30px 90px rgba(0,0,0,.55),var(--inner);padding:18px;color:var(--text)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.modal-head h2{margin:0;font-size:22px}
+.plan-box{border:1px solid var(--border);border-radius:22px;background:var(--card2);padding:14px;margin-bottom:10px;box-shadow:var(--inner)}
+.plan-box h3{margin:0 0 8px;font-size:18px}
+.plan-box ul{margin:0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.55}
+.price-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.price-box{border:1px solid rgba(243,181,69,.28);border-radius:20px;background:linear-gradient(135deg,rgba(243,181,69,.20),rgba(123,76,255,.10));padding:12px;text-align:center}
+.price-box b{display:block;font-size:20px;color:var(--gold2)}
+.settings-link{width:100%;text-align:left;border:1px solid var(--border);border-radius:18px;background:var(--card2);color:var(--text);padding:13px;margin-top:9px;box-shadow:var(--inner);font-weight:900}
+.privacy-text{max-height:58svh;overflow:auto;color:var(--muted);font-size:13px;line-height:1.5;padding-right:6px}
+.privacy-text h3{color:var(--text);margin:14px 0 6px;font-size:15px}
+.account-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(243,181,69,.25);background:rgba(243,181,69,.13);color:var(--gold2);border-radius:999px;padding:7px 10px;font-size:12px;font-weight:900;margin-top:8px}
+
 </style>
 </head>
 <body>
@@ -74,13 +91,153 @@ textarea{width:100%;min-height:110px;resize:vertical;line-height:1.42;font-size:
     <section class="screen" id="screen-dialogue"><div class="card"><div class="card-pad"><div class="result-title"><div><h2>Live Dialogue</h2><p>Two-way conversation translation.</p></div><span class="pill gold">LIVE</span></div><div id="dialogueList"></div><button class="main-btn gold" id="dialogueRecordBtn">🎙 Record reply</button><button class="pill" id="clearDialogueBtn" style="margin-top:10px">Clear dialogue</button></div></div></section>
     <section class="screen" id="screen-vault"><div class="card"><div class="card-pad"><div class="result-title"><div><h2>Vault</h2><p>Saved translations from this device.</p></div><button class="pill" id="clearHistoryBtn">Clear</button></div><div id="historyList"></div></div></div></section>
     <section class="screen" id="screen-photo"><div class="card"><div class="card-pad"><div class="result-title"><div><h2>Photo Translate</h2><p>Take or upload a photo with text.</p></div><span class="pill violet">OCR</span></div><input class="hidden" id="takePhotoInput" type="file" accept="image/*" capture="environment"><input class="hidden" id="uploadPhotoInput" type="file" accept="image/*"><div class="photo-box" id="photoName">No photo selected</div><div class="muted" id="photoNote" style="margin-top:10px">Photo translation opens result on the Translate screen in this version.</div><div class="quick-row"><button class="pill gold" id="takePhotoBtn">📷 Take photo</button><button class="pill" id="uploadPhotoBtn">🖼 Upload</button></div><button class="main-btn gold" id="photoTranslateBtn">Translate photo</button></div></div></section>
-    <section class="screen" id="screen-premium"><div class="card"><div class="card-pad"><div class="result-title"><div><h2>Premium</h2><p>Upgrade later after launch.</p></div><span class="pill gold">PRO</span></div><div class="price-card"><h2 style="margin:0 0 8px">Slang Translator AI Premium</h2><p class="muted">Professional tone, live dialogue, photo translate, history vault and advanced style control.</p><div class="grid-2" style="margin-top:12px"><div class="setting"><b>$9.99</b><div class="muted">Monthly</div></div><div class="setting"><b>$79.99</b><div class="muted">Yearly</div></div></div></div></div></div></section>
-    <section class="screen" id="screen-settings"><div class="card"><div class="card-pad"><div class="result-title"><div><h2>Settings</h2><p>Translation intelligence.</p></div></div><div class="setting"><b>English Level</b><div class="quick-row" id="styleChips"><button class="pill" data-style="elementary">Elementary</button><button class="pill" data-style="everyday">Everyday</button><button class="pill" data-style="professional">Professional</button><button class="pill" data-style="native">Native-like</button></div></div><div class="setting"><b>Who are you talking to?</b><div class="quick-row" id="audienceChips"><button class="pill" data-audience="friend">Friend</button><button class="pill" data-audience="family">Family</button><button class="pill" data-audience="boss">Boss</button><button class="pill" data-audience="client_official">Client / Official</button></div></div><div class="setting"><b>Slang & Bad Words</b><div class="quick-row" id="slangChips"><button class="pill" data-slang="polite">Polite</button><button class="pill" data-slang="street">Street Slang</button></div></div></div></div></section>
+    <section class="screen" id="screen-premium">
+  <div class="card"><div class="card-pad">
+    <div class="result-title">
+      <div><h2>Premium</h2><p>Choose the plan that fits your translation needs.</p></div>
+      <span class="pill gold">PRO</span>
+    </div>
+    <div class="plan-box">
+      <h3>Free Plan</h3>
+      <ul>
+        <li>Basic text translation</li>
+        <li>Limited voice translation</li>
+        <li>Limited photo translation</li>
+        <li>Basic dialogue mode</li>
+        <li>A few premium email/business tries</li>
+        <li>Standard emoji endings</li>
+      </ul>
+    </div>
+    <div class="plan-box" style="border-color:rgba(243,181,69,.35)">
+      <h3>Premium Plan</h3>
+      <ul>
+        <li>Unlimited voice, dialogue and photo translation</li>
+        <li>Business writing and boss/client mode</li>
+        <li>Advanced slang and native-style expressions</li>
+        <li>Premium translation quality</li>
+        <li>Saved history and account access</li>
+        <li>Priority improvements and new features</li>
+      </ul>
+      <div class="price-row">
+        <div class="price-box"><b>$9.99</b><span class="muted">Monthly</span></div>
+        <div class="price-box"><b>$79.99</b><span class="muted">Yearly</span></div>
+      </div>
+      <button class="main-btn gold" id="openPremiumModal">Continue with Premium</button>
+      <button class="pill" id="restorePurchaseBtn" style="width:100%;margin-top:10px">Restore Purchase</button>
+      <p class="muted" style="margin-bottom:0">Payments and subscriptions are managed securely through Google Play.</p>
+    </div>
+  </div></div>
+</section>
+
+<section class="screen" id="screen-settings"><div class="card"><div class="card-pad"><div class="result-title"><div><h2>Settings</h2><p>Translation intelligence.</p></div></div><div class="setting"><b>English Level</b><div class="quick-row" id="styleChips"><button class="pill" data-style="elementary">Elementary</button><button class="pill" data-style="everyday">Everyday</button><button class="pill" data-style="professional">Professional</button><button class="pill" data-style="native">Native-like</button></div></div><div class="setting"><b>Who are you talking to?</b><div class="quick-row" id="audienceChips"><button class="pill" data-audience="friend">Friend</button><button class="pill" data-audience="family">Family</button><button class="pill" data-audience="boss">Boss</button><button class="pill" data-audience="client_official">Client / Official</button></div></div><div class="setting"><b>Slang & Bad Words</b><div class="quick-row" id="slangChips"><button class="pill" data-slang="polite">Polite</button><button class="pill" data-slang="street">Street Slang</button></div></div><div class="setting">
+        <b>Privacy & Legal</b>
+        <p class="muted">Review microphone, camera, AI processing, history, purchases and account access.</p>
+        <button class="settings-link" id="openPrivacyBtn">Privacy Policy</button>
+        <button class="settings-link" id="openTermsBtn">Terms / Premium Rules</button>
+      </div></div></div></section>
   </div>
   <nav class="nav"><button class="nav-btn active" data-screen="translate"><b>↯</b><span>Translate</span></button><button class="nav-btn" data-screen="dialogue"><b>💬</b><span>Dialogue</span></button><button class="nav-btn" data-screen="vault"><b>▣</b><span>Vault</span></button><button class="nav-btn" data-screen="photo"><b>📷</b><span>Photo</span></button><button class="nav-btn" data-screen="premium"><b>★</b><span>Premium</span></button><button class="nav-btn" data-screen="settings"><b>⚙</b><span>Settings</span></button></nav>
 </main>
 
-<div class="drawer-overlay" id="drawerOverlay"></div><div class="drawer" id="profileDrawer"><div class="drawer-head"><h2>Profile / Account</h2><button class="pill" id="closeProfile">Close</button></div><div class="profile-card"><div style="display:flex;gap:12px;align-items:center"><div class="logo-fire" style="width:52px;height:52px"></div><div><b>Guest User</b><div class="muted">Slang Translator AI Member</div></div></div></div><div class="grid-2"><div class="setting"><b id="vaultCount">0</b><div class="muted">Saved items</div></div><div class="setting"><b>18</b><div class="muted">Languages</div></div></div><div class="setting"><b>Login / Sign In</b><p class="muted">Email login, billing and account sync can be added later.</p></div></div>
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="profileDrawer">
+  <div class="drawer-head"><h2>Profile / Account</h2><button class="pill" id="closeProfile">Close</button></div>
+  <div class="profile-card">
+    <div style="display:flex;gap:12px;align-items:center">
+      <div class="logo-fire" style="width:52px;height:52px"></div>
+      <div>
+        <b id="profileName">Guest User</b>
+        <div class="muted" id="profileSub">Slang Translator AI Member</div>
+        <span class="account-badge" id="accountBadge">Guest mode</span>
+      </div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="setting"><b id="vaultCount">0</b><div class="muted">Saved items</div></div>
+    <div class="setting"><b>18</b><div class="muted">Languages</div></div>
+  </div>
+  <div class="setting">
+    <b>Account Access</b>
+    <p class="muted">Sign in to connect Premium access with your Google Play purchase and manage your account.</p>
+    <button class="main-btn gold" id="googleSignInBtn" style="margin-top:10px">Continue with Google</button>
+    <button class="pill" id="profileRestoreBtn" style="width:100%;margin-top:10px">Restore Purchase</button>
+    <p class="muted" style="margin-bottom:0">Purchases are managed through Google Play. Full cloud sync can be expanded in a later update.</p>
+  </div>
+  <div class="setting">
+    <b>Premium Status</b>
+    <p class="muted" id="premiumStatusText">No active Premium detected on this device.</p>
+    <button class="pill gold" id="profilePremiumBtn" style="width:100%">View Premium</button>
+  </div>
+  <div class="setting">
+    <b>Privacy</b>
+    <p class="muted">Read how voice, photo, AI translation, local history, account login and purchases are handled.</p>
+    <button class="pill" id="profilePrivacyBtn" style="width:100%">Privacy Policy</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="accountModal">
+  <div class="modal-card">
+    <div class="modal-head"><h2>Account Access</h2><button class="pill" id="closeAccountModal">Close</button></div>
+    <p class="muted">Google Sign-In is prepared for account access and Premium purchase restoration.</p>
+    <div class="plan-box">
+      <h3>Why sign in?</h3>
+      <ul>
+        <li>Connect Premium access with your account</li>
+        <li>Restore purchases after reinstalling</li>
+        <li>Prepare history and settings sync</li>
+      </ul>
+    </div>
+    <button class="main-btn gold" id="simulateGoogleSignIn">Continue with Google</button>
+    <button class="pill" id="continueGuestBtn" style="width:100%;margin-top:10px">Continue as Guest</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="purchaseModal">
+  <div class="modal-card">
+    <div class="modal-head"><h2>Premium</h2><button class="pill" id="closePurchaseModal">Close</button></div>
+    <p class="muted">Unlock unlimited translation, dialogue, photo translation, business writing, stronger slang and premium quality.</p>
+    <div class="price-row">
+      <div class="price-box"><b>$9.99</b><span class="muted">Monthly</span></div>
+      <div class="price-box"><b>$79.99</b><span class="muted">Yearly</span></div>
+    </div>
+    <button class="main-btn gold" id="startPremiumBtn">Continue with Google Play Billing</button>
+    <button class="pill" id="modalRestoreBtn" style="width:100%;margin-top:10px">Restore Purchase</button>
+    <p class="muted" style="margin-bottom:0">Final purchase will be processed securely by Google Play. We do not store payment card details.</p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="privacyModal">
+  <div class="modal-card">
+    <div class="modal-head"><h2>Privacy Policy</h2><button class="pill" id="closePrivacyModal">Close</button></div>
+    <div class="privacy-text">
+      <p><b>Last updated: April 2026</b></p>
+      <p>This Privacy Policy explains how Slang Translator AI handles user information.</p>
+      <h3>Age Restriction</h3><p>This app may include slang, strong informal expressions, profanity, and adult-oriented language styles. The app is intended for users aged 16+ and is not intended for children.</p>
+      <h3>Information We Process</h3><p>The app may process text, voice input, and images uploaded or captured by the user to provide translation features.</p>
+      <h3>Microphone Permission</h3><p>Microphone access is used only to transcribe and translate spoken input.</p>
+      <h3>Camera and Photo Permission</h3><p>Camera or photo access is used only to read and translate visible text.</p>
+      <h3>Translation and AI Processing</h3><p>Text, audio, or image content may be sent to third-party AI/API services for transcription, OCR, and translation.</p>
+      <h3>Local History</h3><p>The app may save translation history locally on the user’s device. Users can delete history inside the app.</p>
+      <h3>Account Login</h3><p>Users may optionally sign in using Google Sign-In to restore purchases, sync Premium access, and improve account management. Basic account information such as email address and profile name may be processed for this purpose.</p>
+      <h3>Premium Features and Payments</h3><p>Some features may require payment or subscription. Purchases are processed securely through official platform providers such as Google Play. We do not store users’ payment card details.</p>
+      <h3>Subscription Management</h3><p>Users can manage or cancel subscriptions through their Google Play account settings. Restore Purchase may be available for previously purchased Premium access.</p>
+      <h3>Data Sharing</h3><p>We do not sell users’ personal data. Data may only be processed by service providers required for translation, transcription, OCR, hosting, analytics, account, or payment features.</p>
+      <h3>Contact Us</h3><p>Email: aislang.business@gmail.com</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="termsModal">
+  <div class="modal-card">
+    <div class="modal-head"><h2>Terms / Premium Rules</h2><button class="pill" id="closeTermsModal">Close</button></div>
+    <div class="privacy-text">
+      <h3>Free Plan</h3><p>Free users can use basic translation features with limits. Premium trials may be limited and can change as the app improves.</p>
+      <h3>Premium Plan</h3><p>Premium unlocks unlimited voice, dialogue, photo translation, business writing, advanced slang/native expressions, account access, and premium translation quality.</p>
+      <h3>Payments</h3><p>Premium subscriptions are processed through Google Play. Subscription management, cancellation, and restoration are handled through the user’s Google Play account.</p>
+      <h3>AI Translation</h3><p>AI translations may not always be perfect. Users should review important business, legal, medical, or official texts before sending or relying on them.</p>
+    </div>
+  </div>
+</div>
 
 <script>
 const input=document.getElementById('input'),output=document.getElementById('output'),statusEl=document.getElementById('status'),sourceLang=document.getElementById('sourceLang'),targetVariant=document.getElementById('targetVariant');
@@ -132,7 +289,56 @@ document.getElementById('clearDialogueBtn').onclick=()=>document.getElementById(
 document.getElementById('takePhotoBtn').onclick=()=>document.getElementById('takePhotoInput').click();document.getElementById('uploadPhotoBtn').onclick=()=>document.getElementById('uploadPhotoInput').click();function setPhotoFile(file){selectedPhotoFile=file||null;document.getElementById('photoName').textContent=file?file.name:'No photo selected'}document.getElementById('takePhotoInput').onchange=e=>setPhotoFile(e.target.files[0]);document.getElementById('uploadPhotoInput').onchange=e=>setPhotoFile(e.target.files[0]);
 function resizeImage(file,maxWidth=1200,quality=.72){return new Promise((resolve,reject)=>{const img=new Image(),reader=new FileReader();reader.onload=e=>{img.onload=()=>{const scale=Math.min(1,maxWidth/img.width),canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL('image/jpeg',quality))};img.onerror=reject;img.src=e.target.result};reader.onerror=reject;reader.readAsDataURL(file)})}
 document.getElementById('photoTranslateBtn').onclick=async()=>{const file=selectedPhotoFile;if(!file){statusEl.textContent='Choose or take a photo first';return}statusEl.textContent='Preparing photo...';try{const compressedImage=await resizeImage(file);statusEl.textContent='Translating photo...';const res=await fetch('/api/photo-translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:compressedImage,targetLanguage:sourceLang.options[sourceLang.selectedIndex].text,sourceLanguage:sourceLang.options[sourceLang.selectedIndex].text,targetVariant:targetVariant.value,resultType,englishStyle,audience,slang})});const data=await res.json();if(!res.ok){statusEl.textContent=data.error||'Photo translation failed';return}input.value=data.detectedText||'';output.value=data.translation||'';saveHistory(input.value,output.value);showScreen('translate');statusEl.textContent='Photo translated'}catch(e){statusEl.textContent='Photo backend error'}};
-document.getElementById('profileOpen').onclick=()=>{document.getElementById('profileDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');renderHistory()};document.getElementById('closeProfile').onclick=()=>{document.getElementById('profileDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open')};document.getElementById('drawerOverlay').onclick=document.getElementById('closeProfile').onclick;renderHistory();
+document.getElementById('profileOpen').onclick=()=>{updateAccountUI();document.getElementById('profileDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');renderHistory()};document.getElementById('closeProfile').onclick=()=>{document.getElementById('profileDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open')};document.getElementById('drawerOverlay').onclick=document.getElementById('closeProfile').onclick;renderHistory();
+
+function openModal(id){document.getElementById(id)?.classList.add('open')}
+function closeModal(id){document.getElementById(id)?.classList.remove('open')}
+function fakeGoogleSignIn(){
+  localStorage.setItem('accountName','Google User');
+  localStorage.setItem('accountMode','signed-in');
+  updateAccountUI();
+  closeModal('accountModal');
+  statusEl.textContent='Signed in preview mode';
+}
+function updateAccountUI(){
+  const mode=localStorage.getItem('accountMode')||'guest';
+  const name=localStorage.getItem('accountName')||'Guest User';
+  const isPremium=localStorage.getItem('premiumActive')==='true';
+  const profileName=document.getElementById('profileName');
+  const profileSub=document.getElementById('profileSub');
+  const badge=document.getElementById('accountBadge');
+  const premiumText=document.getElementById('premiumStatusText');
+  if(profileName)profileName.textContent=name;
+  if(profileSub)profileSub.textContent=mode==='signed-in'?'Google account connected':'Slang Translator AI Member';
+  if(badge)badge.textContent=mode==='signed-in'?'Signed in':'Guest mode';
+  if(premiumText)premiumText.textContent=isPremium?'Premium active on this device.':'No active Premium detected on this device.';
+}
+function restorePurchasePreview(){
+  statusEl.textContent='Restore Purchase will connect to Google Play Billing in the release build.';
+  openModal('purchaseModal');
+}
+function startPremiumPreview(){
+  statusEl.textContent='Google Play Billing setup required before real purchases.';
+}
+document.getElementById('googleSignInBtn')?.addEventListener('click',()=>openModal('accountModal'));
+document.getElementById('simulateGoogleSignIn')?.addEventListener('click',fakeGoogleSignIn);
+document.getElementById('continueGuestBtn')?.addEventListener('click',()=>closeModal('accountModal'));
+document.getElementById('closeAccountModal')?.addEventListener('click',()=>closeModal('accountModal'));
+document.getElementById('openPremiumModal')?.addEventListener('click',()=>openModal('purchaseModal'));
+document.getElementById('profilePremiumBtn')?.addEventListener('click',()=>showScreen('premium'));
+document.getElementById('closePurchaseModal')?.addEventListener('click',()=>closeModal('purchaseModal'));
+document.getElementById('startPremiumBtn')?.addEventListener('click',startPremiumPreview);
+document.getElementById('restorePurchaseBtn')?.addEventListener('click',restorePurchasePreview);
+document.getElementById('profileRestoreBtn')?.addEventListener('click',restorePurchasePreview);
+document.getElementById('modalRestoreBtn')?.addEventListener('click',restorePurchasePreview);
+document.getElementById('openPrivacyBtn')?.addEventListener('click',()=>openModal('privacyModal'));
+document.getElementById('profilePrivacyBtn')?.addEventListener('click',()=>openModal('privacyModal'));
+document.getElementById('closePrivacyModal')?.addEventListener('click',()=>closeModal('privacyModal'));
+document.getElementById('openTermsBtn')?.addEventListener('click',()=>openModal('termsModal'));
+document.getElementById('closeTermsModal')?.addEventListener('click',()=>closeModal('termsModal'));
+document.querySelectorAll('.modal-overlay').forEach(modal=>{modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')})});
+updateAccountUI();
+
 </script>
 </body>
 </html>
