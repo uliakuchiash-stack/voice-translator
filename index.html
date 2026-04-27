@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,6 +59,7 @@ textarea{width:100%;min-height:110px;resize:vertical;line-height:1.42;font-size:
 .privacy-text h3{color:var(--text);margin:14px 0 6px;font-size:15px}
 .account-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(243,181,69,.25);background:rgba(243,181,69,.13);color:var(--gold2);border-radius:999px;padding:7px 10px;font-size:12px;font-weight:900;margin-top:8px}
 
+.real-file-input{position:fixed!important;left:-10000px!important;top:-10000px!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
 </style>
 </head>
 <body>
@@ -90,7 +90,26 @@ textarea{width:100%;min-height:110px;resize:vertical;line-height:1.42;font-size:
 
     <section class="screen" id="screen-dialogue"><div class="card"><div class="card-pad"><div class="result-title"><div><h2>Live Dialogue</h2><p>Two-way conversation translation.</p></div><span class="pill gold">LIVE</span></div><div id="dialogueList"></div><button class="main-btn gold" id="dialogueRecordBtn">🎙 Record reply</button><button class="pill" id="clearDialogueBtn" style="margin-top:10px">Clear dialogue</button></div></div></section>
     <section class="screen" id="screen-vault"><div class="card"><div class="card-pad"><div class="result-title"><div><h2>Vault</h2><p>Saved translations from this device.</p></div><button class="pill" id="clearHistoryBtn">Clear</button></div><div id="historyList"></div></div></div></section>
-    <section class="screen" id="screen-photo"><div class="card"><div class="card-pad"><div class="result-title"><div><h2>Photo Translate</h2><p>Take or upload a photo with text.</p></div><span class="pill violet">OCR</span></div><input class="hidden" id="takePhotoInput" type="file" accept="image/*" capture="environment"><input class="hidden" id="uploadPhotoInput" type="file" accept="image/*"><div class="photo-box" id="photoName">No photo selected</div><div class="muted" id="photoNote" style="margin-top:10px">Photo translation opens result on the Translate screen in this version.</div><div class="quick-row"><button class="pill gold" id="takePhotoBtn">📷 Take photo</button><button class="pill" id="uploadPhotoBtn">🖼 Upload</button></div><button class="main-btn gold" id="photoTranslateBtn">Translate photo</button></div></div></section>
+    <section class="screen" id="screen-photo">
+  <div class="card"><div class="card-pad">
+    <div class="result-title">
+      <div><h2>Photo Translate</h2><p>Take or upload a photo with text.</p></div>
+      <span class="pill violet">OCR</span>
+    </div>
+
+    <input class="real-file-input" id="takePhotoInput" type="file" accept="image/*" capture="environment">
+    <input class="real-file-input" id="uploadPhotoInput" type="file" accept="image/*">
+
+    <div class="photo-box" id="photoName">No photo selected</div>
+
+    <div class="quick-row">
+      <button type="button" class="pill gold" id="takePhotoBtn">📷 Take photo</button>
+      <button type="button" class="pill" id="uploadPhotoBtn">🖼 Upload</button>
+    </div>
+
+    <button class="main-btn gold" id="photoTranslateBtn">Translate photo</button>
+  </div></div>
+</section>
     <section class="screen" id="screen-premium">
   <div class="card"><div class="card-pad">
     <div class="result-title">
@@ -340,52 +359,62 @@ document.querySelectorAll('.modal-overlay').forEach(modal=>{modal.addEventListen
 updateAccountUI();
 
 
+// Final stable photo buttons fix: native file input open, no old conflicts.
 (function(){
-  const photoInput = document.getElementById('photoInput');
+  const takeInput = document.getElementById('takePhotoInput');
+  const uploadInput = document.getElementById('uploadPhotoInput');
+  const takeBtn = document.getElementById('takePhotoBtn');
+  const uploadBtn = document.getElementById('uploadPhotoBtn');
 
-  function tryFindButton(words){
-    const buttons = Array.from(document.querySelectorAll('button'));
-    return buttons.find(btn => words.some(w => (btn.textContent || '').toLowerCase().includes(w)));
-  }
-
-  const takeBtn = document.getElementById('takePhotoBtn') || tryFindButton(['take photo','camera','take']);
-  const uploadBtn = document.getElementById('uploadPhotoBtn') || tryFindButton(['upload','photo']);
-
-  function openPhotoPicker(useCamera){
-    if(!photoInput) return;
-    if(useCamera){
-      photoInput.setAttribute('capture','environment');
-    } else {
-      photoInput.removeAttribute('capture');
+  function safeOpen(input){
+    if(!input){
+      if(typeof statusEl !== 'undefined' && statusEl) statusEl.textContent = 'Photo input not found';
+      return;
     }
-    photoInput.click();
+    input.value = '';
+    input.click();
   }
 
-  if(takeBtn){
-    takeBtn.onclick = function(){ openPhotoPicker(true); };
+  if(takeBtn && takeInput){
+    takeBtn.onclick = function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      takeInput.setAttribute('capture','environment');
+      safeOpen(takeInput);
+    };
   }
 
-  if(uploadBtn){
-    uploadBtn.onclick = function(){ openPhotoPicker(false); };
+  if(uploadBtn && uploadInput){
+    uploadBtn.onclick = function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      uploadInput.removeAttribute('capture');
+      safeOpen(uploadInput);
+    };
   }
 
-  if(photoInput){
-    photoInput.addEventListener('change', function(e){
-      const file = e.target.files && e.target.files[0];
-      if(!file) return;
-      if(typeof statusEl !== 'undefined' && statusEl){
-        statusEl.textContent = 'Processing photo...';
-      }
-      if(typeof window.handlePhotoTranslate === 'function'){
-        window.handlePhotoTranslate(file);
-      }
-    });
+  function onPhotoChosen(e){
+    const file = e.target.files && e.target.files[0];
+    if(typeof setPhotoFile === 'function'){
+      setPhotoFile(file);
+    } else {
+      const box = document.getElementById('photoName');
+      if(box) box.textContent = file ? file.name : 'No photo selected';
+      window.selectedPhotoFile = file || null;
+    }
+    if(typeof statusEl !== 'undefined' && statusEl && file){
+      statusEl.textContent = 'Photo selected';
+    }
+  }
+
+  if(takeInput){
+    takeInput.onchange = onPhotoChosen;
+  }
+  if(uploadInput){
+    uploadInput.onchange = onPhotoChosen;
   }
 })();
 
 </script>
-
-<input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" />
-
 </body>
 </html>
