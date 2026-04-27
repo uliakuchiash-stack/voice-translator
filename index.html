@@ -339,6 +339,53 @@ document.getElementById('closeTermsModal')?.addEventListener('click',()=>closeMo
 document.querySelectorAll('.modal-overlay').forEach(modal=>{modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')})});
 updateAccountUI();
 
+
+(function(){
+  const photoInput = document.getElementById('photoInput');
+
+  function tryFindButton(words){
+    const buttons = Array.from(document.querySelectorAll('button'));
+    return buttons.find(btn => words.some(w => (btn.textContent || '').toLowerCase().includes(w)));
+  }
+
+  const takeBtn = document.getElementById('takePhotoBtn') || tryFindButton(['take photo','camera','take']);
+  const uploadBtn = document.getElementById('uploadPhotoBtn') || tryFindButton(['upload','photo']);
+
+  function openPhotoPicker(useCamera){
+    if(!photoInput) return;
+    if(useCamera){
+      photoInput.setAttribute('capture','environment');
+    } else {
+      photoInput.removeAttribute('capture');
+    }
+    photoInput.click();
+  }
+
+  if(takeBtn){
+    takeBtn.onclick = function(){ openPhotoPicker(true); };
+  }
+
+  if(uploadBtn){
+    uploadBtn.onclick = function(){ openPhotoPicker(false); };
+  }
+
+  if(photoInput){
+    photoInput.addEventListener('change', function(e){
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      if(typeof statusEl !== 'undefined' && statusEl){
+        statusEl.textContent = 'Processing photo...';
+      }
+      if(typeof window.handlePhotoTranslate === 'function'){
+        window.handlePhotoTranslate(file);
+      }
+    });
+  }
+})();
+
 </script>
+
+<input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" />
+
 </body>
 </html>
