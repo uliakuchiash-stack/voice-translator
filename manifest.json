@@ -1,0 +1,17 @@
+{
+  "name": "Slang Translator AI",
+  "short_name": "Slang AI",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#070711",
+  "theme_color": "#070711",
+  "icons": [
+    {
+      "src": "https://placehold.co/512x512/070711/FFFFFF.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
