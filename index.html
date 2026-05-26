@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -158,6 +159,7 @@ textarea{width:100%;min-height:110px;resize:vertical;line-height:1.42;font-size:
         <p class="muted">Review microphone, camera, AI processing, history, purchases and account access.</p>
         <button class="settings-link" id="openPrivacyBtn">Privacy Policy</button>
         <button class="settings-link" id="openTermsBtn">Terms / Premium Rules</button>
+        <button class="settings-link" id="contactSupportBtn">Contact Support</button>
       </div></div></div></section>
   </div>
   <nav class="nav"><button class="nav-btn active" data-screen="translate"><b>↯</b><span>Translate</span></button><button class="nav-btn" data-screen="dialogue"><b>💬</b><span>Dialogue</span></button><button class="nav-btn" data-screen="vault"><b>▣</b><span>Vault</span></button><button class="nav-btn" data-screen="photo"><b>📷</b><span>Photo</span></button><button class="nav-btn" data-screen="premium"><b>★</b><span>Premium</span></button><button class="nav-btn" data-screen="settings"><b>⚙</b><span>Settings</span></button></nav>
@@ -359,6 +361,7 @@ document.getElementById('openPrivacyBtn')?.addEventListener('click',()=>openModa
 document.getElementById('profilePrivacyBtn')?.addEventListener('click',()=>openModal('privacyModal'));
 document.getElementById('closePrivacyModal')?.addEventListener('click',()=>closeModal('privacyModal'));
 document.getElementById('openTermsBtn')?.addEventListener('click',()=>openModal('termsModal'));
+document.getElementById('contactSupportBtn')?.addEventListener('click',()=>{window.location.href='mailto:aislang.business@gmail.com?subject=Slang%20Translator%20AI%20Support'});
 document.getElementById('closeTermsModal')?.addEventListener('click',()=>closeModal('termsModal'));
 document.querySelectorAll('.modal-overlay').forEach(modal=>{modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')})});
 updateAccountUI();
