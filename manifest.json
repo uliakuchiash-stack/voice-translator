@@ -8,9 +8,9 @@
   "theme_color": "#070711",
   "icons": [
     {
-      "src": "https://placehold.co/512x512/070711/FFFFFF.png",
+      "src": "/slang-app-icon-512.jpg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     }
   ]
